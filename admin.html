@@ -399,9 +399,9 @@ body.admin-body,.admin-body{background:#f6f8fb!important;color:#183247!important
         </div>
         <label>Tiêu đề chung <small class="muted">(không bắt buộc)</small><input id="assignmentTitle" placeholder="Ví dụ: Bài tập Petrophysics"></label>
         <label>Chủ đề / mô tả chung<input id="assignmentTopic" placeholder="Ví dụ: Formation Evaluation · Chương 2"></label>
-        <label>Chọn nhiều file<input id="assignmentFile" type="file" multiple required accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx"></label>
-        <div id="selectedFilesPreview" class="selected-files-preview">Chưa chọn file.</div>
-        <small class="muted">Mỗi file sẽ trở thành một Bài riêng. Hệ thống tự tiếp tục Bài 1, Bài 2, Bài 3... trong ngày đã chọn.</small>
+        <label>File đính kèm <small class="muted">(không bắt buộc · có thể chọn nhiều file)</small><input id="assignmentFile" type="file" multiple accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx"></label>
+        <div id="selectedFilesPreview" class="selected-files-preview">Chưa chọn file — bạn vẫn có thể lưu bài tập.</div>
+        <small class="muted">Chọn 1, 2, 3 hoặc nhiều file: mỗi file sẽ thành một Bài riêng. Nếu không chọn file, hệ thống vẫn tạo 1 Bài và bạn có thể gắn file sau bằng nút “Tải lại file”.</small>
         <button class="btn btn-dark" type="submit">Tải lên & lưu tất cả</button>
         <p class="form-status" id="assignmentStatus"></p>
       </form>
@@ -687,7 +687,7 @@ const subjectModal=$('#subjectModal');
 function openAssignmentModal(){
   $('#assignmentForm').reset();
   $('#assignmentStatus').textContent='';
-  $('#selectedFilesPreview').textContent='Chưa chọn file.';
+  $('#selectedFilesPreview').textContent='Chưa chọn file — bạn vẫn có thể lưu bài tập.';
   $('#assignmentDate').value=localToday();
   populateAssignmentSubjectSelect();
   assignmentModal.classList.add('open');assignmentModal.setAttribute('aria-hidden','false');document.body.classList.add('modal-open');
@@ -696,7 +696,7 @@ function closeAssignmentModal(){ assignmentModal.classList.remove('open');assign
 $('#addAssignmentBtn')?.addEventListener('click',openAssignmentModal);$('#assignmentModalClose')?.addEventListener('click',closeAssignmentModal);assignmentModal?.addEventListener('click',e=>{if(e.target===assignmentModal)closeAssignmentModal();});
 $('#assignmentFile')?.addEventListener('change',event=>{
   const files=[...(event.target.files||[])];
-  $('#selectedFilesPreview').innerHTML=files.length?files.map((f,i)=>`<span><b>${i+1}.</b> ${esc(f.name)}</span>`).join(''):'Chưa chọn file.';
+  $('#selectedFilesPreview').innerHTML=files.length?files.map((f,i)=>`<span><b>${i+1}.</b> ${esc(f.name)}</span>`).join(''):'Chưa chọn file — bạn vẫn có thể lưu bài tập.';
 });
 
 function openSubjectModal(){ $('#subjectStatus').textContent='';renderSubjects();subjectModal.classList.add('open');subjectModal.setAttribute('aria-hidden','false');document.body.classList.add('modal-open'); }
@@ -724,38 +724,49 @@ $('#assignmentForm')?.addEventListener('submit',async event=>{
   const files=[...($('#assignmentFile').files||[])];
   if(!assignmentDate){$('#assignmentStatus').textContent='Hãy chọn ngày học.';return;}
   if(!subject){$('#assignmentStatus').textContent='Hãy chọn môn học.';return;}
-  if(!files.length){$('#assignmentStatus').textContent='Hãy chọn ít nhất một file.';return;}
+  if(!files.length && titlePrefix.length<2){$('#assignmentStatus').textContent='Nếu không chọn file, hãy nhập tiêu đề bài tập.';return;}
   const tooLarge=files.find(file=>file.size>24*1024*1024);
   if(tooLarge){$('#assignmentStatus').textContent=`File “${tooLarge.name}” vượt quá 24 MB.`;return;}
   const button=form.querySelector('button[type="submit"]');button.disabled=true;
   const uploadedPaths=[];const insertedIds=[];
   try{
     const maxExisting=assignments.filter(a=>a.assignmentDate===assignmentDate).reduce((m,a)=>Math.max(m,a.assignmentNumber),0);
-    for(let i=0;i<files.length;i++){
-      const file=files[i];
+    const items=files.length?files:[null];
+    for(let i=0;i<items.length;i++){
+      const file=items[i];
       const number=maxExisting+i+1;
       const id=`a_${Date.now()}_${i}_${Math.random().toString(36).slice(2,7)}`;
-      const path=`date-${assignmentDate}/${id}/${Date.now()}-${safeName(file.name)}`;
-      $('#assignmentStatus').textContent=`Đang tải ${i+1}/${files.length}: ${file.name}`;
-      const up=await sb.storage.from('assignments').upload(path,file,{upsert:false,contentType:file.type||undefined});
-      if(up.error)throw up.error;
-      uploadedPaths.push(path);
-      const fileUrl=sb.storage.from('assignments').getPublicUrl(path).data.publicUrl;
-      const ext=(file.name.split('.').pop()||'FILE').toUpperCase();
-      const title=titlePrefix ? (files.length===1?titlePrefix:`${titlePrefix} ${number}`) : fileBaseName(file.name);
-      const row={id,type:ext,title,topic,subject,assignment_date:assignmentDate,assignment_number:number,date_text:formatAssignmentDate(assignmentDate),file_name:file.name,file_url:fileUrl,file_path:path,published:true};
+      let path='',fileUrl='',fileName='',ext='BÀI';
+      if(file){
+        path=`date-${assignmentDate}/${id}/${Date.now()}-${safeName(file.name)}`;
+        $('#assignmentStatus').textContent=`Đang tải ${i+1}/${items.length}: ${file.name}`;
+        const up=await sb.storage.from('assignments').upload(path,file,{upsert:false,contentType:file.type||undefined});
+        if(up.error)throw up.error;
+        uploadedPaths.push(path);
+        fileUrl=sb.storage.from('assignments').getPublicUrl(path).data.publicUrl;
+        fileName=file.name;
+        ext=(file.name.split('.').pop()||'FILE').toUpperCase();
+      }else{
+        $('#assignmentStatus').textContent='Đang lưu bài tập không có file đính kèm…';
+      }
+      const title=file
+        ? (titlePrefix ? (items.length===1?titlePrefix:`${titlePrefix} ${number}`) : fileBaseName(file.name))
+        : titlePrefix;
+      const row={id,type:ext,title,topic,subject,assignment_date:assignmentDate,assignment_number:number,date_text:formatAssignmentDate(assignmentDate),file_name:fileName,file_url:fileUrl,file_path:path,published:true};
       const {error}=await sb.from('assignments').insert(row);
       if(error)throw error;
       insertedIds.push(id);
     }
-    form.reset();$('#selectedFilesPreview').textContent='Chưa chọn file.';
-    $('#assignmentStatus').textContent=`Đã lưu ${files.length} bài vào ngày ${formatAssignmentDate(assignmentDate)}.`;
-    await loadAdminData();notifyPublicContentChanged('assignments');toast(`Đã tải lên ${files.length} bài tập`);
+    form.reset();$('#selectedFilesPreview').textContent='Chưa chọn file — bạn vẫn có thể lưu bài tập.';
+    const savedCount=items.length;
+    $('#assignmentStatus').textContent=`Đã lưu ${savedCount} bài vào ngày ${formatAssignmentDate(assignmentDate)}.`;
+    await loadAdminData();notifyPublicContentChanged('assignments');
+    toast(files.length?`Đã tải lên ${savedCount} bài tập`:'Đã tạo bài tập chưa có file');
     setTimeout(closeAssignmentModal,900);
   }catch(e){
     if(insertedIds.length) await sb.from('assignments').delete().in('id',insertedIds).catch(()=>{});
     if(uploadedPaths.length) await sb.storage.from('assignments').remove(uploadedPaths).catch(()=>{});
-    $('#assignmentStatus').textContent=e.message||'Không tải được nhóm bài tập.';
+    $('#assignmentStatus').textContent=e.message||'Không lưu được bài tập.';
   }finally{button.disabled=false;}
 });
 
