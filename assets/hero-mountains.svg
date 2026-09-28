@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice">
+<defs>
+  <linearGradient id="sky" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#071A2C"/><stop offset=".52" stop-color="#0B3E68"/><stop offset="1" stop-color="#187B9A"/></linearGradient>
+  <radialGradient id="sun"><stop stop-color="#FFE5A0" stop-opacity=".95"/><stop offset="1" stop-color="#EBAE3B" stop-opacity="0"/></radialGradient>
+  <linearGradient id="ridge1" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#173B5F"/><stop offset="1" stop-color="#0B243A"/></linearGradient>
+  <linearGradient id="ridge2" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#205A75"/><stop offset="1" stop-color="#0B2D43"/></linearGradient>
+  <linearGradient id="river" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#87D5E4"/><stop offset=".5" stop-color="#E9FAFF"/><stop offset="1" stop-color="#2B95B6"/></linearGradient>
+  <pattern id="contours" width="160" height="120" patternUnits="userSpaceOnUse">
+    <path d="M0 70C35 35 85 28 160 55M0 94C45 58 100 54 160 76M18 120C54 89 112 83 160 98" fill="none" stroke="#D7E7F2" stroke-opacity=".1" stroke-width="1.2"/>
+  </pattern>
+</defs>
+<rect width="1600" height="900" fill="url(#sky)"/>
+<circle cx="1260" cy="155" r="220" fill="url(#sun)"/>
+<rect width="620" height="900" fill="url(#contours)" opacity=".9"/>
+<path d="M0 520 160 380 280 465 430 300 565 442 720 275 875 440 1030 335 1170 455 1335 300 1600 485V900H0Z" fill="#86A8B8" opacity=".22"/>
+<path d="M0 600 180 455 320 560 500 365 630 520 770 390 930 565 1090 420 1220 550 1390 395 1600 590V900H0Z" fill="url(#ridge2)"/>
+<path d="M0 690 220 535 360 650 545 455 690 615 820 505 960 650 1145 520 1290 640 1460 520 1600 635V900H0Z" fill="url(#ridge1)"/>
+<path d="M1600 720C1370 690 1255 696 1110 750c-150 56-242 97-425 67-177-29-285-13-430 83H1600Z" fill="#0A2133" opacity=".88"/>
+<path d="M1600 730c-250-14-368 8-511 70-147 64-279 56-423 30-159-29-300 7-476 70" fill="none" stroke="url(#river)" stroke-width="24" stroke-linecap="round" opacity=".75"/>
+<path d="M1600 744c-242-9-358 12-500 72-143 61-276 55-421 32-155-25-287 5-456 62" fill="none" stroke="#DDF7FF" stroke-width="6" stroke-linecap="round" opacity=".75"/>
+<g fill="none" stroke="#F0C15B" stroke-width="3" opacity=".55"><path d="M1150 205h160"/><path d="M1170 220h120"/></g>
+</svg>
