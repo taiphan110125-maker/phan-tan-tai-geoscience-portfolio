@@ -264,6 +264,23 @@ body.admin-body,.admin-body{background:#f6f8fb!important;color:#183247!important
 @media(max-width:720px){.assignment-batch-grid,.subject-add-form{grid-template-columns:1fr}.admin-assignment-actions{justify-content:flex-start}.subject-manager-row{align-items:flex-start;flex-direction:column}.subject-manager-row>div:last-child{justify-content:flex-start}}
 
 </style>
+<style id="ptt-project-report-admin">
+
+.project-report-editor{margin-top:4px;padding:15px;border:1px solid #dfe7ed;border-radius:14px;background:#f8fafc}
+.project-report-editor-head{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:11px}
+.project-report-editor-head strong{display:block;color:#17324a;font-size:12px}.project-report-editor-head small{display:block;color:#7c8e9b;font-size:9px;margin-top:2px}
+.project-report-picker{position:relative;display:inline-flex;align-items:center;padding:9px 12px;border:1px solid #cfdce5;border-radius:9px;background:#fff;color:#2e6796;font-size:10px;font-weight:800;cursor:pointer;white-space:nowrap}
+.project-report-picker input{position:absolute;inset:0;opacity:0;cursor:pointer}
+.project-report-preview{display:grid;gap:7px}
+.project-report-none{padding:12px;text-align:center;color:#83939f;border:1px dashed #d7e1e8;border-radius:10px;background:#fff;font-size:10px}
+.project-report-admin-item{display:grid;grid-template-columns:42px minmax(0,1fr) auto;align-items:center;gap:10px;padding:9px 10px;background:#fff;border:1px solid #e0e8ee;border-radius:10px}
+.project-report-admin-item.pending{border-style:dashed;background:#fbfcfd}
+.project-report-admin-item .report-type{width:38px;height:38px;display:grid;place-items:center;border-radius:9px;background:#17324a;color:#fff;font-size:8px;font-weight:900}
+.project-report-admin-item strong{display:block;color:#27465d;font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.project-report-admin-item small{display:block;color:#8a99a4;font-size:8px;margin-top:2px}
+@media(max-width:640px){.project-report-editor-head{align-items:flex-start;flex-direction:column}.project-report-picker{width:100%;justify-content:center}}
+
+</style>
 </head>
 <body class="admin-body">
   <header class="admin-topbar">
@@ -379,6 +396,13 @@ body.admin-body,.admin-body{background:#f6f8fb!important;color:#183247!important
           </div>
           <div class="project-image-preview"><img id="projectImagePreview" src="assets/hero-geoscience.svg" alt="Xem trước ảnh dự án"></div>
         </div>
+        <div class="project-report-editor">
+          <div class="project-report-editor-head">
+            <div><strong>File báo cáo dự án</strong><small>Có thể tải nhiều PDF, DOCX, PPTX hoặc XLSX. Tối đa 24 MB mỗi file.</small></div>
+            <label class="project-report-picker">+ Chọn file<input id="projectReportFiles" type="file" multiple accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx"></label>
+          </div>
+          <div id="projectReportPreview" class="project-report-preview">Chưa có file báo cáo.</div>
+        </div>
         <div class="admin-form-actions">
           <button class="btn btn-outline admin-cancel" type="button" id="projectCancelBtn">Hủy</button>
           <button class="btn btn-dark" type="submit" id="projectSaveBtn">Lưu dự án</button>
@@ -468,13 +492,15 @@ const sb = window.pttSupabase;
 let projects = [], assignments = [], comments = [], messages = [], subjects = [];
 let adminUser = null;
 let pendingProjectImageFile = null;
+let pendingProjectReportFiles = [];
+let removedProjectReportPaths = new Set();
 
 function esc(value = ''){ return String(value).replace(/[&<>'"]/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[char])); }
 function toast(message){ const el=$('#toast'); if(!el)return; el.textContent=message; el.classList.add('show'); clearTimeout(toast.timer); toast.timer=setTimeout(()=>el.classList.remove('show'),2200); }
 function requireSupabase(){ if(!sb) throw new Error('Chưa cấu hình Supabase.'); return sb; }
 function safeName(name='file'){ return name.normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^A-Za-z0-9._-]+/g,'-').replace(/^-+|-+$/g,'').slice(-100) || 'file'; }
 function notifyPublicContentChanged(kind){ try { new BroadcastChannel('ptt-content-sync').postMessage({kind,at:Date.now()}); } catch {} }
-function mapProject(r){ return {id:r.id,title:r.title,type:r.type,image:r.image_url||'',imagePath:r.image_path||'',summary:r.summary||'',tags:r.tags||[],objective:r.objective||'',data:r.data_text||'',method:r.method||'',output:r.output||'',sortOrder:r.sort_order||0}; }
+function mapProject(r){ return {id:r.id,title:r.title,type:r.type,image:r.image_url||'',imagePath:r.image_path||'',summary:r.summary||'',tags:r.tags||[],objective:r.objective||'',data:r.data_text||'',method:r.method||'',output:r.output||'',reportFiles:Array.isArray(r.report_files)?r.report_files:[],sortOrder:r.sort_order||0}; }
 function formatAssignmentDate(value=''){ const p=String(value||'').split('-'); return p.length===3?`${p[2]}/${p[1]}/${p[0]}`:String(value||''); }
 function localToday(){ const d=new Date(); const y=d.getFullYear(); const m=String(d.getMonth()+1).padStart(2,'0'); const day=String(d.getDate()).padStart(2,'0'); return `${y}-${m}-${day}`; }
 function mapAssignment(r, counts){ return {id:r.id,type:r.type,title:r.title,topic:r.topic||'',subject:r.subject||'other',assignmentDate:r.assignment_date||'',assignmentNumber:Number(r.assignment_number||1),date:r.assignment_date?formatAssignmentDate(r.assignment_date):(r.date_text||''),fileName:r.file_name||'',fileUrl:r.file_url||'',filePath:r.file_path||'',commentCount:counts[r.id]||0}; }
@@ -553,7 +579,7 @@ function renderSubjects(){
       </div>
     </div>`).join(''):'<div class="empty-state">Chưa có môn học.</div>';
 }
-function renderProjects(){ const q=($('#projectSearch')?.value||'').trim().toLowerCase(); const filtered=projects.filter(p=>`${p.title} ${p.type} ${(p.tags||[]).join(' ')}`.toLowerCase().includes(q)); $('#adminProjectRows').innerHTML=filtered.length?filtered.map(p=>`<tr><td><div class="admin-project-title"><img src="${esc(p.image||'assets/hero-geoscience.svg')}" alt=""><div><strong>${esc(p.title)}</strong><small>${esc((p.summary||'').slice(0,105))}${(p.summary||'').length>105?'…':''}</small></div></div></td><td>${esc(p.type||'—')}</td><td><div class="admin-tag-list">${(p.tags||[]).slice(0,3).map(t=>`<span>${esc(t)}</span>`).join('')||'<span>Chưa có</span>'}</div></td><td><small>${p.imagePath?'Supabase Storage':esc(p.image||'Mặc định')}</small></td><td><div class="admin-row-actions"><button class="edit-btn" data-edit-project="${esc(p.id)}">Sửa</button><button class="danger-btn" data-delete-project="${esc(p.id)}">Xóa</button></div></td></tr>`).join(''):'<tr><td colspan="5"><div class="empty-state">Không tìm thấy dự án phù hợp.</div></td></tr>'; }
+function renderProjects(){ const q=($('#projectSearch')?.value||'').trim().toLowerCase(); const filtered=projects.filter(p=>`${p.title} ${p.type} ${(p.tags||[]).join(' ')}`.toLowerCase().includes(q)); $('#adminProjectRows').innerHTML=filtered.length?filtered.map(p=>`<tr><td><div class="admin-project-title"><img src="${esc(p.image||'assets/hero-geoscience.svg')}" alt=""><div><strong>${esc(p.title)}</strong><small>${esc((p.summary||'').slice(0,105))}${(p.summary||'').length>105?'…':''} · ${p.reportFiles.length} file báo cáo</small></div></div></td><td>${esc(p.type||'—')}</td><td><div class="admin-tag-list">${(p.tags||[]).slice(0,3).map(t=>`<span>${esc(t)}</span>`).join('')||'<span>Chưa có</span>'}</div></td><td><small>${p.imagePath?'Supabase Storage':esc(p.image||'Mặc định')}</small></td><td><div class="admin-row-actions"><button class="edit-btn" data-edit-project="${esc(p.id)}">Sửa</button><button class="danger-btn" data-delete-project="${esc(p.id)}">Xóa</button></div></td></tr>`).join(''):'<tr><td colspan="5"><div class="empty-state">Không tìm thấy dự án phù hợp.</div></td></tr>'; }
 function renderFeedback(){ $('#feedbackList').innerHTML=comments.length?comments.map(c=>`<div class="feedback-item"><div class="feedback-item-head"><strong>${esc(c.name)} · ${esc(c.role)}</strong><small>${new Date(c.createdAt).toLocaleString('vi-VN')}</small></div><p><b>${esc(c.assignmentTitle||'Bài tập')}</b><br>${esc(c.text)}</p><button class="danger-btn" data-delete-comment="${esc(c.id)}">Xóa nhận xét</button></div>`).join(''):'<div class="empty-state">Chưa có nhận xét.</div>'; }
 function renderMessages(){ $('#messageList').innerHTML=messages.length?messages.map(m=>`<div class="message-item"><div class="message-item-head"><strong>${esc(m.name)} · ${esc(m.topic||'Liên hệ')}</strong><small>${new Date(m.createdAt).toLocaleString('vi-VN')}</small></div><p>${esc(m.email)}<br>${esc(m.message)}</p><button class="danger-btn" data-delete-message="${esc(m.id)}">Xóa lời nhắn</button></div>`).join(''):'<div class="empty-state">Chưa có lời nhắn.</div>'; }
 function renderAll(){ renderMetrics();renderDashboard();renderAssignments();renderProjects();renderFeedback();renderMessages();renderSubjects();populateAssignmentSubjectSelect(); }
@@ -676,7 +702,7 @@ document.addEventListener('click',async event=>{
   if(da){ const id=da.dataset.deleteAssignment; const item=assignments.find(a=>a.id===id); if(!item||!confirm(`Xóa ${formatAssignmentDate(item.assignmentDate)} · Bài ${item.assignmentNumber} “${item.title}”?\n\nFile đính kèm và nhận xét liên quan sẽ bị xóa.`))return; try{ const sourceDate=item.assignmentDate; if(item.filePath) await sb.storage.from('assignments').remove([item.filePath]); const {error}=await sb.from('assignments').delete().eq('id',id); if(error)throw error; assignments=assignments.filter(a=>a.id!==id); await normalizeAssignmentNumbers(sourceDate); await loadAdminData();notifyPublicContentChanged('assignments');toast('Đã xóa bài tập'); }catch(e){toast(e.message);} return; }
   const ep=event.target.closest('[data-edit-project]'); if(ep){ const p=projects.find(x=>x.id===ep.dataset.editProject); if(p)openProjectEditor(p); return; }
   const dp=event.target.closest('[data-delete-project]');
-  if(dp){ const id=dp.dataset.deleteProject; const p=projects.find(x=>x.id===id); if(!p||!confirm(`Xóa dự án “${p.title}”?\n\nDự án sẽ biến mất khỏi website công khai.`))return; try{ if(p.imagePath) await sb.storage.from('project-images').remove([p.imagePath]); const {error}=await sb.from('projects').delete().eq('id',id); if(error)throw error; await loadAdminData();notifyPublicContentChanged('projects');toast('Đã xóa dự án'); }catch(e){toast(e.message);} return; }
+  if(dp){ const id=dp.dataset.deleteProject; const p=projects.find(x=>x.id===id); if(!p||!confirm(`Xóa dự án “${p.title}”?\n\nDự án, ảnh và các file báo cáo đính kèm sẽ bị xóa.`))return; try{ if(p.imagePath) await sb.storage.from('project-images').remove([p.imagePath]); const reportPaths=(p.reportFiles||[]).map(f=>f.path).filter(Boolean); if(reportPaths.length) await sb.storage.from('project-reports').remove(reportPaths); const {error}=await sb.from('projects').delete().eq('id',id); if(error)throw error; await loadAdminData();notifyPublicContentChanged('projects');toast('Đã xóa dự án'); }catch(e){toast(e.message);} return; }
   const dc=event.target.closest('[data-delete-comment]'); if(dc){ if(!confirm('Xóa nhận xét này?'))return; const {error}=await sb.from('comments').delete().eq('id',dc.dataset.deleteComment); if(error)toast(error.message); else{await loadAdminData();toast('Đã xóa nhận xét');} return; }
   const dm=event.target.closest('[data-delete-message]'); if(dm){ if(!confirm('Xóa lời nhắn này?'))return; const {error}=await sb.from('messages').delete().eq('id',dm.dataset.deleteMessage); if(error)toast(error.message); else{await loadAdminData();toast('Đã xóa lời nhắn');} }
 });
@@ -773,23 +799,105 @@ $('#assignmentForm')?.addEventListener('submit',async event=>{
 // Project editor
 const projectModal=$('#projectAdminModal');
 function setProjectPreview(src){$('#projectImagePreview').src=src||'assets/hero-geoscience.svg';}
-function resetProjectForm(){ $('#projectForm').reset();$('#projectId').value='';$('#projectStatus').textContent='';$('#projectFormEyebrow').textContent='NEW PROJECT';$('#projectFormHeading').textContent='Thêm dự án & nghiên cứu';$('#projectSaveBtn').textContent='Lưu dự án';$('#projectImage').value='assets/hero-geoscience.svg';pendingProjectImageFile=null;setProjectPreview('assets/hero-geoscience.svg'); }
-function openProjectEditor(project=null){ resetProjectForm(); if(project){$('#projectId').value=project.id;$('#projectTitle').value=project.title||'';$('#projectType').value=project.type||'';$('#projectSummary').value=project.summary||'';$('#projectTags').value=(project.tags||[]).join(', ');$('#projectObjective').value=project.objective||'';$('#projectData').value=project.data||'';$('#projectMethod').value=project.method||'';$('#projectOutput').value=project.output||'';$('#projectImage').value=project.imagePath?'':(project.image||'');setProjectPreview(project.image);$('#projectFormEyebrow').textContent='EDIT PROJECT';$('#projectFormHeading').textContent='Chỉnh sửa dự án';$('#projectSaveBtn').textContent='Lưu thay đổi';} projectModal.classList.add('open');projectModal.setAttribute('aria-hidden','false');document.body.classList.add('modal-open');setTimeout(()=>$('#projectTitle').focus(),80); }
+function reportType(name=''){ return (name.split('.').pop()||'FILE').toUpperCase(); }
+function currentEditingProject(){ const id=$('#projectId').value; return projects.find(p=>p.id===id)||null; }
+function renderProjectReportPreview(project=null){
+  const host=$('#projectReportPreview'); if(!host)return;
+  const existing=(project?.reportFiles||[]).filter(f=>!removedProjectReportPaths.has(f.path));
+  const pending=pendingProjectReportFiles;
+  if(!existing.length&&!pending.length){ host.innerHTML='<div class="project-report-none">Chưa có file báo cáo.</div>'; return; }
+  host.innerHTML=[
+    ...existing.map((f,i)=>`<div class="project-report-admin-item"><span class="report-type">${esc(f.type||reportType(f.name))}</span><div><strong>${esc(f.name||'Báo cáo dự án')}</strong><small>Đã lưu trên hệ thống</small></div><button type="button" class="danger-btn" data-remove-project-report="${esc(f.path||String(i))}">Xóa</button></div>`),
+    ...pending.map((f,i)=>`<div class="project-report-admin-item pending"><span class="report-type">${esc(reportType(f.name))}</span><div><strong>${esc(f.name)}</strong><small>Chờ tải lên khi bấm Lưu dự án</small></div><button type="button" class="danger-btn" data-remove-pending-report="${i}">Bỏ</button></div>`)
+  ].join('');
+}
+function resetProjectForm(){ $('#projectForm').reset();$('#projectId').value='';$('#projectStatus').textContent='';$('#projectFormEyebrow').textContent='NEW PROJECT';$('#projectFormHeading').textContent='Thêm dự án & nghiên cứu';$('#projectSaveBtn').textContent='Lưu dự án';$('#projectImage').value='assets/hero-geoscience.svg';pendingProjectImageFile=null;pendingProjectReportFiles=[];removedProjectReportPaths=new Set();setProjectPreview('assets/hero-geoscience.svg');renderProjectReportPreview(); }
+function openProjectEditor(project=null){ resetProjectForm(); if(project){$('#projectId').value=project.id;$('#projectTitle').value=project.title||'';$('#projectType').value=project.type||'';$('#projectSummary').value=project.summary||'';$('#projectTags').value=(project.tags||[]).join(', ');$('#projectObjective').value=project.objective||'';$('#projectData').value=project.data||'';$('#projectMethod').value=project.method||'';$('#projectOutput').value=project.output||'';$('#projectImage').value=project.imagePath?'':(project.image||'');setProjectPreview(project.image);$('#projectFormEyebrow').textContent='EDIT PROJECT';$('#projectFormHeading').textContent='Chỉnh sửa dự án';$('#projectSaveBtn').textContent='Lưu thay đổi';renderProjectReportPreview(project);} projectModal.classList.add('open');projectModal.setAttribute('aria-hidden','false');document.body.classList.add('modal-open');setTimeout(()=>$('#projectTitle').focus(),80); }
 function closeProjectEditor(){ projectModal.classList.remove('open');projectModal.setAttribute('aria-hidden','true');if(!$('.modal.open'))document.body.classList.remove('modal-open'); }
 $('#addProjectBtn')?.addEventListener('click',()=>openProjectEditor());$('#projectAdminModalClose')?.addEventListener('click',closeProjectEditor);$('#projectCancelBtn')?.addEventListener('click',closeProjectEditor);projectModal?.addEventListener('click',e=>{if(e.target===projectModal)closeProjectEditor();});
 $('#projectImage')?.addEventListener('input',e=>{const v=e.target.value.trim();if(v){pendingProjectImageFile=null;setProjectPreview(v);}});
 $('#projectImageFile')?.addEventListener('change',event=>{const file=event.target.files[0];if(!file)return;if(!file.type.startsWith('image/')){$('#projectStatus').textContent='Tệp đã chọn không phải ảnh.';return;}if(file.size>6*1024*1024){$('#projectStatus').textContent='Ảnh vượt quá 6 MB.';return;}pendingProjectImageFile=file;$('#projectImage').value='';setProjectPreview(URL.createObjectURL(file));$('#projectStatus').textContent=`Đã chọn ảnh: ${file.name}`;});
+$('#projectReportFiles')?.addEventListener('change',event=>{
+  const selected=[...(event.target.files||[])];
+  const invalid=selected.find(file=>file.size>24*1024*1024);
+  if(invalid){$('#projectStatus').textContent=`File “${invalid.name}” vượt quá 24 MB.`;event.target.value='';return;}
+  pendingProjectReportFiles=[...pendingProjectReportFiles,...selected];
+  event.target.value='';
+  renderProjectReportPreview(currentEditingProject());
+});
+document.addEventListener('click',event=>{
+  const removeExisting=event.target.closest('[data-remove-project-report]');
+  if(removeExisting){
+    removedProjectReportPaths.add(removeExisting.dataset.removeProjectReport);
+    renderProjectReportPreview(currentEditingProject());return;
+  }
+  const removePending=event.target.closest('[data-remove-pending-report]');
+  if(removePending){
+    pendingProjectReportFiles.splice(Number(removePending.dataset.removePendingReport),1);
+    renderProjectReportPreview(currentEditingProject());
+  }
+});
 $('#projectForm')?.addEventListener('submit',async event=>{
-  event.preventDefault(); const title=$('#projectTitle').value.trim(),type=$('#projectType').value.trim(),summary=$('#projectSummary').value.trim(); if(title.length<3||type.length<2||summary.length<10){$('#projectStatus').textContent='Vui lòng nhập đầy đủ tiêu đề, lĩnh vực và phần tóm tắt.';return;} const button=$('#projectSaveBtn');button.disabled=true;$('#projectStatus').textContent='Đang lưu dự án lên cloud…'; let newPath='';
+  event.preventDefault();
+  const title=$('#projectTitle').value.trim(),type=$('#projectType').value.trim(),summary=$('#projectSummary').value.trim();
+  if(title.length<3||type.length<2||summary.length<10){$('#projectStatus').textContent='Vui lòng nhập đầy đủ tiêu đề, lĩnh vực và phần tóm tắt.';return;}
+  const button=$('#projectSaveBtn');button.disabled=true;$('#projectStatus').textContent='Đang lưu dự án lên cloud…';
+  let newImagePath=''; const newReportPaths=[];
   try{
-    const id=$('#projectId').value||`p_${Date.now()}`;const oldProject=projects.find(p=>p.id===id);let imageUrl=$('#projectImage').value.trim()||oldProject?.image||'assets/hero-geoscience.svg';let imagePath=oldProject?.imagePath||'';
-    if(pendingProjectImageFile){ newPath=`${id}/${Date.now()}-${safeName(pendingProjectImageFile.name)}`; const up=await sb.storage.from('project-images').upload(newPath,pendingProjectImageFile,{upsert:false,contentType:pendingProjectImageFile.type}); if(up.error)throw up.error; imageUrl=sb.storage.from('project-images').getPublicUrl(newPath).data.publicUrl; imagePath=newPath; }
-    const row={id,title,type,image_url:imageUrl,image_path:imagePath,summary,tags:$('#projectTags').value.split(',').map(t=>t.trim()).filter(Boolean).slice(0,8),objective:$('#projectObjective').value.trim(),data_text:$('#projectData').value.trim(),method:$('#projectMethod').value.trim(),output:$('#projectOutput').value.trim(),sort_order:oldProject?.sortOrder??projects.length,published:true,updated_at:new Date().toISOString()};
-    const {error}=await sb.from('projects').upsert(row,{onConflict:'id'});if(error)throw error;
-    if(newPath&&oldProject?.imagePath&&oldProject.imagePath!==newPath)await sb.storage.from('project-images').remove([oldProject.imagePath]).catch(()=>{});
-    await loadAdminData();notifyPublicContentChanged('projects');$('#projectStatus').textContent=oldProject?'Đã lưu thay đổi.':'Đã thêm dự án mới.';toast(oldProject?'Đã cập nhật dự án':'Đã thêm dự án');setTimeout(closeProjectEditor,520);
-  }catch(e){ if(newPath)await sb.storage.from('project-images').remove([newPath]).catch(()=>{});$('#projectStatus').textContent=e.message||'Không lưu được dự án.'; }
-  finally{button.disabled=false;pendingProjectImageFile=null;}
+    const id=$('#projectId').value||`p_${Date.now()}`;
+    const oldProject=projects.find(p=>p.id===id);
+    let imageUrl=$('#projectImage').value.trim()||oldProject?.image||'assets/hero-geoscience.svg';
+    let imagePath=oldProject?.imagePath||'';
+    if(pendingProjectImageFile){
+      newImagePath=`${id}/${Date.now()}-${safeName(pendingProjectImageFile.name)}`;
+      const up=await sb.storage.from('project-images').upload(newImagePath,pendingProjectImageFile,{upsert:false,contentType:pendingProjectImageFile.type});
+      if(up.error)throw up.error;
+      imageUrl=sb.storage.from('project-images').getPublicUrl(newImagePath).data.publicUrl;
+      imagePath=newImagePath;
+    }
+
+    const keptReports=(oldProject?.reportFiles||[]).filter(file=>!removedProjectReportPaths.has(file.path));
+    const addedReports=[];
+    for(let i=0;i<pendingProjectReportFiles.length;i++){
+      const file=pendingProjectReportFiles[i];
+      $('#projectStatus').textContent=`Đang tải báo cáo ${i+1}/${pendingProjectReportFiles.length}: ${file.name}`;
+      const path=`${id}/${Date.now()}-${i}-${safeName(file.name)}`;
+      const up=await sb.storage.from('project-reports').upload(path,file,{upsert:false,contentType:file.type||'application/octet-stream'});
+      if(up.error)throw up.error;
+      newReportPaths.push(path);
+      const url=sb.storage.from('project-reports').getPublicUrl(path).data.publicUrl;
+      addedReports.push({name:file.name,type:reportType(file.name),path,url});
+    }
+    const reportFiles=[...keptReports,...addedReports];
+
+    const row={
+      id,title,type,image_url:imageUrl,image_path:imagePath,summary,
+      tags:$('#projectTags').value.split(',').map(t=>t.trim()).filter(Boolean).slice(0,8),
+      objective:$('#projectObjective').value.trim(),data_text:$('#projectData').value.trim(),
+      method:$('#projectMethod').value.trim(),output:$('#projectOutput').value.trim(),
+      report_files:reportFiles,
+      sort_order:oldProject?.sortOrder??projects.length,published:true,updated_at:new Date().toISOString()
+    };
+    const {error}=await sb.from('projects').upsert(row,{onConflict:'id'});
+    if(error)throw error;
+
+    if(newImagePath&&oldProject?.imagePath&&oldProject.imagePath!==newImagePath) await sb.storage.from('project-images').remove([oldProject.imagePath]).catch(()=>{});
+    const removed=[...(oldProject?.reportFiles||[])].map(f=>f.path).filter(path=>path&&removedProjectReportPaths.has(path));
+    if(removed.length) await sb.storage.from('project-reports').remove(removed).catch(()=>{});
+
+    await loadAdminData();notifyPublicContentChanged('projects');
+    $('#projectStatus').textContent=oldProject?'Đã lưu thay đổi.':'Đã thêm dự án mới.';
+    toast(oldProject?'Đã cập nhật dự án':'Đã thêm dự án');
+    setTimeout(closeProjectEditor,650);
+  }catch(e){
+    if(newImagePath) await sb.storage.from('project-images').remove([newImagePath]).catch(()=>{});
+    if(newReportPaths.length) await sb.storage.from('project-reports').remove(newReportPaths).catch(()=>{});
+    $('#projectStatus').textContent=e.message||'Không lưu được dự án.';
+  }finally{
+    button.disabled=false;
+    pendingProjectImageFile=null;
+    pendingProjectReportFiles=[];
+  }
 });
 
 document.addEventListener('keydown',event=>{if(event.key!=='Escape')return;if(projectModal?.classList.contains('open'))closeProjectEditor();if(assignmentModal?.classList.contains('open'))closeAssignmentModal();});

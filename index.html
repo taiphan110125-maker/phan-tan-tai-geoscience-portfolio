@@ -474,6 +474,22 @@ body{background:#fff;color:var(--ink);font-family:"Segoe UI",Arial,Helvetica,san
 }
 
 </style>
+<style id="ptt-project-reports">
+
+.project-report-section{margin-top:24px;padding-top:20px;border-top:1px solid #e1e8ee}
+.project-report-heading{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:12px}
+.project-report-heading span{display:block;color:#8a6a2d;font-size:9px;font-weight:900;letter-spacing:.15em;margin-bottom:3px}
+.project-report-heading h4{margin:0;color:#17324a;font-size:18px}
+.project-report-heading>strong{font-size:10px;color:#63798b;background:#f1f5f8;border-radius:999px;padding:6px 9px}
+.project-report-list{display:grid;gap:8px}
+.project-report-file{width:100%;display:grid;grid-template-columns:48px minmax(0,1fr) auto;gap:12px;align-items:center;text-align:left;border:1px solid #dfe7ed;background:#f9fbfc;border-radius:12px;padding:10px 12px;cursor:pointer;color:#17324a}
+.project-report-file:hover{background:#f0f5f8;border-color:#cddce7}
+.project-report-icon{width:42px;height:42px;border-radius:10px;display:grid;place-items:center;background:#17324a;color:#fff;font-size:8px;font-weight:900}
+.project-report-file b{display:block;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.project-report-file small{display:block;margin-top:3px;color:#7a8d9b;font-size:9px}
+.project-report-file i{font-style:normal;color:#55738b;font-size:18px}.project-report-empty{margin:0;color:#80909d;font-size:11px}
+
+</style>
 </head>
 <body>
   <a class="skip-link" href="#main">Bỏ qua menu</a>
@@ -932,9 +948,44 @@ function openProject(projectId){
       <dt>Dữ liệu</dt><dd>${escapeHtml(project.data || 'Chưa cập nhật.')}</dd>
       <dt>Phương pháp</dt><dd>${escapeHtml(project.method || 'Chưa cập nhật.')}</dd>
       <dt>Sản phẩm</dt><dd>${escapeHtml(project.output || 'Chưa cập nhật.')}</dd>
-    </dl>`;
+    </dl>
+    <section class="project-report-section">
+      <div class="project-report-heading">
+        <div><span>TÀI LIỆU DỰ ÁN</span><h4>File báo cáo</h4></div>
+        <strong>${project.reportFiles.length} file</strong>
+      </div>
+      ${project.reportFiles.length ? `
+        <div class="project-report-list">
+          ${project.reportFiles.map((file,index)=>`
+            <button type="button" class="project-report-file" data-project-report-project="${escapeHtml(project.id)}" data-project-report-index="${index}">
+              <span class="project-report-icon">${escapeHtml(file.type || 'FILE')}</span>
+              <span><b>${escapeHtml(file.name || 'Báo cáo dự án')}</b><small>Mở báo cáo</small></span>
+              <i aria-hidden="true">↗</i>
+            </button>`).join('')}
+        </div>` : '<p class="project-report-empty">Dự án này chưa có file báo cáo đính kèm.</p>'}
+    </section>`;
   openModal(projectModal);
 }
+async function openProjectReport(projectId,index){
+  const project=projects.find(item=>item.id===projectId);
+  const file=project?.reportFiles?.[Number(index)];
+  if(!file){ showToast('Không tìm thấy file báo cáo.'); return; }
+  try{
+    let target=file.url || '';
+    if(file.path){
+      const {data,error}=await sb.storage.from('project-reports').createSignedUrl(file.path,120);
+      if(error || !data?.signedUrl) throw error || new Error('File báo cáo không còn trong Storage.');
+      target=data.signedUrl;
+    }
+    if(!target) throw new Error('File báo cáo chưa có đường dẫn.');
+    const opened=window.open(target,'_blank','noopener');
+    if(!opened) location.href=target;
+  }catch(error){
+    console.warn('Project report unavailable:',error);
+    showToast('File báo cáo này hiện không mở được. Quản trị viên cần tải lại file.');
+  }
+}
+
 async function openAssignmentFile(assignment){
   if (!assignment) return;
   if (!assignment.filePath && !assignment.fileUrl){
@@ -958,7 +1009,12 @@ async function openAssignmentFile(assignment){
 
 document.addEventListener('click', event => {
   const trigger = event.target.closest('.project-open');
-  if (trigger){ event.preventDefault(); openProject(trigger.dataset.projectId); }
+  if (trigger){ event.preventDefault(); openProject(trigger.dataset.projectId); return; }
+  const report = event.target.closest('[data-project-report-project]');
+  if(report){
+    event.preventDefault();
+    openProjectReport(report.dataset.projectReportProject, report.dataset.projectReportIndex);
+  }
 });
 $('#projectModalClose')?.addEventListener('click', () => closeModal(projectModal));
 
@@ -1102,7 +1158,21 @@ $('#contactForm')?.addEventListener('submit', async event => {
 });
 
 function mapProject(row){
-  return {id:row.id,title:row.title,type:row.type,image:row.image_url || '',imagePath:row.image_path || '',summary:row.summary || '',tags:row.tags || [],objective:row.objective || '',data:row.data_text || '',method:row.method || '',output:row.output || '',sortOrder:row.sort_order || 0};
+  return {
+    id:row.id,
+    title:row.title,
+    type:row.type,
+    image:row.image_url || '',
+    imagePath:row.image_path || '',
+    summary:row.summary || '',
+    tags:row.tags || [],
+    objective:row.objective || '',
+    data:row.data_text || '',
+    method:row.method || '',
+    output:row.output || '',
+    reportFiles:Array.isArray(row.report_files) ? row.report_files : [],
+    sortOrder:row.sort_order || 0
+  };
 }
 function mapAssignment(row, countMap){
   return {
