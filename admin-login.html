@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#061822">
+  <title>Đăng nhập Admin | Phan Tấn Tài</title>
+  <style>
+*{box-sizing:border-box}body{margin:0;min-height:100vh;font-family:"Segoe UI",Arial,Helvetica,sans-serif;background:#061822;color:#132129}.auth-page{min-height:100vh;display:grid;grid-template-columns:1.1fr .9fr}.auth-visual{position:relative;min-height:100vh;overflow:hidden}.auth-visual>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}.auth-visual::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(4,18,27,.32),rgba(4,18,27,.86)),linear-gradient(180deg,rgba(3,17,25,.08),rgba(3,17,25,.72))}.auth-visual-copy{position:absolute;z-index:2;left:clamp(28px,5vw,76px);right:48px;bottom:64px;color:white}.auth-kicker{font-size:10px;letter-spacing:.2em;font-weight:900;color:#f0c980;margin:0 0 14px}.auth-visual-copy h1{font-size:clamp(46px,6vw,82px);line-height:.95;margin:0 0 18px;letter-spacing:-.04em}.auth-visual-copy p{max-width:620px;color:#d5e0e3;font-size:15px}.auth-panel{min-height:100vh;background:#fffaf1;display:grid;place-items:center;padding:36px}.auth-card{width:min(470px,100%)}.auth-brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:#071b25;margin-bottom:50px}.auth-mark{width:45px;height:38px;position:relative}.auth-mark span{position:absolute;bottom:4px;width:22px;height:22px;border-left:2px solid #ad7323;border-top:2px solid #ad7323;transform:rotate(45deg)}.auth-mark span:nth-child(2){left:12px;width:29px;height:29px}.auth-mark span:nth-child(3){left:26px;width:17px;height:17px}.auth-brand strong{display:block;font-size:13px;letter-spacing:.14em}.auth-brand small{display:block;margin-top:3px;font-size:9px;color:#77858a;letter-spacing:.14em}.auth-card .eyebrow{font-size:10px;letter-spacing:.19em;font-weight:900;color:#9a6b25;margin:0 0 12px}.auth-card h2{font-size:38px;letter-spacing:-.035em;margin:0 0 12px}.auth-lead{color:#66767b;font-size:13px;margin:0 0 28px}.auth-form{display:grid;gap:16px}.auth-form label{display:grid;gap:7px;font-size:10px;font-weight:900;color:#43565d}.auth-form input{width:100%;border:1px solid #d7d2c7;background:#fff;border-radius:12px;padding:13px 14px;font:inherit;outline:0}.auth-form input:focus{border-color:#b27a2c;box-shadow:0 0 0 3px rgba(217,169,92,.15)}.auth-row{display:flex;align-items:center;justify-content:space-between;gap:12px}.auth-check{display:flex!important;grid-template-columns:auto 1fr;align-items:center;gap:8px!important}.auth-check input{width:auto!important}.auth-btn{width:100%;border:0;border-radius:12px;padding:13px 16px;background:linear-gradient(135deg,#f0ca82,#c99443);color:#0e1c21;font-weight:900;cursor:pointer}.auth-status{min-height:20px;margin:2px 0 0;font-size:11px;color:#9b382e}.auth-note{margin-top:22px;padding:14px;border-radius:12px;background:#efe8da;color:#6d604c;font-size:10px}.back-link{display:inline-flex;margin-top:20px;color:#80581f;font-size:11px;font-weight:800;text-decoration:none}.back-link:hover{text-decoration:underline}@media(max-width:900px){.auth-page{grid-template-columns:1fr}.auth-visual{display:none}.auth-panel{padding:24px}.auth-brand{margin-bottom:38px}}
+
+</style>
+</head>
+<body>
+  <main class="auth-page">
+    <section class="auth-visual" aria-hidden="true">
+      <img src="assets/hero-geoscience.webp" alt="">
+      <div class="auth-visual-copy">
+        <p class="auth-kicker">SECURE ADMIN WORKSPACE</p>
+        <h1>Quản trị nội dung<br>Geoscience Portfolio</h1>
+        <p>Khu vực riêng dành cho chủ website để quản lý dự án, bài tập, nhận xét và nội dung học thuật.</p>
+      </div>
+    </section>
+    <section class="auth-panel">
+      <div class="auth-card">
+        <a class="auth-brand" href="index.html">
+          <span class="auth-mark" aria-hidden="true"><span></span><span></span><span></span></span>
+          <span><strong>PHAN TẤN TÀI</strong><small>ADMIN CONSOLE</small></span>
+        </a>
+        <p class="eyebrow">ADMIN ONLY</p>
+        <h2>Đăng nhập quản trị</h2>
+        <p class="auth-lead">Tài khoản người dùng thông thường không có quyền truy cập khu vực này.</p>
+        <form class="auth-form" id="adminLoginForm">
+          <label>Email quản trị<input id="adminEmail" type="email" required autocomplete="username" placeholder="Email tài khoản quản trị"></label>
+          <label>Mật khẩu<input id="adminPassword" type="password" required autocomplete="current-password" placeholder="••••••••"></label>
+          <label class="auth-check"><input id="adminShowPassword" type="checkbox"> Hiện mật khẩu</label>
+          <button class="auth-btn" type="submit">Vào Admin Dashboard</button>
+          <p class="auth-status" id="adminLoginStatus" role="status"></p>
+        </form>
+        <div class="auth-note"><strong>Cloud Admin:</strong> đăng nhập bằng tài khoản Supabase có quyền <b>admin</b>. Tài khoản người dùng thường không thể vào trang này.</div>
+        <a class="back-link" href="index.html">← Quay lại website công khai</a>
+      </div>
+    </section>
+  </main>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+// CẤU HÌNH PUBLIC CHO SUPABASE
+// Publishable key được phép dùng ở frontend; không đặt service_role key ở đây.
+window.PTT_CONFIG = {
+  SUPABASE_URL: 'https://aqkasetqystwvpassidd.supabase.co',
+  SUPABASE_ANON_KEY: 'sb_publishable_f2yw7xfbADdzj9iCfcnxqA_yHG5AqVo',
+  GEO_AI_FUNCTION: 'geo-ai'
+};
+
+</script>
+  <script>
+'use strict';
+(function(){
+  const cfg = window.PTT_CONFIG || {};
+  const ready = Boolean(
+    cfg.SUPABASE_URL && cfg.SUPABASE_ANON_KEY &&
+    !cfg.SUPABASE_URL.includes('PASTE_') && !cfg.SUPABASE_ANON_KEY.includes('PASTE_')
+  );
+  window.PTT_SUPABASE_READY = ready;
+  if (!ready || !window.supabase?.createClient) {
+    window.pttSupabase = null;
+    return;
+  }
+  window.pttSupabase = window.supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_ANON_KEY, {
+    auth: {
+      persistSession: true,
+      autoRefreshToken: true,
+      detectSessionInUrl: true,
+      storageKey: 'ptt-portfolio-auth'
+    },
+    realtime: { params: { eventsPerSecond: 5 } }
+  });
+})();
+
+</script>
+  <script>
+'use strict';
+const $ = selector => document.querySelector(selector);
+const sb = window.pttSupabase;
+
+function setStatus(text){ $('#adminLoginStatus').textContent = text; }
+async function isAdmin(user){
+  if (!sb || !user) return false;
+  const {data,error} = await sb.from('profiles').select('role').eq('id', user.id).maybeSingle();
+  if (error) throw error;
+  return data?.role === 'admin';
+}
+
+$('#adminShowPassword')?.addEventListener('change', event => { $('#adminPassword').type = event.target.checked ? 'text' : 'password'; });
+
+(async function checkExistingSession(){
+  if (!sb){ setStatus('Website chưa được kết nối Supabase. Hãy cấu hình supabase-config.js trước.'); return; }
+  try {
+    const {data,error} = await sb.auth.getUser();
+    if (error || !data.user) return;
+    if (await isAdmin(data.user)) location.replace('admin.html');
+  } catch {}
+})();
+
+$('#adminLoginForm')?.addEventListener('submit', async event => {
+  event.preventDefault();
+  const button = event.currentTarget.querySelector('button[type="submit"]');
+  setStatus('Đang xác thực…');
+  button.disabled = true;
+  try {
+    if (!sb) throw new Error('Chưa cấu hình Supabase.');
+    const {data,error} = await sb.auth.signInWithPassword({email:$('#adminEmail').value.trim(),password:$('#adminPassword').value});
+    if (error) throw error;
+    if (!(await isAdmin(data.user))){
+      await sb.auth.signOut();
+      throw new Error('Tài khoản này không có quyền quản trị.');
+    }
+    setStatus('Đăng nhập thành công.');
+    location.replace('admin.html');
+  } catch (error){ setStatus(error.message || 'Không thể đăng nhập Admin.'); }
+  finally { button.disabled = false; }
+});
+
+</script>
+</body>
+</html>
