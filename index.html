@@ -478,7 +478,6 @@ body{background:#fff;color:var(--ink);font-family:"Segoe UI",Arial,Helvetica,san
         <a href="#geo-ai">Geo AI</a>
         <a href="#contact">Liên hệ</a>
       </nav>
-      <a class="admin-shortcut" href="admin-login.html" aria-label="Đăng nhập quản trị">Admin</a>
       <div class="account-actions" id="accountActions">
         <button class="btn btn-outline btn-login" id="userLoginOpen">Đăng nhập</button>
         <button class="btn btn-gold btn-register" id="userRegisterOpen">Đăng ký</button>
@@ -841,6 +840,12 @@ function formatDate(value){
   try { return new Date(value).toLocaleDateString('vi-VN', {month:'2-digit', year:'numeric'}); }
   catch { return String(value); }
 }
+function formatAssignmentDate(value){
+  if(!value) return '';
+  const parts=String(value).split('-');
+  if(parts.length===3) return `${parts[2]}/${parts[1]}/${parts[0]}`;
+  return String(value);
+}
 
 // Header + navigation
 const header = $('#siteHeader');
@@ -964,23 +969,24 @@ function renderAssignments(){
   const rows=assignments
     .filter(a=>{
       const subjectName=assignmentSubjectName(a.subject);
-      const haystack=`${a.title} ${a.topic} ${a.fileName} ${subjectName} ngày ${a.dayNumber} bài ${a.assignmentNumber}`.toLowerCase();
+      const haystack=`${a.title} ${a.topic} ${a.fileName} ${subjectName} ${formatAssignmentDate(a.assignmentDate)} bài ${a.assignmentNumber}`.toLowerCase();
       return (subject==='all'||a.subject===subject) && haystack.includes(q);
     })
-    .sort((a,b)=>a.dayNumber-b.dayNumber || a.assignmentNumber-b.assignmentNumber || a.title.localeCompare(b.title,'vi'));
+    .sort((a,b)=>String(a.assignmentDate).localeCompare(String(b.assignmentDate)) || a.assignmentNumber-b.assignmentNumber || a.title.localeCompare(b.title,'vi'));
   if(!rows.length){
     host.innerHTML='<div class="assignment-empty">Không tìm thấy bài tập phù hợp.</div>';
     return;
   }
   const groups=new Map();
   rows.forEach(a=>{
-    if(!groups.has(a.dayNumber)) groups.set(a.dayNumber,[]);
-    groups.get(a.dayNumber).push(a);
+    const key=a.assignmentDate || 'Không rõ ngày';
+    if(!groups.has(key)) groups.set(key,[]);
+    groups.get(key).push(a);
   });
-  host.innerHTML=[...groups.entries()].map(([day,items])=>`
+  host.innerHTML=[...groups.entries()].map(([dateKey,items])=>`
     <section class="assignment-day">
       <header class="assignment-day-head">
-        <div><span>NHÓM BÀI TẬP</span><h3>Ngày ${day}</h3></div>
+        <div><span>NGÀY HỌC</span><h3>${escapeHtml(formatAssignmentDate(dateKey))}</h3></div>
         <strong>${items.length} bài</strong>
       </header>
       <div class="assignment-day-list">
@@ -1020,7 +1026,7 @@ function openComment(id){
   const assignment = assignments.find(item => item.id === id);
   if (!assignment) return;
   $('#commentAssignmentId').value = id;
-  $('#commentTarget').textContent = `Ngày ${assignment.dayNumber} · Bài ${assignment.assignmentNumber} · ${assignment.title}`;
+  $('#commentTarget').textContent = `${formatAssignmentDate(assignment.assignmentDate)} · Bài ${assignment.assignmentNumber} · ${assignment.title}`;
   $('#commentStatus').textContent = '';
   if (currentUser?.name) $('#commentName').value = currentUser.name;
   openModal(commentModal);
@@ -1090,9 +1096,9 @@ function mapAssignment(row, countMap){
     title:row.title,
     topic:row.topic || '',
     subject:row.subject || 'other',
-    dayNumber:Number(row.day_number || 1),
+    assignmentDate:row.assignment_date || '',
     assignmentNumber:Number(row.assignment_number || 1),
-    date:row.date_text || formatDate(row.created_at),
+    date:row.assignment_date ? formatAssignmentDate(row.assignment_date) : (row.date_text || formatDate(row.created_at)),
     fileName:row.file_name || '',
     fileUrl:row.file_url || '',
     filePath:row.file_path || '',
@@ -1106,7 +1112,7 @@ async function loadPublicContent({silent = false} = {}){
     const client = requireSupabase();
     const [pRes, aRes, cRes, latestRes, sRes] = await Promise.all([
       client.from('projects').select('*').eq('published', true).order('sort_order', {ascending:true}).order('created_at', {ascending:false}),
-      client.from('assignments').select('*').eq('published', true).order('day_number', {ascending:true}).order('assignment_number', {ascending:true}).order('created_at', {ascending:true}),
+      client.from('assignments').select('*').eq('published', true).order('assignment_date', {ascending:true}).order('assignment_number', {ascending:true}).order('created_at', {ascending:true}),
       client.from('comments').select('assignment_id'),
       client.from('comments').select('name,role,body,created_at').order('created_at', {ascending:false}).limit(1).maybeSingle(),
       client.from('assignment_subjects').select('slug,name,sort_order').eq('active', true).order('sort_order', {ascending:true}).order('name', {ascending:true})
@@ -1189,7 +1195,7 @@ function aiFind(query,items,limit){
   return items.map(function(item){return {item:item,score:aiScore(query,item)};}).filter(function(x){return x.score>0;}).sort(function(a,b){return b.score-a.score;}).slice(0,limit||3).map(function(x){return x.item;});
 }
 function aiProjectLine(p){ return '• '+p.title+(p.type?' — '+p.type:'')+(p.summary?'\n  '+p.summary:''); }
-function aiAssignmentLine(a){ return '• Ngày '+a.dayNumber+' · Bài '+a.assignmentNumber+' — '+a.title+(a.topic?' · '+a.topic:''); }
+function aiAssignmentLine(a){ return '• '+formatAssignmentDate(a.assignmentDate)+' · Bài '+a.assignmentNumber+' — '+a.title+(a.topic?' · '+a.topic:''); }
 function localSmartAnswer(query){
   const t=aiNormalize(query);
   if(!t) return 'Bạn hãy nhập câu hỏi về Địa chất – Địa vật lý, dự án hoặc bài tập trên website.';
