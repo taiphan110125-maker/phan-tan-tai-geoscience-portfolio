@@ -196,7 +196,7 @@ body,button,input,select,textarea,.hero h1,.hero h2,.section-head h2,.about-copy
 
   <main id="main">
     <section class="hero" id="home" aria-labelledby="heroTitle">
-      <img class="hero-media" src="assets/hero-geoscience.webp" alt="Minh họa địa chất, địa chấn và biểu đồ địa vật lý giếng khoan">
+      <img class="hero-media" src="assets/hero-geoscience.svg" alt="Minh họa địa chất, địa chấn và biểu đồ địa vật lý giếng khoan">
       <div class="hero-overlay"></div>
       <div class="shell hero-content">
         <div class="hero-copy reveal">
@@ -233,7 +233,7 @@ body,button,input,select,textarea,.hero h1,.hero h2,.section-head h2,.about-copy
 
         <div class="feature-grid">
           <article class="visual-card reveal">
-            <img src="assets/about-fieldwork.webp" alt="Sinh viên khảo sát địa chất thực địa">
+            <img src="assets/about-fieldwork.svg" alt="Sinh viên khảo sát địa chất thực địa">
             <div class="visual-card-overlay"></div>
             <div class="visual-card-body">
               <span class="icon-box">⌁</span>
@@ -243,7 +243,7 @@ body,button,input,select,textarea,.hero h1,.hero h2,.section-head h2,.about-copy
             </div>
           </article>
           <article class="visual-card reveal delay-1">
-            <img src="assets/assignments-review.webp" alt="Không gian học tập với tài liệu địa chất và hệ thống nhận xét">
+            <img src="assets/assignments-review.svg" alt="Không gian học tập với tài liệu địa chất và hệ thống nhận xét">
             <div class="visual-card-overlay"></div>
             <div class="visual-card-body">
               <span class="icon-box">▤</span>
@@ -253,7 +253,7 @@ body,button,input,select,textarea,.hero h1,.hero h2,.section-head h2,.about-copy
             </div>
           </article>
           <article class="visual-card reveal delay-2">
-            <img src="assets/geo-ai.webp" alt="Giao diện trợ lý AI chuyên ngành địa chất và địa vật lý">
+            <img src="assets/geo-ai.svg" alt="Giao diện trợ lý AI chuyên ngành địa chất và địa vật lý">
             <div class="visual-card-overlay"></div>
             <div class="visual-card-body">
               <span class="icon-box">AI</span>
@@ -269,7 +269,7 @@ body,button,input,select,textarea,.hero h1,.hero h2,.section-head h2,.about-copy
     <section class="section about-section" id="about">
       <div class="shell about-layout">
         <div class="about-media reveal">
-          <img src="assets/about-fieldwork.webp" alt="Khảo sát địa chất ngoài thực địa">
+          <img src="assets/about-fieldwork.svg" alt="Khảo sát địa chất ngoài thực địa">
           <div class="media-caption"><span>FIELD NOTE 01</span><strong>Observe · Measure · Interpret</strong></div>
         </div>
         <div class="about-copy reveal delay-1">
@@ -327,7 +327,7 @@ body,button,input,select,textarea,.hero h1,.hero h2,.section-head h2,.about-copy
           </div>
 
           <aside class="feedback-card reveal delay-1">
-            <div class="feedback-image"><img src="assets/assignments-review.webp" alt="Minh họa quy trình xem và nhận xét bài tập"></div>
+            <div class="feedback-image"><img src="assets/assignments-review.svg" alt="Minh họa quy trình xem và nhận xét bài tập"></div>
             <div class="feedback-body">
               <p class="eyebrow">RECENT FEEDBACK</p>
               <h3>Trao đổi học thuật có cấu trúc</h3>
@@ -354,7 +354,7 @@ body,button,input,select,textarea,.hero h1,.hero h2,.section-head h2,.about-copy
           <button class="btn btn-gold" id="aiOpenFromSection">Mở Geo AI →</button>
         </div>
         <div class="ai-media reveal delay-1">
-          <img src="assets/geo-ai.webp" alt="Trợ lý AI kết hợp dữ liệu địa chấn, bản đồ và well log">
+          <img src="assets/geo-ai.svg" alt="Trợ lý AI kết hợp dữ liệu địa chấn, bản đồ và well log">
           <div class="ai-badge"><span class="pulse"></span> AI READY · MVP</div>
         </div>
       </div>
@@ -567,7 +567,7 @@ function renderProjects(){
   const side = projects.slice(1);
   host.innerHTML = `
     <article class="project-feature reveal visible" data-project-id="${escapeHtml(featured.id)}">
-      <img src="${escapeHtml(featured.image || 'assets/hero-geoscience.webp')}" alt="Minh họa ${escapeHtml(featured.title)}">
+      <img src="${escapeHtml(featured.image || 'assets/hero-geoscience.svg')}" alt="Minh họa ${escapeHtml(featured.title)}">
       <div class="project-feature-overlay"></div>
       <div class="project-feature-content">
         <span class="pill">${escapeHtml(featured.type || 'PROJECT')}</span>
@@ -579,7 +579,7 @@ function renderProjects(){
     <div class="project-side ${side.length > 2 ? 'project-side-scroll' : ''}">
       ${side.length ? side.map(project => `
         <article class="project-mini reveal visible" data-project-id="${escapeHtml(project.id)}">
-          <img src="${escapeHtml(project.image || 'assets/hero-geoscience.webp')}" alt="Minh họa ${escapeHtml(project.title)}">
+          <img src="${escapeHtml(project.image || 'assets/hero-geoscience.svg')}" alt="Minh họa ${escapeHtml(project.title)}">
           <div>
             <span class="pill soft">${escapeHtml(project.type || 'PROJECT')}</span>
             <h3>${escapeHtml(project.title)}</h3>
@@ -597,7 +597,7 @@ function openProject(projectId){
   const tags = Array.isArray(project.tags) ? project.tags : [];
   $('#projectModalContent').innerHTML = `
     <div class="project-modal-visual">
-      <img src="${escapeHtml(project.image || 'assets/hero-geoscience.webp')}" alt="Minh họa ${escapeHtml(project.title)}">
+      <img src="${escapeHtml(project.image || 'assets/hero-geoscience.svg')}" alt="Minh họa ${escapeHtml(project.title)}">
       <span class="project-modal-badge">${escapeHtml(project.type || 'Project')}</span>
     </div>
     <h3 id="projectModalTitle">${escapeHtml(project.title)}</h3>
