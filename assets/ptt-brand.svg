@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 170" role="img" aria-labelledby="title desc">
+<title id="title">Phan Tấn Tài — Geology &amp; Geophysics</title>
+<desc id="desc">Biểu tượng núi và sóng biển màu xanh navy, xanh biển và vàng kim.</desc>
+<defs>
+  <linearGradient id="ocean" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#0B3158"/><stop offset=".55" stop-color="#087EA4"/><stop offset="1" stop-color="#11B7CC"/></linearGradient>
+  <linearGradient id="mount" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#061B36"/><stop offset=".55" stop-color="#0C4F85"/><stop offset="1" stop-color="#1089A7"/></linearGradient>
+  <linearGradient id="gold" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#A96C11"/><stop offset=".55" stop-color="#F0C15B"/><stop offset="1" stop-color="#C98A1F"/></linearGradient>
+</defs>
+<g transform="translate(5 4)">
+  <path d="M20 72A64 64 0 0 1 143 56" fill="none" stroke="url(#gold)" stroke-width="6" stroke-linecap="round"/>
+  <path d="M15 103 47 67 65 84 91 39 119 82 137 69 155 101Z" fill="url(#mount)"/>
+  <path d="m47 67 17 17 27-45 7 25 21 18-14 4-14-19-15 25Z" fill="url(#gold)" opacity=".95"/>
+  <path d="M10 105c28-22 53-8 76 6 25 15 49 18 78-9-11 27-31 43-57 44-31 1-52-16-75-22-11-3-18-1-22 2 18 2 34 9 49 17 37 20 78 14 99-18-6 31-31 47-62 45-27-2-48-14-67-25-12-7-22-10-32-8 10-13 17-22 13-32Z" fill="url(#ocean)"/>
+  <path d="M21 109c29-13 49 0 68 12 22 13 43 15 65-1" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round"/>
+  <path d="M114 115c17-20 37-19 49-7 10 10 9 28-3 39" fill="none" stroke="#EAFBFF" stroke-width="8" stroke-linecap="round"/>
+</g>
+<g transform="translate(183 30)">
+  <text x="0" y="58" font-family="Segoe UI,Arial,sans-serif" font-size="52" font-weight="800" letter-spacing="2.5" fill="#082B52">PHAN TẤN TÀI</text>
+  <rect x="2" y="76" width="72" height="4" rx="2" fill="url(#gold)"/>
+  <text x="0" y="110" font-family="Segoe UI,Arial,sans-serif" font-size="18" font-weight="700" letter-spacing="7" fill="#31516F">GEOLOGY • GEOPHYSICS</text>
+</g>
+</svg>
