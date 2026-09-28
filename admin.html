@@ -442,17 +442,47 @@ function openAssignmentModal(){ $('#assignmentForm').reset();$('#assignmentStatu
 function closeAssignmentModal(){ assignmentModal.classList.remove('open');assignmentModal.setAttribute('aria-hidden','true');if(!$('.modal.open'))document.body.classList.remove('modal-open'); }
 $('#addAssignmentBtn')?.addEventListener('click',openAssignmentModal);$('#assignmentModalClose')?.addEventListener('click',closeAssignmentModal);assignmentModal?.addEventListener('click',e=>{if(e.target===assignmentModal)closeAssignmentModal();});
 $('#assignmentForm')?.addEventListener('submit',async event=>{
-  event.preventDefault(); const title=$('#assignmentTitle').value.trim(); const topic=$('#assignmentTopic').value.trim(); if(title.length<3||topic.length<2){$('#assignmentStatus').textContent='Vui lòng nhập tiêu đề và chủ đề.';return;} const button=event.currentTarget.querySelector('button[type="submit"]');button.disabled=true;$('#assignmentStatus').textContent='Đang tải bài tập lên cloud…';
+  event.preventDefault();
+  const form=event.currentTarget;
+  const title=$('#assignmentTitle').value.trim();
+  const topic=$('#assignmentTopic').value.trim();
+  if(title.length<3||topic.length<2){$('#assignmentStatus').textContent='Vui lòng nhập tiêu đề và chủ đề.';return;}
+  const button=form.querySelector('button[type="submit"]');
+  button.disabled=true;
+  $('#assignmentStatus').textContent='Đang tải bài tập lên cloud…';
   let uploadedPath='';
+  let savedToDatabase=false;
   try{
-    const file=$('#assignmentFile').files[0]; if(file&&file.size>24*1024*1024)throw new Error('File vượt quá 24 MB.');
-    const id=`a_${Date.now()}`; let fileUrl='',fileName='';
-    if(file){ uploadedPath=`${id}/${Date.now()}-${safeName(file.name)}`; const up=await sb.storage.from('assignments').upload(uploadedPath,file,{upsert:false,contentType:file.type||undefined}); if(up.error)throw up.error; fileName=file.name; fileUrl=sb.storage.from('assignments').getPublicUrl(uploadedPath).data.publicUrl; }
+    const file=$('#assignmentFile').files[0];
+    if(file&&file.size>24*1024*1024)throw new Error('File vượt quá 24 MB.');
+    const id=`a_${Date.now()}`;
+    let fileUrl='',fileName='';
+    if(file){
+      uploadedPath=`${id}/${Date.now()}-${safeName(file.name)}`;
+      const up=await sb.storage.from('assignments').upload(uploadedPath,file,{upsert:false,contentType:file.type||undefined});
+      if(up.error)throw up.error;
+      fileName=file.name;
+      fileUrl=sb.storage.from('assignments').getPublicUrl(uploadedPath).data.publicUrl;
+    }
     const row={id,type:$('#assignmentType').value,title,topic,subject:$('#assignmentSubject').value,date_text:new Date().toLocaleDateString('vi-VN',{month:'2-digit',year:'numeric'}),file_name:fileName,file_url:fileUrl,file_path:uploadedPath,published:true};
-    const {error}=await sb.from('assignments').insert(row); if(error)throw error;
-    event.currentTarget.reset();$('#assignmentStatus').textContent='Đã lưu bài tập. Website công khai sẽ cập nhật tự động.';await loadAdminData();notifyPublicContentChanged('assignments');toast('Đã thêm bài tập');setTimeout(closeAssignmentModal,650);
-  }catch(e){ if(uploadedPath)await sb.storage.from('assignments').remove([uploadedPath]).catch(()=>{});$('#assignmentStatus').textContent=e.message||'Không lưu được bài tập.'; }
-  finally{button.disabled=false;}
+    const {error}=await sb.from('assignments').insert(row);
+    if(error)throw error;
+    savedToDatabase=true;
+
+    form.reset();
+    $('#assignmentStatus').textContent='Đã lưu bài tập. Website công khai sẽ cập nhật tự động.';
+    await loadAdminData();
+    notifyPublicContentChanged('assignments');
+    toast('Đã thêm bài tập');
+    setTimeout(closeAssignmentModal,650);
+  }catch(e){
+    if(uploadedPath&&!savedToDatabase){
+      await sb.storage.from('assignments').remove([uploadedPath]).catch(()=>{});
+    }
+    $('#assignmentStatus').textContent=e.message||'Không lưu được bài tập.';
+  }finally{
+    button.disabled=false;
+  }
 });
 
 // Project editor
