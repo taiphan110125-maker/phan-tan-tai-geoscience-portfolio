@@ -661,12 +661,13 @@ function openComment(id){
 $('#commentModalClose')?.addEventListener('click', () => closeModal(commentModal));
 $('#commentForm')?.addEventListener('submit', async event => {
   event.preventDefault();
+  const form = event.currentTarget;
   const name = $('#commentName').value.trim();
   const role = $('#commentRole').value;
   const text = $('#commentText').value.trim();
   const assignmentId = $('#commentAssignmentId').value;
   if (name.length < 2 || text.length < 5){ $('#commentStatus').textContent = 'Vui lòng nhập đầy đủ họ tên và nhận xét.'; return; }
-  const submit = event.currentTarget.querySelector('button[type="submit"]');
+  const submit = form.querySelector('button[type="submit"]');
   submit.disabled = true;
   $('#commentStatus').textContent = 'Đang gửi nhận xét…';
   try {
@@ -678,7 +679,7 @@ $('#commentForm')?.addEventListener('submit', async event => {
       name, role, body: text
     });
     if (error) throw error;
-    event.currentTarget.reset();
+    form.reset();
     $('#commentStatus').textContent = 'Đã lưu nhận xét vào hệ thống.';
     $('#latestComment').innerHTML = `<strong>${escapeHtml(name)} · ${escapeHtml(role)}</strong><br>${escapeHtml(text)}`;
     await loadPublicContent({silent:true});
@@ -881,18 +882,19 @@ $('#userLoginForm')?.addEventListener('submit', async event => {
 });
 $('#userRegisterForm')?.addEventListener('submit', async event => {
   event.preventDefault();
+  const form = event.currentTarget;
   const password = $('#userRegisterPassword').value;
   const password2 = $('#userRegisterPassword2').value;
   if (password !== password2){ $('#userRegisterStatus').textContent = 'Hai mật khẩu chưa khớp.'; return; }
   const name = $('#userRegisterName').value.trim();
   const email = $('#userRegisterEmail').value.trim();
-  const button = event.currentTarget.querySelector('button[type="submit"]');
+  const button = form.querySelector('button[type="submit"]');
   $('#userRegisterStatus').textContent = 'Đang tạo tài khoản…'; button.disabled = true;
   try {
     const client = requireSupabase();
     const {data,error} = await client.auth.signUp({email,password,options:{data:{name}}});
     if (error) throw error;
-    event.currentTarget.reset();
+    form.reset();
     if (data.session){
       const user = userView(data.user); syncUserUI(user); showToast(`Chào mừng ${user.name}`);
       $('#userRegisterStatus').textContent = 'Tạo tài khoản thành công.';
