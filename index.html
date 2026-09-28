@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="description" content="Portfolio học thuật của Phan Tấn Tài - sinh viên Địa chất và Địa vật lý.">
-  <meta name="theme-color" content="#071a24">
+  <meta name="theme-color" content="#ffffff">\n  <link rel="icon" href="assets/ptt-emblem.svg" type="image/svg+xml">
   <title>Phan Tấn Tài | Geology & Geophysics</title>
   <style>
 :root{
@@ -161,15 +161,165 @@ body,button,input,select,textarea,.hero h1,.hero h2,.section-head h2,.about-copy
 .runtime-warning{position:relative;z-index:9999;display:flex;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap;padding:12px 18px;background:#fff1cc;color:#593b0b;border-bottom:1px solid #deb55e;font:600 13px/1.45 "Segoe UI",Arial,Helvetica,sans-serif;text-align:center}.runtime-warning strong{font-weight:900}.runtime-warning b{font-weight:900}
 
 </style>
-</head>
+<style id="ptt-v4-polish">
+:root{
+  --navy:#06223f;--navy-2:#0a3157;--navy-3:#0d4267;--ink:#102942;--paper:#ffffff;--paper-2:#f4f7fb;
+  --cream:#ffffff;--gold:#d7a42f;--gold-2:#f2c55d;--teal:#0a88a8;--muted:#647789;--line:#dfe7ef;
+  --shadow:0 18px 55px rgba(13,47,76,.10);--radius:22px;--radius-sm:14px;--shell:min(1240px,calc(100% - 48px));
+}
+body{background:#fff;color:var(--ink);font-size:15px}
+.section{padding:92px 0}
+.site-header,.site-header.scrolled{background:rgba(255,255,255,.96);border-bottom:1px solid #e7edf3;box-shadow:0 6px 28px rgba(9,40,65,.08);backdrop-filter:blur(18px)}
+.nav-row{min-height:78px;gap:22px}
+.brand-header{margin-right:auto;min-width:238px}
+.brand-lockup{width:238px;height:58px;object-fit:contain;object-position:left center}
+.primary-nav{gap:21px}
+.primary-nav a{color:#23415e;font-size:12.5px;font-weight:700;padding:29px 0}
+.primary-nav a:hover,.primary-nav a.active{color:#0a5db3}
+.primary-nav a::after{background:#0a67c6;bottom:20px}
+.nav-toggle{color:#123956}
+.admin-shortcut{font-size:11px;font-weight:800;text-decoration:none;color:#31546d;border:1px solid #d6e1ea;border-radius:999px;padding:8px 11px;background:#f8fafc}
+.admin-shortcut:hover{border-color:#c99a2b;color:#8b6414}
+.btn-register{background:linear-gradient(135deg,#0c5ca8,#093b70)!important;color:#fff!important;border-color:transparent!important;box-shadow:0 8px 18px rgba(10,83,151,.18)}
+.btn-login{border-color:#d4e0e8!important;color:#163d5d!important;background:#fff!important}
+.account-chip{background:#0a3157;border-color:#164d76}
+.account-menu{background:#fff;color:#12334d;border-color:#dce6ee;box-shadow:0 18px 40px rgba(8,39,66,.15)}
+.account-menu small{color:#6f8290}.account-menu button{color:#0d4f89;background:#eef5fb}
+
+.hero{min-height:710px;margin-top:78px;background:#07223e;display:flex;align-items:center}
+.hero-media{filter:saturate(.94) contrast(1.03);object-position:center center}
+.hero-overlay{background:linear-gradient(90deg,rgba(3,20,37,.94) 0%,rgba(4,28,49,.80) 42%,rgba(5,34,57,.26) 74%,rgba(5,34,57,.12) 100%),linear-gradient(180deg,rgba(4,19,35,.05),rgba(3,20,35,.42))}
+.hero-content{grid-template-columns:minmax(0,1.2fr) minmax(300px,.55fr);gap:70px;align-items:center;padding-top:10px}
+.hero-copy{max-width:760px}
+.kicker{color:#f0c55d;font-size:11px;letter-spacing:.2em;margin-bottom:16px}
+.hero h1{font-size:clamp(62px,7vw,94px);line-height:.92;letter-spacing:-.06em;color:#fff;margin-bottom:12px;text-shadow:0 8px 30px rgba(0,0,0,.22)}
+.hero h2{font-size:clamp(28px,3vw,40px);font-weight:650;color:#d9e9f4;letter-spacing:-.035em;margin:0 0 18px}
+.hero h2 span{color:#f2c55d}
+.hero-lead{font-size:16px;line-height:1.72;color:#e3edf3;max-width:650px}
+.hero-actions{gap:12px;margin-top:28px}
+.hero-actions .btn{min-height:48px;padding:13px 20px;border-radius:12px;font-size:13px}
+.hero-actions .btn-gold{background:linear-gradient(135deg,#f2c55d,#d49a22);color:#0d2941;box-shadow:0 10px 30px rgba(215,164,47,.26)}
+.hero-actions .btn-glass{border-color:rgba(255,255,255,.65);color:#fff;background:rgba(8,31,52,.30);backdrop-filter:blur(8px)}
+.hero-tags{gap:8px;margin-top:26px}.hero-tags span{background:rgba(8,31,52,.42);border:1px solid rgba(255,255,255,.18);color:#dcebf3;border-radius:999px;padding:7px 11px}
+.hero-brief{background:rgba(255,255,255,.92);color:#12334d;border:1px solid rgba(255,255,255,.78);box-shadow:0 18px 50px rgba(0,0,0,.16);backdrop-filter:blur(16px);border-radius:22px;padding:24px}
+.hero-brief>p{color:#a06f14;font-weight:900}.hero-brief dt{color:#708393}.hero-brief dd{color:#0e3454}.hero-brief dl>div{border-color:#e3e9ee}
+.scroll-cue{display:none}
+
+#highlights{background:#f5f8fb;color:var(--ink);border-bottom:1px solid #e7eef4}
+#highlights .section-head.light>p{color:var(--muted)}
+#highlights .section-head.light h2{color:var(--ink)}
+#highlights .eyebrow{color:#a37318}
+.section-head{grid-template-columns:1fr 1fr;gap:60px;margin-bottom:34px}
+.section-head h2,.about-copy h2,.contact-copy h2,.ai-copy h2{font-size:clamp(38px,4.8vw,62px);letter-spacing:-.05em;line-height:1.02;color:#102d47}
+.section-head>p{font-size:14px;line-height:1.8}
+.eyebrow{color:#9b6b17;font-size:10px;letter-spacing:.2em}
+.feature-grid{gap:20px}
+.visual-card{min-height:350px;border-radius:20px;border:1px solid #dce6ed;box-shadow:var(--shadow);background:#0b3556}
+.visual-card>img{filter:saturate(.9)}
+.visual-card-overlay{background:linear-gradient(180deg,rgba(7,35,58,.03),rgba(7,30,50,.90))}
+.visual-card-body{padding:25px}.visual-card h3{font-size:23px}.visual-card p{color:#dbe8ef}
+.icon-box{background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.2)}
+.circle-link{background:#f0c55d;color:#0b2c48}
+
+.about-section{background:#fff}
+.about-layout{gap:52px;align-items:stretch}
+.about-media{border-radius:24px;overflow:hidden;box-shadow:var(--shadow);min-height:520px}
+.about-media img{height:100%;min-height:520px;object-fit:cover}
+.media-caption{background:linear-gradient(180deg,transparent,rgba(5,31,50,.88))}
+.about-copy{padding:22px 0}
+.about-copy .lead{font-size:18px;line-height:1.72;color:#203c53}
+.about-copy>p:not(.eyebrow):not(.lead){color:#667988;font-size:14px}
+.stats-row{gap:12px;margin:28px 0}
+.stats-row>div{background:#f7f9fc;border:1px solid #e2e9ef;border-radius:16px;padding:18px;box-shadow:0 8px 22px rgba(20,52,78,.05)}
+.stats-row strong{color:#0b4f8c;font-size:28px}.stats-row span{color:#6c7f8e;font-size:11px}
+.text-link{color:#0b5eaa;font-weight:800}
+
+.projects-section{background:#f6f8fb}
+.project-feature,.project-mini{border:1px solid #dbe4ec;box-shadow:0 14px 38px rgba(17,49,75,.08)}
+.project-feature{border-radius:24px}.project-feature::after{background:linear-gradient(180deg,rgba(6,25,42,.05),rgba(5,29,49,.82))}
+.project-feature-content{max-width:720px}
+.project-feature h3{font-size:36px}
+.project-mini{border-radius:18px;background:#fff}
+.project-mini h3{color:#14324b}
+.project-modal-visual img{filter:saturate(.9)}
+
+.assignments-section{background:#fff;color:var(--ink);border-top:1px solid #edf1f5;border-bottom:1px solid #edf1f5}
+.assignments-section .section-head.light h2{color:#102d47}
+.assignments-section .section-head.light>p{color:#65798a}
+.assignments-section .eyebrow{color:#9b6b17}
+.repository-card{background:#fff;border:1px solid #dfe7ed;box-shadow:var(--shadow);border-radius:20px}
+.toolbar{border-color:#e8edf1}
+.search-control,.toolbar select{background:#f7f9fc;border-color:#dce5ec;color:#1c3b54}
+.assignment-table th{color:#667d8e;border-color:#e6edf2}.assignment-table td{border-color:#edf1f4;color:#20384b}
+.file-type{background:#eaf3fb;color:#0a5b9d}
+.mini-btn{border-color:#dbe5ed;background:#fff;color:#0e568f}.mini-btn:hover{background:#0d5da5;color:#fff}
+.feedback-card{background:linear-gradient(155deg,#072c4c,#0b5275);border-radius:20px;box-shadow:var(--shadow);overflow:hidden}
+.feedback-body h3,.feedback-body p,.feedback-body .eyebrow{color:#fff}
+.latest-comment{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.12);color:#e7f2f7}
+
+.ai-section{background:linear-gradient(120deg,#061f38 0%,#083d61 55%,#0a6f87 100%);color:#fff;position:relative;overflow:hidden}
+.ai-section::before{content:"";position:absolute;width:420px;height:420px;border-radius:50%;right:-90px;top:-140px;background:radial-gradient(circle,rgba(242,197,93,.23),transparent 68%)}
+.ai-showcase{gap:60px;position:relative}
+.ai-copy h2{color:#fff}.ai-copy .eyebrow{color:#f1c45a}.ai-copy .lead{color:#dbeaf1}.check-list li{color:#e1edf2}
+.ai-media{border-radius:24px;box-shadow:0 24px 70px rgba(0,0,0,.22);border:1px solid rgba(255,255,255,.18);overflow:hidden}
+.ai-media img{height:470px;object-fit:cover}
+.ai-badge{background:#fff;color:#0b456a;box-shadow:0 8px 24px rgba(0,0,0,.18)}
+.pulse{background:#12b981}
+
+.contact-section{background:#f6f8fb}
+.contact-layout{gap:60px}
+.contact-copy p{color:#667b8d;max-width:500px}
+.contact-form{background:#fff;border:1px solid #dfe7ed;box-shadow:var(--shadow);border-radius:22px;padding:28px}
+.contact-form input,.contact-form select,.contact-form textarea{background:#f8fafc;border-color:#dce5ec}
+.btn-dark{background:#082d4d;color:#fff;border-radius:11px}
+
+.site-footer{background:#061c31;border-top:0;padding:40px 0}
+.footer-grid{align-items:center}.footer-emblem{width:58px;height:58px}.footer-brand{color:#fff}.footer-brand .brand-copy strong{color:#fff}.footer-brand .brand-copy small{color:#9db5c5}
+.footer-links a{color:#c6d5df}.footer-links a:hover{color:#f1c45a}
+.site-footer p{color:#849dac}
+
+.ai-fab{width:58px;height:58px;border-radius:18px;background:linear-gradient(145deg,#0a5ca5,#082c50);box-shadow:0 14px 35px rgba(5,44,78,.28);border:2px solid rgba(255,255,255,.75)}
+.ai-panel{border-radius:22px;border:1px solid #dbe6ee;box-shadow:0 24px 70px rgba(5,31,52,.24);overflow:hidden}
+.ai-panel-head{background:linear-gradient(120deg,#072f50,#0b6283)}
+.ai-quick{background:#f7fafc}.ai-quick button{color:#0c527f;border-color:#c9dce9;background:#fff}.ai-input{background:#fff;border-top-color:#e3ebf1}
+.ai-input input{background:#f7f9fb;border-color:#dce5eb}.ai-input button{background:#0a5da6}
+
+.modal-card{border:1px solid #dfe6ec;box-shadow:0 28px 90px rgba(6,37,61,.22)}
+.modal-emblem{width:84px;height:84px;margin-bottom:8px}
+
+@media(max-width:1050px){
+  .brand-header{min-width:190px}.brand-lockup{width:190px}
+  .primary-nav{gap:14px}.primary-nav a{font-size:11.5px}
+  .admin-shortcut{display:none}
+  .hero-content{grid-template-columns:1fr .65fr;gap:36px}
+}
+@media(max-width:900px){
+  :root{--shell:min(100% - 28px,1240px)}
+  .site-header .brand-header{min-width:auto}.brand-lockup{width:185px;height:52px}
+  .hero{min-height:760px}.hero-content{grid-template-columns:1fr;padding-top:55px}
+  .hero-brief{max-width:560px}.section-head{grid-template-columns:1fr;gap:16px}
+  .about-layout,.ai-showcase,.contact-layout{grid-template-columns:1fr}
+  .about-media{min-height:380px}.about-media img{min-height:380px}
+}
+@media(max-width:700px){
+  .nav-row{min-height:70px}.site-header{position:fixed}.hero{margin-top:70px;min-height:760px}
+  .brand-lockup{width:168px}
+  .hero h1{font-size:58px}.hero h2{font-size:26px}.hero-lead{font-size:14px}
+  .hero-brief{display:none}.hero-tags{max-width:none}
+  .section{padding:68px 0}.section-head h2,.about-copy h2,.contact-copy h2,.ai-copy h2{font-size:38px}
+  .feature-grid{grid-template-columns:1fr}.visual-card{min-height:330px}
+  .stats-row{grid-template-columns:1fr 1fr}.stats-row>div:last-child{grid-column:1/-1}
+  .repository-card{overflow:hidden}.assignment-table{min-width:700px}
+  .ai-panel{right:10px;left:10px;width:auto;bottom:82px}
+}
+</style>\n</head>
 <body>
   <a class="skip-link" href="#main">Bỏ qua menu</a>
 
   <header class="site-header" id="siteHeader">
     <div class="shell nav-row">
-      <a class="brand" href="#home" aria-label="Phan Tấn Tài - Trang chủ">
-        <img class="brand-logo-mark" src="assets/phan-tan-tai-logo-mark.webp" alt="Logo Phan Tấn Tài">
-        <span class="brand-copy"><strong>PHAN TẤN TÀI</strong><small>GEOLOGY · GEOPHYSICS</small></span>
+      <a class="brand brand-header" href="#home" aria-label="Phan Tấn Tài - Trang chủ">
+        <img class="brand-lockup" src="assets/ptt-brand.svg" alt="Phan Tấn Tài — Geology & Geophysics">
       </a>
 
       <button class="nav-toggle" id="navToggle" aria-label="Mở menu" aria-expanded="false">☰</button>
@@ -181,7 +331,7 @@ body,button,input,select,textarea,.hero h1,.hero h2,.section-head h2,.about-copy
         <a href="#geo-ai">Geo AI</a>
         <a href="#contact">Liên hệ</a>
       </nav>
-      <div class="account-actions" id="accountActions">
+      <a class="admin-shortcut" href="admin-login.html" aria-label="Đăng nhập quản trị">Admin</a>\n      <div class="account-actions" id="accountActions">
         <button class="btn btn-outline btn-login" id="userLoginOpen">Đăng nhập</button>
         <button class="btn btn-gold btn-register" id="userRegisterOpen">Đăng ký</button>
         <button class="account-chip" id="userAccountBtn" type="button" hidden aria-haspopup="true" aria-expanded="false">
@@ -199,28 +349,28 @@ body,button,input,select,textarea,.hero h1,.hero h2,.section-head h2,.about-copy
 
   <main id="main">
     <section class="hero" id="home" aria-labelledby="heroTitle">
-      <img class="hero-media" src="assets/hero-geoscience.svg" alt="Minh họa địa chất, địa chấn và biểu đồ địa vật lý giếng khoan">
+      <img class="hero-media" src="assets/hero-mountains.svg" alt="Minh họa địa chất, địa chấn và biểu đồ địa vật lý giếng khoan">
       <div class="hero-overlay"></div>
       <div class="shell hero-content">
         <div class="hero-copy reveal">
-          <p class="kicker">KHÁM PHÁ · PHÂN TÍCH · KIẾN TẠO TRI THỨC ĐỊA CHẤT</p>
+          <p class="kicker">KHÁM PHÁ TRÁI ĐẤT · KIẾN TẠO TRI THỨC</p>
           <h1 id="heroTitle">Phan Tấn Tài</h1>
-          <h2>Sinh viên Địa chất – Địa vật lý</h2>
-          <p class="hero-lead">Nơi giới thiệu hồ sơ học thuật, đề tài nghiên cứu, dự án thực địa và bài tập chuyên ngành.</p>
+          <h2>Geology &amp; Geophysics <span>Portfolio</span></h2>
+          <p class="hero-lead">Hành trình học tập, nghiên cứu và khám phá Trái Đất qua các dự án, bài tập chuyên ngành và công cụ số phục vụ Địa chất – Địa vật lý.</p>
           <div class="hero-actions">
             <a class="btn btn-gold" href="#projects">Xem dự án <span>→</span></a>
-            <a class="btn btn-glass" href="#assignments">Xem bài tập</a>
+            <a class="btn btn-glass" href="#assignments">Khám phá bài tập</a>
           </div>
           <div class="hero-tags" aria-label="Lĩnh vực chuyên môn">
             <span>Geology</span><span>Geophysics</span><span>Petrophysics</span><span>Field Research</span>
           </div>
         </div>
         <aside class="hero-brief reveal delay-1" aria-label="Hồ sơ nhanh">
-          <p>ACADEMIC PROFILE</p>
+          <p>ACADEMIC PROFILE · 2026</p>
           <dl>
-            <div><dt>Focus</dt><dd>Formation Evaluation</dd></div>
-            <div><dt>Methods</dt><dd>Well Logs · Seismic · ERT</dd></div>
-            <div><dt>Direction</dt><dd>Subsurface Interpretation</dd></div>
+            <div><dt>Hướng tập trung</dt><dd>Formation Evaluation</dd></div>
+            <div><dt>Phương pháp</dt><dd>Well Logs · Seismic · ERT</dd></div>
+            <div><dt>Định hướng</dt><dd>Subsurface Interpretation</dd></div>
           </dl>
         </aside>
       </div>
@@ -230,8 +380,8 @@ body,button,input,select,textarea,.hero h1,.hero h2,.section-head h2,.about-copy
     <section class="section dark-section" id="highlights">
       <div class="shell">
         <div class="section-head light reveal">
-          <div><p class="eyebrow">HIGHLIGHTS</p><h2>Nổi bật</h2></div>
-          <p>Ba khu vực trọng tâm được thiết kế cho hành trình học tập, nghiên cứu và trao đổi chuyên môn.</p>
+          <div><p class="eyebrow">KHÁM PHÁ HỒ SƠ</p><h2>Nền tảng học thuật</h2></div>
+          <p>Ba khu vực kết nối dự án nghiên cứu, tài liệu học tập và trợ lý Geo AI trong cùng một portfolio.</p>
         </div>
 
         <div class="feature-grid">
@@ -276,14 +426,14 @@ body,button,input,select,textarea,.hero h1,.hero h2,.section-head h2,.about-copy
           <div class="media-caption"><span>FIELD NOTE 01</span><strong>Observe · Measure · Interpret</strong></div>
         </div>
         <div class="about-copy reveal delay-1">
-          <p class="eyebrow">ABOUT</p>
-          <h2>Về tôi</h2>
+          <p class="eyebrow">01 · GIỚI THIỆU</p>
+          <h2>Xin chào, mình là<br>Phan Tấn Tài</h2>
           <p class="lead">Tôi là <strong>Phan Tấn Tài</strong>, sinh viên Địa chất – Địa vật lý, quan tâm đến địa chất dầu khí, địa vật lý giếng khoan, địa chấn và đánh giá đặc tính vỉa chứa.</p>
           <p>Website này đóng vai trò như một hồ sơ học thuật sống: ghi lại quá trình học tập, thực địa, nghiên cứu, bài tập chuyên ngành và những kỹ năng tôi đang phát triển.</p>
           <div class="stats-row">
-            <div><strong>08+</strong><span>Dự án học thuật</span></div>
-            <div><strong>25+</strong><span>Bài tập & báo cáo</span></div>
-            <div><strong>04</strong><span>Nhóm chuyên môn</span></div>
+            <div><strong id="statProjects">—</strong><span>Dự án công khai</span></div>
+            <div><strong id="statAssignments">—</strong><span>Bài tập & tài liệu</span></div>
+            <div><strong>05+</strong><span>Lĩnh vực quan tâm</span></div>
           </div>
           <a class="text-link" href="#projects">Khám phá hồ sơ chuyên môn →</a>
         </div>
@@ -293,7 +443,7 @@ body,button,input,select,textarea,.hero h1,.hero h2,.section-head h2,.about-copy
     <section class="section projects-section" id="projects">
       <div class="shell">
         <div class="section-head reveal">
-          <div><p class="eyebrow">SELECTED WORK</p><h2>Dự án tiêu biểu</h2></div>
+          <div><p class="eyebrow">02 · DỰ ÁN NGHIÊN CỨU</p><h2>Một số dự án tiêu biểu</h2></div>
           <p>Các dự án được trình bày theo cấu trúc: mục tiêu, dữ liệu, phương pháp, kết quả và bài học chuyên môn.</p>
         </div>
 
@@ -306,7 +456,7 @@ body,button,input,select,textarea,.hero h1,.hero h2,.section-head h2,.about-copy
     <section class="section assignments-section" id="assignments">
       <div class="shell">
         <div class="section-head light reveal">
-          <div><p class="eyebrow">COURSEWORK HUB</p><h2>Bài tập & phản hồi</h2></div>
+          <div><p class="eyebrow">03 · BÀI TẬP & TÀI LIỆU</p><h2>Học tập & chia sẻ tài liệu</h2></div>
           <p>Kho học tập cho phép tìm kiếm, mở nội dung, xem lượt nhận xét và gửi góp ý trực tiếp trên website.</p>
         </div>
 
@@ -345,8 +495,8 @@ body,button,input,select,textarea,.hero h1,.hero h2,.section-head h2,.about-copy
     <section class="section ai-section" id="geo-ai">
       <div class="shell ai-showcase">
         <div class="ai-copy reveal">
-          <p class="eyebrow">GEO AI ASSISTANT</p>
-          <h2>Trợ lý học thuật cho website</h2>
+          <p class="eyebrow">04 · GEO AI</p>
+          <h2>Trợ lý học tập Địa chất & Địa vật lý</h2>
           <p class="lead">Trợ lý miễn phí chuyên cho nội dung Địa chất – Địa vật lý, có thể tra cứu dự án, bài tập trên website và giải thích nhanh các khái niệm chuyên ngành.</p>
           <ul class="check-list">
             <li>Tra cứu nhanh dự án và bài tập</li>
@@ -366,8 +516,8 @@ body,button,input,select,textarea,.hero h1,.hero h2,.section-head h2,.about-copy
     <section class="section contact-section" id="contact">
       <div class="shell contact-layout">
         <div class="contact-copy reveal">
-          <p class="eyebrow">ACADEMIC CONTACT</p>
-          <h2>Kết nối & trao đổi</h2>
+          <p class="eyebrow">05 · LIÊN HỆ</p>
+          <h2>Kết nối & trao đổi học thuật</h2>
           <p>Gửi góp ý, trao đổi học thuật hoặc đề nghị cộng tác trong các chủ đề liên quan đến Địa chất – Địa vật lý.</p>
         </div>
         <form class="contact-form reveal delay-1" id="contactForm" novalidate>
@@ -387,7 +537,7 @@ body,button,input,select,textarea,.hero h1,.hero h2,.section-head h2,.about-copy
   <footer class="site-footer">
     <div class="shell footer-grid">
       <div class="brand footer-brand">
-        <img class="brand-logo-mark" src="assets/phan-tan-tai-logo-mark.webp" alt="Logo Phan Tấn Tài">
+        <img class="footer-emblem" src="assets/ptt-emblem.svg" alt="">
         <span class="brand-copy"><strong>PHAN TẤN TÀI</strong><small>GEOLOGY · GEOPHYSICS</small></span>
       </div>
       <div class="footer-links"><a href="#about">Giới thiệu</a><a href="#projects">Dự án</a><a href="#assignments">Bài tập</a><a href="#geo-ai">Geo AI</a><a href="admin-login.html">Quản trị viên</a></div>
@@ -444,7 +594,7 @@ body,button,input,select,textarea,.hero h1,.hero h2,.section-head h2,.about-copy
   <div class="modal" id="userLoginModal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="userLoginTitle">
     <div class="modal-card login-card">
       <button class="modal-close" id="userLoginClose" aria-label="Đóng">×</button>
-      <div class="login-brand"><img class="brand-logo-mark" src="assets/phan-tan-tai-logo-mark.webp" alt="Logo Phan Tấn Tài"></div>
+      <div class="login-brand"><img class="modal-emblem" src="assets/ptt-emblem.svg" alt="Logo Phan Tấn Tài"></div>
       <p class="eyebrow">USER ACCOUNT</p>
       <h3 id="userLoginTitle">Đăng nhập người dùng</h3>
       <p class="muted">Đăng nhập là tùy chọn. Bạn vẫn có thể xem toàn bộ dự án và bài tập công khai mà không cần tài khoản.</p>
@@ -765,6 +915,10 @@ async function loadPublicContent({silent = false} = {}){
     for (const c of cRes.data || []) counts[c.assignment_id] = (counts[c.assignment_id] || 0) + 1;
     projects = (pRes.data || []).map(mapProject);
     assignments = (aRes.data || []).map(row => mapAssignment(row, counts));
+    const statProjects = $('#statProjects');
+    const statAssignments = $('#statAssignments');
+    if (statProjects) statProjects.textContent = projects.length + '+';
+    if (statAssignments) statAssignments.textContent = assignments.length + '+';
     renderProjects();
     renderAssignments();
     if (latestRes.data){
