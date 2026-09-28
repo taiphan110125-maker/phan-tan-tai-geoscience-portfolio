@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180" role="img" aria-label="Phan Tấn Tài geology emblem">
+<defs>
+  <linearGradient id="o" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#0B3158"/><stop offset=".55" stop-color="#087EA4"/><stop offset="1" stop-color="#11B7CC"/></linearGradient>
+  <linearGradient id="m" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#061B36"/><stop offset=".55" stop-color="#0C4F85"/><stop offset="1" stop-color="#1089A7"/></linearGradient>
+  <linearGradient id="g" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#A96C11"/><stop offset=".55" stop-color="#F0C15B"/><stop offset="1" stop-color="#C98A1F"/></linearGradient>
+</defs>
+<path d="M20 76A72 72 0 0 1 159 57" fill="none" stroke="url(#g)" stroke-width="7" stroke-linecap="round"/>
+<path d="M13 112 52 70 70 88 99 40 128 87 147 73 168 111Z" fill="url(#m)"/>
+<path d="m52 70 18 18 29-48 8 27 21 20-14 4-15-20-16 27Z" fill="url(#g)" opacity=".96"/>
+<path d="M9 113c31-23 58-8 82 7 27 17 52 18 83-10-11 29-33 46-61 48-34 2-57-18-81-24-11-3-19-1-23 2 19 2 36 10 52 19 40 21 83 15 106-19-7 34-33 51-67 49-29-2-52-16-72-27-13-8-24-10-34-8 11-14 18-24 15-37Z" fill="url(#o)"/>
+<path d="M23 119c31-13 52 1 72 14 23 14 46 16 69-1" fill="none" stroke="#fff" stroke-width="8" stroke-linecap="round"/>
+<path d="M123 126c18-22 40-21 53-8 11 11 10 30-3 42" fill="none" stroke="#F1FCFF" stroke-width="9" stroke-linecap="round"/>
+</svg>
