@@ -434,6 +434,31 @@ body{background:#fff;color:var(--ink);font-family:"Segoe UI",Arial,Helvetica,san
 }
 
 </style>
+<style id="ptt-assignment-groups">
+
+.assignment-groups{display:grid;gap:18px;padding:18px}
+.assignment-day{background:#fff;border:1px solid #e1e8ee;border-radius:18px;overflow:hidden}
+.assignment-day-head{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:18px 20px;background:#f6f9fb;border-bottom:1px solid #e5ebf0}
+.assignment-day-head span{display:block;color:#7b8d9b;font-size:9px;font-weight:900;letter-spacing:.16em;margin-bottom:3px}
+.assignment-day-head h3{margin:0;color:#17324a;font-size:22px}
+.assignment-day-head>strong{padding:7px 11px;border-radius:999px;background:#eaf1f7;color:#315b7c;font-size:11px}
+.assignment-day-list{display:grid}
+.assignment-item{display:grid;grid-template-columns:68px minmax(0,1fr) auto;gap:16px;align-items:center;padding:17px 20px;border-bottom:1px solid #edf1f4}
+.assignment-item:last-child{border-bottom:0}
+.assignment-index{width:56px;height:56px;border-radius:14px;background:#17324a;color:#fff;display:grid;place-items:center;align-content:center;line-height:1}
+.assignment-index span{font-size:8px;text-transform:uppercase;letter-spacing:.12em;opacity:.72;margin-bottom:4px}.assignment-index strong{font-size:20px}
+.assignment-content{min-width:0}.assignment-content h4{margin:6px 0 4px;color:#17324a;font-size:15px}.assignment-content p{margin:0 0 5px;color:#627789;font-size:12px}
+.assignment-content small{color:#8998a4;font-size:10px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.assignment-meta{display:flex;gap:6px;flex-wrap:wrap}.subject-pill,.file-pill{display:inline-flex;align-items:center;padding:4px 8px;border-radius:999px;font-size:9px;font-weight:800}
+.subject-pill{background:#eef5fa;color:#2f6692}.file-pill{background:#f5f1e8;color:#89651f}
+.assignment-actions{display:flex;gap:7px;flex-wrap:wrap;justify-content:flex-end}
+.assignment-empty{padding:34px;text-align:center;color:#718494;background:#fff;border:1px dashed #d8e2ea;border-radius:16px}
+@media(max-width:720px){
+  .assignment-groups{padding:12px}.assignment-item{grid-template-columns:52px 1fr;padding:15px}.assignment-index{width:46px;height:46px;border-radius:12px}
+  .assignment-actions{grid-column:1/-1;justify-content:flex-start;padding-left:68px}.assignment-day-head{padding:15px}
+}
+
+</style>
 </head>
 <body>
   <a class="skip-link" href="#main">Bỏ qua menu</a>
@@ -594,12 +619,7 @@ body{background:#fff;color:var(--ink);font-family:"Segoe UI",Arial,Helvetica,san
                 <option value="geology">Geology</option>
               </select>
             </div>
-            <div class="assignment-table-wrap">
-              <table class="assignment-table">
-                <thead><tr><th>Tài liệu</th><th>Chủ đề</th><th>Phản hồi</th><th></th></tr></thead>
-                <tbody id="assignmentList"></tbody>
-              </table>
-            </div>
+            <div id="assignmentGroups" class="assignment-groups" aria-live="polite"></div>
           </div>
 
           <aside class="feedback-card reveal delay-1">
@@ -797,6 +817,7 @@ const sb = window.pttSupabase;
 let currentUser = null;
 let projects = [];
 let assignments = [];
+let assignmentSubjects = [];
 let publicContentLoading = false;
 let publicContentLoadedOnce = false;
 
@@ -924,18 +945,61 @@ $('#projectModalClose')?.addEventListener('click', () => closeModal(projectModal
 // Assignments
 const assignmentSearch = $('#assignmentSearch');
 const subjectFilter = $('#subjectFilter');
+
+function assignmentSubjectName(slug){
+  return assignmentSubjects.find(s => s.slug === slug)?.name || slug || 'Khác';
+}
+function populateSubjectFilter(){
+  if(!subjectFilter) return;
+  const current=subjectFilter.value || 'all';
+  subjectFilter.innerHTML='<option value="all">Tất cả môn học</option>' +
+    assignmentSubjects.map(s => `<option value="${escapeHtml(s.slug)}">${escapeHtml(s.name)}</option>`).join('');
+  subjectFilter.value=[...subjectFilter.options].some(o=>o.value===current)?current:'all';
+}
 function renderAssignments(){
-  if (!assignmentSearch || !subjectFilter) return;
-  const q = assignmentSearch.value.trim().toLowerCase();
-  const subject = subjectFilter.value;
-  const rows = assignments.filter(a => (subject === 'all' || a.subject === subject) && (`${a.title} ${a.topic}`.toLowerCase().includes(q)));
-  $('#assignmentList').innerHTML = rows.length ? rows.map(a => `
-    <tr>
-      <td><div class="file-cell"><span class="file-type">${escapeHtml(a.type)}</span><div><strong>${escapeHtml(a.title)}</strong><small>${escapeHtml(a.date)}</small></div></div></td>
-      <td>${escapeHtml(a.topic)}</td>
-      <td>${Number(a.commentCount || 0)} nhận xét</td>
-      <td><div class="table-actions"><button class="mini-btn assignment-view" data-id="${escapeHtml(a.id)}">Xem</button><button class="mini-btn comment-open" data-id="${escapeHtml(a.id)}">Nhận xét</button></div></td>
-    </tr>`).join('') : '<tr><td colspan="4">Không tìm thấy tài liệu phù hợp.</td></tr>';
+  const host=$('#assignmentGroups');
+  if(!host || !assignmentSearch || !subjectFilter) return;
+  const q=assignmentSearch.value.trim().toLowerCase();
+  const subject=subjectFilter.value;
+  const rows=assignments
+    .filter(a=>{
+      const subjectName=assignmentSubjectName(a.subject);
+      const haystack=`${a.title} ${a.topic} ${a.fileName} ${subjectName} ngày ${a.dayNumber} bài ${a.assignmentNumber}`.toLowerCase();
+      return (subject==='all'||a.subject===subject) && haystack.includes(q);
+    })
+    .sort((a,b)=>a.dayNumber-b.dayNumber || a.assignmentNumber-b.assignmentNumber || a.title.localeCompare(b.title,'vi'));
+  if(!rows.length){
+    host.innerHTML='<div class="assignment-empty">Không tìm thấy bài tập phù hợp.</div>';
+    return;
+  }
+  const groups=new Map();
+  rows.forEach(a=>{
+    if(!groups.has(a.dayNumber)) groups.set(a.dayNumber,[]);
+    groups.get(a.dayNumber).push(a);
+  });
+  host.innerHTML=[...groups.entries()].map(([day,items])=>`
+    <section class="assignment-day">
+      <header class="assignment-day-head">
+        <div><span>NHÓM BÀI TẬP</span><h3>Ngày ${day}</h3></div>
+        <strong>${items.length} bài</strong>
+      </header>
+      <div class="assignment-day-list">
+        ${items.map(a=>`
+          <article class="assignment-item">
+            <div class="assignment-index"><span>Bài</span><strong>${a.assignmentNumber}</strong></div>
+            <div class="assignment-content">
+              <div class="assignment-meta"><span class="subject-pill">${escapeHtml(assignmentSubjectName(a.subject))}</span><span class="file-pill">${escapeHtml(a.type)}</span></div>
+              <h4>${escapeHtml(a.title)}</h4>
+              ${a.topic?`<p>${escapeHtml(a.topic)}</p>`:''}
+              <small>${escapeHtml(a.fileName || 'Chưa có file đính kèm')} · ${Number(a.commentCount||0)} nhận xét</small>
+            </div>
+            <div class="assignment-actions">
+              <button class="mini-btn assignment-view" data-id="${escapeHtml(a.id)}">Xem file</button>
+              <button class="mini-btn comment-open" data-id="${escapeHtml(a.id)}">Nhận xét</button>
+            </div>
+          </article>`).join('')}
+      </div>
+    </section>`).join('');
 }
 assignmentSearch?.addEventListener('input', renderAssignments);
 subjectFilter?.addEventListener('change', renderAssignments);
@@ -956,7 +1020,7 @@ function openComment(id){
   const assignment = assignments.find(item => item.id === id);
   if (!assignment) return;
   $('#commentAssignmentId').value = id;
-  $('#commentTarget').textContent = assignment.title;
+  $('#commentTarget').textContent = `Ngày ${assignment.dayNumber} · Bài ${assignment.assignmentNumber} · ${assignment.title}`;
   $('#commentStatus').textContent = '';
   if (currentUser?.name) $('#commentName').value = currentUser.name;
   openModal(commentModal);
@@ -1020,24 +1084,40 @@ function mapProject(row){
   return {id:row.id,title:row.title,type:row.type,image:row.image_url || '',imagePath:row.image_path || '',summary:row.summary || '',tags:row.tags || [],objective:row.objective || '',data:row.data_text || '',method:row.method || '',output:row.output || '',sortOrder:row.sort_order || 0};
 }
 function mapAssignment(row, countMap){
-  return {id:row.id,type:row.type,title:row.title,topic:row.topic || '',subject:row.subject || 'other',date:row.date_text || formatDate(row.created_at),fileName:row.file_name || '',fileUrl:row.file_url || '',filePath:row.file_path || '',commentCount:countMap[row.id] || 0};
+  return {
+    id:row.id,
+    type:row.type,
+    title:row.title,
+    topic:row.topic || '',
+    subject:row.subject || 'other',
+    dayNumber:Number(row.day_number || 1),
+    assignmentNumber:Number(row.assignment_number || 1),
+    date:row.date_text || formatDate(row.created_at),
+    fileName:row.file_name || '',
+    fileUrl:row.file_url || '',
+    filePath:row.file_path || '',
+    commentCount:countMap[row.id] || 0
+  };
 }
 async function loadPublicContent({silent = false} = {}){
   if (publicContentLoading) return;
   publicContentLoading = true;
   try {
     const client = requireSupabase();
-    const [pRes, aRes, cRes, latestRes] = await Promise.all([
+    const [pRes, aRes, cRes, latestRes, sRes] = await Promise.all([
       client.from('projects').select('*').eq('published', true).order('sort_order', {ascending:true}).order('created_at', {ascending:false}),
-      client.from('assignments').select('*').eq('published', true).order('created_at', {ascending:false}),
+      client.from('assignments').select('*').eq('published', true).order('day_number', {ascending:true}).order('assignment_number', {ascending:true}).order('created_at', {ascending:true}),
       client.from('comments').select('assignment_id'),
-      client.from('comments').select('name,role,body,created_at').order('created_at', {ascending:false}).limit(1).maybeSingle()
+      client.from('comments').select('name,role,body,created_at').order('created_at', {ascending:false}).limit(1).maybeSingle(),
+      client.from('assignment_subjects').select('slug,name,sort_order').eq('active', true).order('sort_order', {ascending:true}).order('name', {ascending:true})
     ]);
-    for (const res of [pRes,aRes,cRes,latestRes]) if (res.error) throw res.error;
+    for (const res of [pRes,aRes,cRes,latestRes,sRes]) if (res.error) throw res.error;
     const counts = {};
     for (const c of cRes.data || []) counts[c.assignment_id] = (counts[c.assignment_id] || 0) + 1;
     projects = (pRes.data || []).map(mapProject);
     assignments = (aRes.data || []).map(row => mapAssignment(row, counts));
+    assignmentSubjects = (sRes.data || []).map(row => ({slug:row.slug,name:row.name,sortOrder:Number(row.sort_order||0)}));
+    populateSubjectFilter();
     const statProjects = $('#statProjects');
     const statAssignments = $('#statAssignments');
     if (statProjects) statProjects.textContent = projects.length + '+';
@@ -1053,7 +1133,8 @@ async function loadPublicContent({silent = false} = {}){
     console.error(error);
     if (!silent || !publicContentLoadedOnce){
       $('#projectShowcase').innerHTML = `<div class="project-empty"><strong>Chưa kết nối được dữ liệu cloud.</strong><span>${escapeHtml(error.message || 'Kiểm tra cấu hình Supabase.')}</span></div>`;
-      $('#assignmentList').innerHTML = '<tr><td colspan="4">Chưa kết nối được kho bài tập cloud.</td></tr>';
+      const assignmentHost=$('#assignmentGroups');
+      if(assignmentHost) assignmentHost.innerHTML='<div class="assignment-empty">Chưa kết nối được kho bài tập cloud.</div>';
     }
   } finally { publicContentLoading = false; }
 }
@@ -1066,6 +1147,7 @@ function subscribeRealtime(){
       .on('postgres_changes', {event:'*',schema:'public',table:'projects'}, () => loadPublicContent({silent:true}))
       .on('postgres_changes', {event:'*',schema:'public',table:'assignments'}, () => loadPublicContent({silent:true}))
       .on('postgres_changes', {event:'*',schema:'public',table:'comments'}, () => loadPublicContent({silent:true}))
+      .on('postgres_changes', {event:'*',schema:'public',table:'assignment_subjects'}, () => loadPublicContent({silent:true}))
       .subscribe();
   } catch (error){ console.warn('Realtime unavailable:', error); }
 }
@@ -1107,7 +1189,7 @@ function aiFind(query,items,limit){
   return items.map(function(item){return {item:item,score:aiScore(query,item)};}).filter(function(x){return x.score>0;}).sort(function(a,b){return b.score-a.score;}).slice(0,limit||3).map(function(x){return x.item;});
 }
 function aiProjectLine(p){ return '• '+p.title+(p.type?' — '+p.type:'')+(p.summary?'\n  '+p.summary:''); }
-function aiAssignmentLine(a){ return '• '+a.title+(a.topic?' — '+a.topic:'')+(a.date?' ('+a.date+')':''); }
+function aiAssignmentLine(a){ return '• Ngày '+a.dayNumber+' · Bài '+a.assignmentNumber+' — '+a.title+(a.topic?' · '+a.topic:''); }
 function localSmartAnswer(query){
   const t=aiNormalize(query);
   if(!t) return 'Bạn hãy nhập câu hỏi về Địa chất – Địa vật lý, dự án hoặc bài tập trên website.';

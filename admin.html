@@ -246,6 +246,24 @@ body.admin-body,.admin-body{background:#f6f8fb!important;color:#183247!important
 @media(max-width:650px){.admin-sidebar{background:#fff!important;border-bottom:1px solid #e1e8ee!important}}
 
 </style>
+<style id="ptt-assignment-admin-v2">
+
+.admin-assignment-actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+.assignment-admin-note{display:flex;gap:8px;flex-wrap:wrap;padding:13px 15px;margin-bottom:14px;background:#f7fafc;border:1px solid #e1e8ee;border-radius:12px;font-size:11px;color:#667b8b}
+.assignment-admin-note strong{color:#17324a}.assignment-admin-table{min-width:980px}
+.admin-inline-select{min-width:140px;padding:8px 9px;border:1px solid #d8e3ea;border-radius:9px;background:#fff;color:#29465c;font:inherit;font-size:11px}
+.inline-day-control{display:flex;align-items:center;gap:6px;color:#708493;font-size:10px}.inline-day-control input{width:62px;padding:7px 8px;border:1px solid #d8e3ea;border-radius:9px;background:#fff;color:#17324a}
+.assignment-batch-modal{width:min(620px,calc(100vw - 28px))!important}.assignment-batch-grid{display:grid;grid-template-columns:1fr 1.4fr;gap:12px}
+.selected-files-preview{display:grid;gap:5px;max-height:150px;overflow:auto;padding:10px 12px;background:#f7fafc;border:1px solid #e1e8ee;border-radius:11px;color:#5f7485;font-size:10px}
+.selected-files-preview span{padding-bottom:5px;border-bottom:1px solid #e7edf2}.selected-files-preview span:last-child{border-bottom:0;padding-bottom:0}
+.subject-add-form{display:grid;grid-template-columns:1fr auto;gap:8px;margin:14px 0}.subject-add-form input{border:1px solid #dbe4eb;border-radius:10px;padding:11px 12px;font:inherit}
+.subject-manager-list{display:grid;gap:8px;max-height:380px;overflow:auto;margin-top:12px}
+.subject-manager-row{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:12px;background:#f8fafc;border:1px solid #e2e9ef;border-radius:12px}
+.subject-manager-row>div:first-child{min-width:0}.subject-manager-row strong{display:block;color:#17324a;font-size:12px}.subject-manager-row small{display:block;color:#7c8e9b;font-size:9px;margin-top:2px}
+.subject-manager-row>div:last-child{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+@media(max-width:720px){.assignment-batch-grid,.subject-add-form{grid-template-columns:1fr}.admin-assignment-actions{justify-content:flex-start}.subject-manager-row{align-items:flex-start;flex-direction:column}.subject-manager-row>div:last-child{justify-content:flex-start}}
+
+</style>
 </head>
 <body class="admin-body">
   <header class="admin-topbar">
@@ -279,8 +297,17 @@ body.admin-body,.admin-body{background:#f6f8fb!important;color:#183247!important
       </section>
 
       <section class="admin-view" data-panel="assignments">
-        <div class="admin-heading"><div><p class="eyebrow">CONTENT</p><h1>Quản lý bài tập</h1></div><button class="btn btn-gold" id="addAssignmentBtn">+ Thêm bài tập</button></div>
-        <div class="admin-panel"><div class="table-scroll"><table class="admin-table"><thead><tr><th>Tài liệu</th><th>Chủ đề</th><th>Ngày</th><th>Nhận xét</th><th></th></tr></thead><tbody id="adminAssignmentRows"></tbody></table></div></div>
+        <div class="admin-heading">
+          <div><p class="eyebrow">CONTENT</p><h1>Quản lý bài tập</h1><p>Nhóm bài theo Ngày, tự đánh số Bài và tải nhiều file trong một lần.</p></div>
+          <div class="admin-assignment-actions">
+            <button class="btn btn-outline" id="manageSubjectsBtn">Quản lý môn học</button>
+            <button class="btn btn-gold" id="addAssignmentBtn">+ Tải nhiều bài tập</button>
+          </div>
+        </div>
+        <div class="admin-panel">
+          <div class="assignment-admin-note"><strong>Cấu trúc hiển thị:</strong><span>Ngày 1 → Bài 1, Bài 2, Bài 3... · Ngày 2 → tiếp tục nhóm mới.</span></div>
+          <div class="table-scroll"><table class="admin-table assignment-admin-table"><thead><tr><th>Bài tập</th><th>Môn học</th><th>Nhóm ngày</th><th>Chủ đề</th><th>Nhận xét</th><th></th></tr></thead><tbody id="adminAssignmentRows"></tbody></table></div>
+        </div>
       </section>
 
       <section class="admin-view" data-panel="projects">
@@ -362,19 +389,36 @@ body.admin-body,.admin-body{background:#f6f8fb!important;color:#183247!important
   </div>
 
   <div class="modal" id="assignmentModal" aria-hidden="true">
-    <div class="modal-card compact">
+    <div class="modal-card compact assignment-batch-modal">
       <button class="modal-close" id="assignmentModalClose" aria-label="Đóng">×</button>
-      <p class="eyebrow">NEW ASSIGNMENT</p><h3>Thêm bài tập</h3>
+      <p class="eyebrow">BATCH UPLOAD</p><h3>Tải nhiều bài tập</h3>
       <form id="assignmentForm" class="stack-form">
-        <label>Tiêu đề<input id="assignmentTitle" required minlength="3" placeholder="Tên bài tập"></label>
-        <label>Loại file<select id="assignmentType"><option>PDF</option><option>DOCX</option><option>PPTX</option><option>XLSX</option></select></label>
-        <label>Nhóm môn<select id="assignmentSubject"><option value="petrophysics">Petrophysics</option><option value="seismic">Seismic</option><option value="geology">Geology</option></select></label>
-        <label>Chủ đề / mô tả ngắn<input id="assignmentTopic" required placeholder="Ví dụ: Petrophysics · Đồ án"></label>
-        <label>File thử nghiệm<input id="assignmentFile" type="file" accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx"></label>
-        <small class="muted">File bài tập sẽ được tải lên Supabase Storage và có thể mở từ website công khai.</small>
-        <button class="btn btn-dark" type="submit">Lưu bài tập</button>
+        <div class="assignment-batch-grid">
+          <label>Ngày học<input id="assignmentDay" type="number" min="1" step="1" value="1" required></label>
+          <label>Môn học<select id="assignmentSubject" required></select></label>
+        </div>
+        <label>Tiêu đề chung <small class="muted">(không bắt buộc)</small><input id="assignmentTitle" placeholder="Ví dụ: Bài tập Petrophysics"></label>
+        <label>Chủ đề / mô tả chung<input id="assignmentTopic" placeholder="Ví dụ: Formation Evaluation · Chương 2"></label>
+        <label>Chọn nhiều file<input id="assignmentFile" type="file" multiple required accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx"></label>
+        <div id="selectedFilesPreview" class="selected-files-preview">Chưa chọn file.</div>
+        <small class="muted">Mỗi file sẽ trở thành một Bài riêng. Hệ thống tự tiếp tục Bài 1, Bài 2, Bài 3... trong Ngày đã chọn.</small>
+        <button class="btn btn-dark" type="submit">Tải lên & lưu tất cả</button>
         <p class="form-status" id="assignmentStatus"></p>
       </form>
+    </div>
+  </div>
+
+  <div class="modal" id="subjectModal" aria-hidden="true">
+    <div class="modal-card compact">
+      <button class="modal-close" id="subjectModalClose" aria-label="Đóng">×</button>
+      <p class="eyebrow">SUBJECTS</p><h3>Quản lý môn học</h3>
+      <p class="muted">Bạn có thể thêm môn mới, đổi tên hoặc ẩn môn khỏi bộ lọc công khai.</p>
+      <form id="subjectForm" class="subject-add-form">
+        <input id="subjectName" required minlength="2" maxlength="80" placeholder="Tên môn học mới">
+        <button class="btn btn-dark" type="submit">+ Thêm môn</button>
+      </form>
+      <p class="form-status" id="subjectStatus"></p>
+      <div id="subjectManagerList" class="subject-manager-list"></div>
     </div>
   </div>
 
@@ -421,7 +465,7 @@ window.PTT_CONFIG = {
 const $ = (selector, root = document) => root.querySelector(selector);
 const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
 const sb = window.pttSupabase;
-let projects = [], assignments = [], comments = [], messages = [];
+let projects = [], assignments = [], comments = [], messages = [], subjects = [];
 let adminUser = null;
 let pendingProjectImageFile = null;
 
@@ -431,7 +475,20 @@ function requireSupabase(){ if(!sb) throw new Error('Chưa cấu hình Supabase.
 function safeName(name='file'){ return name.normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^A-Za-z0-9._-]+/g,'-').replace(/^-+|-+$/g,'').slice(-100) || 'file'; }
 function notifyPublicContentChanged(kind){ try { new BroadcastChannel('ptt-content-sync').postMessage({kind,at:Date.now()}); } catch {} }
 function mapProject(r){ return {id:r.id,title:r.title,type:r.type,image:r.image_url||'',imagePath:r.image_path||'',summary:r.summary||'',tags:r.tags||[],objective:r.objective||'',data:r.data_text||'',method:r.method||'',output:r.output||'',sortOrder:r.sort_order||0}; }
-function mapAssignment(r, counts){ return {id:r.id,type:r.type,title:r.title,topic:r.topic||'',subject:r.subject||'other',date:r.date_text||'',fileName:r.file_name||'',fileUrl:r.file_url||'',filePath:r.file_path||'',commentCount:counts[r.id]||0}; }
+function mapAssignment(r, counts){ return {id:r.id,type:r.type,title:r.title,topic:r.topic||'',subject:r.subject||'other',dayNumber:Number(r.day_number||1),assignmentNumber:Number(r.assignment_number||1),date:r.date_text||'',fileName:r.file_name||'',fileUrl:r.file_url||'',filePath:r.file_path||'',commentCount:counts[r.id]||0}; }
+function subjectLabel(slug){ return subjects.find(s=>s.slug===slug)?.name || slug || 'Khác'; }
+function subjectSlug(name=''){ return name.normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/đ/g,'d').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,60); }
+function fileBaseName(name=''){ return name.replace(/\.[^.]+$/,'').replace(/[_-]+/g,' ').replace(/\s+/g,' ').trim() || 'Bài tập'; }
+function subjectOptions(current='', activeOnly=false){
+  const list=subjects.filter(s=>!activeOnly||s.active||s.slug===current);
+  return list.map(s=>`<option value="${esc(s.slug)}" ${s.slug===current?'selected':''}>${esc(s.name)}${s.active?'':' (ẩn)'}</option>`).join('');
+}
+function populateAssignmentSubjectSelect(){
+  const select=$('#assignmentSubject'); if(!select)return;
+  const current=select.value;
+  select.innerHTML=subjectOptions(current,true);
+  if(!select.value && subjects.find(s=>s.active)) select.value=subjects.find(s=>s.active).slug;
+}
 
 function go(view){ $$('.admin-view').forEach(panel=>panel.classList.toggle('active',panel.dataset.panel===view)); $$('.side-link').forEach(button=>button.classList.toggle('active',button.dataset.view===view)); renderAll(); }
 $$('.side-link').forEach(button=>button.addEventListener('click',()=>go(button.dataset.view)));
@@ -451,16 +508,18 @@ $('#logoutBtn')?.addEventListener('click',async()=>{ try{ if(sb) await sb.auth.s
 
 async function loadAdminData(){
   const client=requireSupabase();
-  const [pRes,aRes,cRes,mRes]=await Promise.all([
+  const [pRes,aRes,cRes,mRes,sRes]=await Promise.all([
     client.from('projects').select('*').order('sort_order',{ascending:true}).order('created_at',{ascending:false}),
-    client.from('assignments').select('*').order('created_at',{ascending:false}),
+    client.from('assignments').select('*').order('day_number',{ascending:true}).order('assignment_number',{ascending:true}).order('created_at',{ascending:true}),
     client.from('comments').select('id,assignment_id,name,role,body,created_at,assignments(title)').order('created_at',{ascending:false}),
-    client.from('messages').select('*').order('created_at',{ascending:false})
+    client.from('messages').select('*').order('created_at',{ascending:false}),
+    client.from('assignment_subjects').select('*').order('sort_order',{ascending:true}).order('name',{ascending:true})
   ]);
-  for(const res of [pRes,aRes,cRes,mRes]) if(res.error) throw res.error;
+  for(const res of [pRes,aRes,cRes,mRes,sRes]) if(res.error) throw res.error;
   const counts={}; for(const c of cRes.data||[]) counts[c.assignment_id]=(counts[c.assignment_id]||0)+1;
   projects=(pRes.data||[]).map(mapProject);
   assignments=(aRes.data||[]).map(r=>mapAssignment(r,counts));
+  subjects=(sRes.data||[]).map(r=>({slug:r.slug,name:r.name,sortOrder:Number(r.sort_order||0),active:Boolean(r.active)}));
   comments=(cRes.data||[]).map(r=>({id:r.id,assignmentId:r.assignment_id,assignmentTitle:r.assignments?.title||'Bài tập',name:r.name,role:r.role,text:r.body,createdAt:r.created_at}));
   messages=(mRes.data||[]).map(r=>({id:r.id,name:r.name,email:r.email,topic:r.topic,message:r.message,createdAt:r.created_at}));
   renderAll();
@@ -468,11 +527,34 @@ async function loadAdminData(){
 
 function renderMetrics(){ const metrics=[['Bài tập',assignments.length,'Tài liệu trên cloud'],['Nhận xét',comments.length,'Phản hồi trong Supabase'],['Lời nhắn',messages.length,'Từ biểu mẫu liên hệ'],['Dự án',projects.length,'Dự án & nghiên cứu']]; $('#metricGrid').innerHTML=metrics.map(i=>`<div class="metric"><span>${i[0]}</span><strong>${i[1]}</strong><small>${i[2]}</small></div>`).join(''); }
 function renderDashboard(){ const a=assignments.slice(0,4); $('#recentAssignments').innerHTML=a.length?`<div class="mini-list">${a.map(i=>`<div class="mini-list-item"><div><strong>${esc(i.title)}</strong><small>${esc(i.topic)}</small></div><small>${esc(i.date)}</small></div>`).join('')}</div>`:'<div class="empty-state">Chưa có bài tập.</div>'; const c=comments.slice(0,4); $('#recentFeedback').innerHTML=c.length?`<div class="mini-list">${c.map(i=>`<div class="mini-list-item"><div><strong>${esc(i.name)}</strong><small>${esc(i.text)}</small></div><small>${esc(i.role)}</small></div>`).join('')}</div>`:'<div class="empty-state">Chưa có nhận xét mới.</div>'; }
-function renderAssignments(){ $('#adminAssignmentRows').innerHTML=assignments.length?assignments.map(i=>`<tr><td><strong>${esc(i.title)}</strong><small>${esc(i.type)}${i.fileName?` · ${esc(i.fileName)}`:''}</small></td><td>${esc(i.topic)}</td><td>${esc(i.date)}</td><td>${Number(i.commentCount||0)}</td><td><div class="admin-row-actions"><button class="edit-btn" data-open-assignment="${esc(i.id)}">${i.filePath||i.fileUrl?'Mở file':'Chưa có file'}</button><button class="edit-btn" data-reupload-assignment="${esc(i.id)}">Tải lại file</button><button class="danger-btn" data-delete-assignment="${esc(i.id)}">Xóa</button></div></td></tr>`).join(''):'<tr><td colspan="5"><div class="empty-state">Chưa có bài tập.</div></td></tr>'; }
+function renderAssignments(){
+  const rows=[...assignments].sort((a,b)=>a.dayNumber-b.dayNumber||a.assignmentNumber-b.assignmentNumber);
+  $('#adminAssignmentRows').innerHTML=rows.length?rows.map(i=>`
+    <tr>
+      <td><strong>Ngày ${i.dayNumber} · Bài ${i.assignmentNumber}</strong><small>${esc(i.title)} · ${esc(i.type)}${i.fileName?` · ${esc(i.fileName)}`:''}</small></td>
+      <td><select class="admin-inline-select" data-assignment-subject="${esc(i.id)}">${subjectOptions(i.subject,false)}</select></td>
+      <td><label class="inline-day-control"><span>Ngày</span><input type="number" min="1" step="1" value="${i.dayNumber}" data-assignment-day="${esc(i.id)}"></label></td>
+      <td>${esc(i.topic||'—')}</td>
+      <td>${Number(i.commentCount||0)}</td>
+      <td><div class="admin-row-actions"><button class="edit-btn" data-open-assignment="${esc(i.id)}">${i.filePath||i.fileUrl?'Mở file':'Chưa có file'}</button><button class="edit-btn" data-reupload-assignment="${esc(i.id)}">Tải lại file</button><button class="danger-btn" data-delete-assignment="${esc(i.id)}">Xóa</button></div></td>
+    </tr>`).join(''):'<tr><td colspan="6"><div class="empty-state">Chưa có bài tập.</div></td></tr>';
+}
+function renderSubjects(){
+  const host=$('#subjectManagerList'); if(!host)return;
+  host.innerHTML=subjects.length?subjects.map(s=>`
+    <div class="subject-manager-row">
+      <div><strong>${esc(s.name)}</strong><small>${esc(s.slug)} · ${s.active?'Đang hiển thị':'Đang ẩn'}</small></div>
+      <div>
+        <button class="edit-btn" data-rename-subject="${esc(s.slug)}">Đổi tên</button>
+        <button class="edit-btn" data-toggle-subject="${esc(s.slug)}">${s.active?'Ẩn':'Hiện'}</button>
+        <button class="danger-btn" data-delete-subject="${esc(s.slug)}">Xóa</button>
+      </div>
+    </div>`).join(''):'<div class="empty-state">Chưa có môn học.</div>';
+}
 function renderProjects(){ const q=($('#projectSearch')?.value||'').trim().toLowerCase(); const filtered=projects.filter(p=>`${p.title} ${p.type} ${(p.tags||[]).join(' ')}`.toLowerCase().includes(q)); $('#adminProjectRows').innerHTML=filtered.length?filtered.map(p=>`<tr><td><div class="admin-project-title"><img src="${esc(p.image||'assets/hero-geoscience.svg')}" alt=""><div><strong>${esc(p.title)}</strong><small>${esc((p.summary||'').slice(0,105))}${(p.summary||'').length>105?'…':''}</small></div></div></td><td>${esc(p.type||'—')}</td><td><div class="admin-tag-list">${(p.tags||[]).slice(0,3).map(t=>`<span>${esc(t)}</span>`).join('')||'<span>Chưa có</span>'}</div></td><td><small>${p.imagePath?'Supabase Storage':esc(p.image||'Mặc định')}</small></td><td><div class="admin-row-actions"><button class="edit-btn" data-edit-project="${esc(p.id)}">Sửa</button><button class="danger-btn" data-delete-project="${esc(p.id)}">Xóa</button></div></td></tr>`).join(''):'<tr><td colspan="5"><div class="empty-state">Không tìm thấy dự án phù hợp.</div></td></tr>'; }
 function renderFeedback(){ $('#feedbackList').innerHTML=comments.length?comments.map(c=>`<div class="feedback-item"><div class="feedback-item-head"><strong>${esc(c.name)} · ${esc(c.role)}</strong><small>${new Date(c.createdAt).toLocaleString('vi-VN')}</small></div><p><b>${esc(c.assignmentTitle||'Bài tập')}</b><br>${esc(c.text)}</p><button class="danger-btn" data-delete-comment="${esc(c.id)}">Xóa nhận xét</button></div>`).join(''):'<div class="empty-state">Chưa có nhận xét.</div>'; }
 function renderMessages(){ $('#messageList').innerHTML=messages.length?messages.map(m=>`<div class="message-item"><div class="message-item-head"><strong>${esc(m.name)} · ${esc(m.topic||'Liên hệ')}</strong><small>${new Date(m.createdAt).toLocaleString('vi-VN')}</small></div><p>${esc(m.email)}<br>${esc(m.message)}</p><button class="danger-btn" data-delete-message="${esc(m.id)}">Xóa lời nhắn</button></div>`).join(''):'<div class="empty-state">Chưa có lời nhắn.</div>'; }
-function renderAll(){ renderMetrics();renderDashboard();renderAssignments();renderProjects();renderFeedback();renderMessages(); }
+function renderAll(){ renderMetrics();renderDashboard();renderAssignments();renderProjects();renderFeedback();renderMessages();renderSubjects();populateAssignmentSubjectSelect(); }
 $('#projectSearch')?.addEventListener('input',renderProjects);
 
 async function openStoredAssignment(item){
@@ -525,13 +607,70 @@ function reuploadAssignmentFile(item){
   input.click();
 }
 
+async function normalizeDayNumbers(day){
+  const items=assignments.filter(a=>a.dayNumber===day).sort((a,b)=>a.assignmentNumber-b.assignmentNumber||a.id.localeCompare(b.id));
+  for(let i=0;i<items.length;i++){
+    const wanted=i+1;
+    if(items[i].assignmentNumber!==wanted){
+      const {error}=await sb.from('assignments').update({assignment_number:wanted}).eq('id',items[i].id);
+      if(error) throw error;
+      items[i].assignmentNumber=wanted;
+    }
+  }
+}
+document.addEventListener('change',async event=>{
+  const subjectSelect=event.target.closest('[data-assignment-subject]');
+  if(subjectSelect){
+    const id=subjectSelect.dataset.assignmentSubject;
+    const {error}=await sb.from('assignments').update({subject:subjectSelect.value}).eq('id',id);
+    if(error){toast(error.message);await loadAdminData();return;}
+    const item=assignments.find(a=>a.id===id);if(item)item.subject=subjectSelect.value;
+    notifyPublicContentChanged('assignments');toast('Đã đổi môn học');return;
+  }
+  const dayInput=event.target.closest('[data-assignment-day]');
+  if(dayInput){
+    const id=dayInput.dataset.assignmentDay;
+    const item=assignments.find(a=>a.id===id);
+    const targetDay=Math.max(1,Number(dayInput.value||1));
+    if(!item||targetDay===item.dayNumber){dayInput.value=item?.dayNumber||1;return;}
+    const sourceDay=item.dayNumber;
+    const maxTarget=assignments.filter(a=>a.id!==id&&a.dayNumber===targetDay).reduce((m,a)=>Math.max(m,a.assignmentNumber),0);
+    const {error}=await sb.from('assignments').update({day_number:targetDay,assignment_number:maxTarget+1}).eq('id',id);
+    if(error){toast(error.message);await loadAdminData();return;}
+    item.dayNumber=targetDay;item.assignmentNumber=maxTarget+1;
+    try{await normalizeDayNumbers(sourceDay);}catch(e){console.warn(e);}
+    await loadAdminData();notifyPublicContentChanged('assignments');toast('Đã chuyển nhóm ngày');return;
+  }
+});
+
 document.addEventListener('click',async event=>{
+  const rs=event.target.closest('[data-rename-subject]');
+  if(rs){
+    const s=subjects.find(x=>x.slug===rs.dataset.renameSubject); if(!s)return;
+    const name=prompt('Tên môn học mới:',s.name)?.trim(); if(!name||name===s.name)return;
+    const {error}=await sb.from('assignment_subjects').update({name}).eq('slug',s.slug);
+    if(error)toast(error.message);else{await loadAdminData();notifyPublicContentChanged('assignment_subjects');toast('Đã đổi tên môn học');} return;
+  }
+  const ts=event.target.closest('[data-toggle-subject]');
+  if(ts){
+    const s=subjects.find(x=>x.slug===ts.dataset.toggleSubject); if(!s)return;
+    const {error}=await sb.from('assignment_subjects').update({active:!s.active}).eq('slug',s.slug);
+    if(error)toast(error.message);else{await loadAdminData();notifyPublicContentChanged('assignment_subjects');toast(s.active?'Đã ẩn môn học':'Đã hiện môn học');} return;
+  }
+  const ds=event.target.closest('[data-delete-subject]');
+  if(ds){
+    const slug=ds.dataset.deleteSubject;
+    if(assignments.some(a=>a.subject===slug)){toast('Môn này đang có bài tập. Hãy đổi môn cho các bài trước khi xóa.');return;}
+    if(!confirm('Xóa môn học này?'))return;
+    const {error}=await sb.from('assignment_subjects').delete().eq('slug',slug);
+    if(error)toast(error.message);else{await loadAdminData();notifyPublicContentChanged('assignment_subjects');toast('Đã xóa môn học');} return;
+  }
   const oa=event.target.closest('[data-open-assignment]');
   if(oa){ const item=assignments.find(a=>a.id===oa.dataset.openAssignment); await openStoredAssignment(item); return; }
   const ra=event.target.closest('[data-reupload-assignment]');
   if(ra){ const item=assignments.find(a=>a.id===ra.dataset.reuploadAssignment); reuploadAssignmentFile(item); return; }
   const da=event.target.closest('[data-delete-assignment]');
-  if(da){ const id=da.dataset.deleteAssignment; const item=assignments.find(a=>a.id===id); if(!item||!confirm(`Xóa bài tập “${item.title}”?\n\nFile đính kèm và nhận xét liên quan sẽ bị xóa.`))return; try{ if(item.filePath) await sb.storage.from('assignments').remove([item.filePath]); const {error}=await sb.from('assignments').delete().eq('id',id); if(error)throw error; await loadAdminData();notifyPublicContentChanged('assignments');toast('Đã xóa bài tập'); }catch(e){toast(e.message);} return; }
+  if(da){ const id=da.dataset.deleteAssignment; const item=assignments.find(a=>a.id===id); if(!item||!confirm(`Xóa Ngày ${item.dayNumber} · Bài ${item.assignmentNumber} “${item.title}”?\n\nFile đính kèm và nhận xét liên quan sẽ bị xóa.`))return; try{ const sourceDay=item.dayNumber; if(item.filePath) await sb.storage.from('assignments').remove([item.filePath]); const {error}=await sb.from('assignments').delete().eq('id',id); if(error)throw error; assignments=assignments.filter(a=>a.id!==id); await normalizeDayNumbers(sourceDay); await loadAdminData();notifyPublicContentChanged('assignments');toast('Đã xóa bài tập'); }catch(e){toast(e.message);} return; }
   const ep=event.target.closest('[data-edit-project]'); if(ep){ const p=projects.find(x=>x.id===ep.dataset.editProject); if(p)openProjectEditor(p); return; }
   const dp=event.target.closest('[data-delete-project]');
   if(dp){ const id=dp.dataset.deleteProject; const p=projects.find(x=>x.id===id); if(!p||!confirm(`Xóa dự án “${p.title}”?\n\nDự án sẽ biến mất khỏi website công khai.`))return; try{ if(p.imagePath) await sb.storage.from('project-images').remove([p.imagePath]); const {error}=await sb.from('projects').delete().eq('id',id); if(error)throw error; await loadAdminData();notifyPublicContentChanged('projects');toast('Đã xóa dự án'); }catch(e){toast(e.message);} return; }
@@ -541,51 +680,80 @@ document.addEventListener('click',async event=>{
 
 // Assignment editor
 const assignmentModal=$('#assignmentModal');
-function openAssignmentModal(){ $('#assignmentForm').reset();$('#assignmentStatus').textContent='';assignmentModal.classList.add('open');assignmentModal.setAttribute('aria-hidden','false');document.body.classList.add('modal-open'); }
+const subjectModal=$('#subjectModal');
+function openAssignmentModal(){
+  $('#assignmentForm').reset();
+  $('#assignmentStatus').textContent='';
+  $('#selectedFilesPreview').textContent='Chưa chọn file.';
+  const maxDay=assignments.reduce((m,a)=>Math.max(m,a.dayNumber||1),1);
+  $('#assignmentDay').value=maxDay;
+  populateAssignmentSubjectSelect();
+  assignmentModal.classList.add('open');assignmentModal.setAttribute('aria-hidden','false');document.body.classList.add('modal-open');
+}
 function closeAssignmentModal(){ assignmentModal.classList.remove('open');assignmentModal.setAttribute('aria-hidden','true');if(!$('.modal.open'))document.body.classList.remove('modal-open'); }
 $('#addAssignmentBtn')?.addEventListener('click',openAssignmentModal);$('#assignmentModalClose')?.addEventListener('click',closeAssignmentModal);assignmentModal?.addEventListener('click',e=>{if(e.target===assignmentModal)closeAssignmentModal();});
+$('#assignmentFile')?.addEventListener('change',event=>{
+  const files=[...(event.target.files||[])];
+  $('#selectedFilesPreview').innerHTML=files.length?files.map((f,i)=>`<span><b>${i+1}.</b> ${esc(f.name)}</span>`).join(''):'Chưa chọn file.';
+});
+
+function openSubjectModal(){ $('#subjectStatus').textContent='';renderSubjects();subjectModal.classList.add('open');subjectModal.setAttribute('aria-hidden','false');document.body.classList.add('modal-open'); }
+function closeSubjectModal(){ subjectModal.classList.remove('open');subjectModal.setAttribute('aria-hidden','true');if(!$('.modal.open'))document.body.classList.remove('modal-open'); }
+$('#manageSubjectsBtn')?.addEventListener('click',openSubjectModal);$('#subjectModalClose')?.addEventListener('click',closeSubjectModal);subjectModal?.addEventListener('click',e=>{if(e.target===subjectModal)closeSubjectModal();});
+$('#subjectForm')?.addEventListener('submit',async event=>{
+  event.preventDefault();
+  const name=$('#subjectName').value.trim(); const slug=subjectSlug(name);
+  if(name.length<2||!slug){$('#subjectStatus').textContent='Tên môn học chưa hợp lệ.';return;}
+  if(subjects.some(s=>s.slug===slug)){ $('#subjectStatus').textContent='Môn học này đã tồn tại.'; return; }
+  const sortOrder=subjects.reduce((m,s)=>Math.max(m,s.sortOrder||0),0)+10;
+  const {error}=await sb.from('assignment_subjects').insert({slug,name,sort_order:sortOrder,active:true});
+  if(error){$('#subjectStatus').textContent=error.message;return;}
+  event.currentTarget.reset();$('#subjectStatus').textContent='Đã thêm môn học.';
+  await loadAdminData();notifyPublicContentChanged('assignment_subjects');renderSubjects();
+});
+
 $('#assignmentForm')?.addEventListener('submit',async event=>{
   event.preventDefault();
   const form=event.currentTarget;
-  const title=$('#assignmentTitle').value.trim();
+  const day=Math.max(1,Number($('#assignmentDay').value||1));
+  const subject=$('#assignmentSubject').value;
+  const titlePrefix=$('#assignmentTitle').value.trim();
   const topic=$('#assignmentTopic').value.trim();
-  if(title.length<3||topic.length<2){$('#assignmentStatus').textContent='Vui lòng nhập tiêu đề và chủ đề.';return;}
-  const button=form.querySelector('button[type="submit"]');
-  button.disabled=true;
-  $('#assignmentStatus').textContent='Đang tải bài tập lên cloud…';
-  let uploadedPath='';
-  let savedToDatabase=false;
+  const files=[...($('#assignmentFile').files||[])];
+  if(!subject){$('#assignmentStatus').textContent='Hãy chọn môn học.';return;}
+  if(!files.length){$('#assignmentStatus').textContent='Hãy chọn ít nhất một file.';return;}
+  const tooLarge=files.find(file=>file.size>24*1024*1024);
+  if(tooLarge){$('#assignmentStatus').textContent=`File “${tooLarge.name}” vượt quá 24 MB.`;return;}
+  const button=form.querySelector('button[type="submit"]');button.disabled=true;
+  const uploadedPaths=[];const insertedIds=[];
   try{
-    const file=$('#assignmentFile').files[0];
-    if(file&&file.size>24*1024*1024)throw new Error('File vượt quá 24 MB.');
-    const id=`a_${Date.now()}`;
-    let fileUrl='',fileName='';
-    if(file){
-      uploadedPath=`${id}/${Date.now()}-${safeName(file.name)}`;
-      const up=await sb.storage.from('assignments').upload(uploadedPath,file,{upsert:false,contentType:file.type||undefined});
+    const maxExisting=assignments.filter(a=>a.dayNumber===day).reduce((m,a)=>Math.max(m,a.assignmentNumber),0);
+    for(let i=0;i<files.length;i++){
+      const file=files[i];
+      const number=maxExisting+i+1;
+      const id=`a_${Date.now()}_${i}_${Math.random().toString(36).slice(2,7)}`;
+      const path=`day-${day}/${id}/${Date.now()}-${safeName(file.name)}`;
+      $('#assignmentStatus').textContent=`Đang tải ${i+1}/${files.length}: ${file.name}`;
+      const up=await sb.storage.from('assignments').upload(path,file,{upsert:false,contentType:file.type||undefined});
       if(up.error)throw up.error;
-      fileName=file.name;
-      fileUrl=sb.storage.from('assignments').getPublicUrl(uploadedPath).data.publicUrl;
+      uploadedPaths.push(path);
+      const fileUrl=sb.storage.from('assignments').getPublicUrl(path).data.publicUrl;
+      const ext=(file.name.split('.').pop()||'FILE').toUpperCase();
+      const title=titlePrefix ? (files.length===1?titlePrefix:`${titlePrefix} ${number}`) : fileBaseName(file.name);
+      const row={id,type:ext,title,topic,subject,day_number:day,assignment_number:number,date_text:new Date().toLocaleDateString('vi-VN'),file_name:file.name,file_url:fileUrl,file_path:path,published:true};
+      const {error}=await sb.from('assignments').insert(row);
+      if(error)throw error;
+      insertedIds.push(id);
     }
-    const row={id,type:$('#assignmentType').value,title,topic,subject:$('#assignmentSubject').value,date_text:new Date().toLocaleDateString('vi-VN',{month:'2-digit',year:'numeric'}),file_name:fileName,file_url:fileUrl,file_path:uploadedPath,published:true};
-    const {error}=await sb.from('assignments').insert(row);
-    if(error)throw error;
-    savedToDatabase=true;
-
-    form.reset();
-    $('#assignmentStatus').textContent='Đã lưu bài tập. Website công khai sẽ cập nhật tự động.';
-    await loadAdminData();
-    notifyPublicContentChanged('assignments');
-    toast('Đã thêm bài tập');
-    setTimeout(closeAssignmentModal,650);
+    form.reset();$('#selectedFilesPreview').textContent='Chưa chọn file.';
+    $('#assignmentStatus').textContent=`Đã lưu ${files.length} bài vào Ngày ${day}.`;
+    await loadAdminData();notifyPublicContentChanged('assignments');toast(`Đã tải lên ${files.length} bài tập`);
+    setTimeout(closeAssignmentModal,900);
   }catch(e){
-    if(uploadedPath&&!savedToDatabase){
-      await sb.storage.from('assignments').remove([uploadedPath]).catch(()=>{});
-    }
-    $('#assignmentStatus').textContent=e.message||'Không lưu được bài tập.';
-  }finally{
-    button.disabled=false;
-  }
+    if(insertedIds.length) await sb.from('assignments').delete().in('id',insertedIds).catch(()=>{});
+    if(uploadedPaths.length) await sb.storage.from('assignments').remove(uploadedPaths).catch(()=>{});
+    $('#assignmentStatus').textContent=e.message||'Không tải được nhóm bài tập.';
+  }finally{button.disabled=false;}
 });
 
 // Project editor
