@@ -436,7 +436,22 @@ body{background:#fff;color:var(--ink);font-family:"Segoe UI",Arial,Helvetica,san
 </style>
 <style id="ptt-assignment-groups">
 
-.assignment-groups{display:grid;gap:18px;padding:18px}
+.assignment-groups{
+  display:grid;
+  gap:18px;
+  padding:18px;
+  max-height:560px;
+  overflow-y:auto;
+  overflow-x:hidden;
+  overscroll-behavior:contain;
+  scrollbar-width:thin;
+  scrollbar-color:#b8c7d3 #f4f7f9;
+  scroll-behavior:smooth;
+}
+.assignment-groups::-webkit-scrollbar{width:9px}
+.assignment-groups::-webkit-scrollbar-track{background:#f4f7f9;border-radius:999px}
+.assignment-groups::-webkit-scrollbar-thumb{background:#b8c7d3;border:2px solid #f4f7f9;border-radius:999px}
+.assignment-groups::-webkit-scrollbar-thumb:hover{background:#91a6b6}
 .assignment-day{background:#fff;border:1px solid #e1e8ee;border-radius:18px;overflow:hidden}
 .assignment-day-head{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:18px 20px;background:#f6f9fb;border-bottom:1px solid #e5ebf0}
 .assignment-day-head span{display:block;color:#7b8d9b;font-size:9px;font-weight:900;letter-spacing:.16em;margin-bottom:3px}
@@ -454,7 +469,7 @@ body{background:#fff;color:var(--ink);font-family:"Segoe UI",Arial,Helvetica,san
 .assignment-actions{display:flex;gap:7px;flex-wrap:wrap;justify-content:flex-end}
 .assignment-empty{padding:34px;text-align:center;color:#718494;background:#fff;border:1px dashed #d8e2ea;border-radius:16px}
 @media(max-width:720px){
-  .assignment-groups{padding:12px}.assignment-item{grid-template-columns:52px 1fr;padding:15px}.assignment-index{width:46px;height:46px;border-radius:12px}
+  .assignment-groups{padding:12px;max-height:520px}.assignment-item{grid-template-columns:52px 1fr;padding:15px}.assignment-index{width:46px;height:46px;border-radius:12px}
   .assignment-actions{grid-column:1/-1;justify-content:flex-start;padding-left:68px}.assignment-day-head{padding:15px}
 }
 
