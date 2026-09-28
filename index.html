@@ -930,5 +930,20 @@ document.addEventListener('keydown', event => { if (event.key === 'Escape') $$('
 })();
 
 </script>
+
+<script>
+(function(){
+  const q=new URLSearchParams(location.search);
+  if(q.get('adminsetup')!=='1') return;
+  window.addEventListener('DOMContentLoaded',()=>{
+    const name=document.getElementById('userRegisterName');
+    const email=document.getElementById('userRegisterEmail');
+    if(name) name.value='Phan Tấn Tài';
+    if(email) email.value='phantantai1101@gmail.com';
+    const btn=document.getElementById('userRegisterOpen');
+    if(btn) btn.click();
+  });
+})();
+</script>
 </body>
 </html>
