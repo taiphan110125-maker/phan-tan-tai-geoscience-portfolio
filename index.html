@@ -1046,137 +1046,143 @@ body{color:var(--ink-strong)!important}
 </style>
 <style id="ptt-footer-contact">
 .site-footer{
-  background:#f7f9fb!important;
-  border-top:1px solid #e1e8ee!important;
-  padding:40px 0 20px!important;
+  background:#ffffff!important;
+  border-top:1px solid #e3e9ee!important;
+  padding:34px 0 18px!important;
 }
-.site-footer .footer-layout{
-  display:grid;
-  grid-template-columns:minmax(230px,.9fr) minmax(320px,1.2fr) minmax(250px,.8fr);
-  grid-template-areas:
-    "profile contact nav"
-    "bottom bottom bottom";
-  gap:34px 54px;
-  align-items:start;
+.site-footer .footer-clean{display:block}
+.site-footer .footer-main{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:42px;
 }
-.site-footer .footer-profile{grid-area:profile}
+.site-footer .footer-left{
+  min-width:0;
+  flex:1 1 auto;
+}
 .site-footer .footer-brand{
-  margin:0!important;
+  margin:0 0 15px!important;
   display:inline-flex;
   align-items:center;
-  gap:13px;
+  gap:12px;
 }
 .site-footer .footer-emblem{
-  width:54px!important;
-  height:54px!important;
+  width:50px!important;
+  height:50px!important;
+  flex:0 0 50px;
 }
 .site-footer .footer-brand .brand-copy strong{
   color:#17324a!important;
   font-size:13.5px!important;
-  letter-spacing:.15em!important;
+  letter-spacing:.14em!important;
+  font-weight:850!important;
 }
 .site-footer .footer-brand .brand-copy small{
-  color:#7a8e9d!important;
+  color:#7a8d9b!important;
   font-size:8.5px!important;
+  letter-spacing:.14em!important;
 }
-
-.site-footer .footer-contact-block{grid-area:contact}
-.site-footer .footer-nav{grid-area:nav}
-.site-footer .footer-column-title{
-  display:block;
-  margin-bottom:14px;
-  color:#17324a!important;
-  font-size:9px!important;
+.site-footer .footer-contact-inline{
+  display:flex;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:10px 14px;
+}
+.site-footer .footer-contact-inline a{
+  display:inline-flex;
+  align-items:baseline;
+  gap:7px;
+  text-decoration:none;
+  min-width:0;
+}
+.site-footer .footer-contact-inline span{
+  color:#9a7127!important;
+  font-size:8px!important;
   font-weight:900!important;
-  letter-spacing:.14em;
+  letter-spacing:.08em;
   text-transform:uppercase;
 }
-.site-footer .footer-contact{
-  display:grid;
-  gap:13px;
-}
-.site-footer .footer-contact a{
-  display:grid;
-  grid-template-columns:76px minmax(0,1fr);
-  align-items:baseline;
-  gap:12px;
-  padding:0;
-  text-decoration:none;
-  border:0!important;
-  background:transparent!important;
-}
-.site-footer .footer-contact small{
-  color:#8a9aa6!important;
-  font-size:8.5px!important;
-  font-weight:800!important;
-  letter-spacing:.04em;
-}
-.site-footer .footer-contact strong{
+.site-footer .footer-contact-inline strong{
   color:#17324a!important;
   font-size:12.5px!important;
-  font-weight:800!important;
-  line-height:1.35;
+  font-weight:750!important;
+  line-height:1.4;
   overflow-wrap:anywhere;
 }
-.site-footer .footer-contact a:hover strong{color:#2f72ad!important}
-
+.site-footer .footer-contact-inline a:hover strong{color:#2f72ad!important}
+.site-footer .footer-contact-sep{
+  width:1px;
+  height:14px;
+  background:#d9e2e8;
+  display:inline-block;
+  flex:0 0 1px;
+}
 .site-footer .footer-links{
-  display:grid!important;
-  grid-template-columns:repeat(2,minmax(100px,1fr));
-  gap:9px 22px!important;
+  display:flex!important;
+  justify-content:flex-end;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:8px 20px!important;
+  max-width:520px;
+  padding-top:13px;
 }
 .site-footer .footer-links a{
-  color:#607789!important;
+  color:#607586!important;
   font-size:10.5px!important;
   font-weight:650!important;
   text-decoration:none;
+  white-space:nowrap;
   padding:2px 0;
 }
-.site-footer .footer-links a:hover{color:#2f72ad!important}
-
+.site-footer .footer-links a:hover{color:#17324a!important}
 .site-footer .footer-bottom{
-  grid-area:bottom;
+  margin-top:25px;
+  padding-top:14px;
+  border-top:1px solid #e8edf1;
   display:flex;
   align-items:center;
   justify-content:space-between;
-  gap:20px;
-  padding-top:16px;
-  border-top:1px solid #e1e8ee;
+  gap:18px;
 }
-.site-footer .footer-copyright{
+.site-footer .footer-bottom p{
   margin:0!important;
-  color:#8798a5!important;
+  color:#8a99a5!important;
   font-size:8.5px!important;
   text-align:left!important;
 }
-.site-footer .footer-top-link{
-  color:#526f84!important;
+.site-footer .footer-bottom a{
+  color:#637b8d!important;
   font-size:9px!important;
   font-weight:750!important;
   text-decoration:none;
 }
-.site-footer .footer-top-link:hover{color:#2f72ad!important}
+.site-footer .footer-bottom a:hover{color:#2f72ad!important}
 
-@media(max-width:980px){
-  .site-footer .footer-layout{
-    grid-template-columns:1fr 1fr;
-    grid-template-areas:
-      "profile profile"
-      "contact nav"
-      "bottom bottom";
-    gap:28px 36px;
-  }
+@media(max-width:900px){
+  .site-footer .footer-main{flex-direction:column;gap:22px}
+  .site-footer .footer-links{justify-content:flex-start;max-width:none;padding-top:0}
 }
-@media(max-width:680px){
-  .site-footer{padding:30px 0 18px!important}
-  .site-footer .footer-layout{
-    grid-template-columns:1fr;
-    grid-template-areas:"profile" "contact" "nav" "bottom";
-    gap:24px;
+@media(max-width:600px){
+  .site-footer{padding:28px 0 16px!important}
+  .site-footer .footer-brand{margin-bottom:13px!important}
+  .site-footer .footer-contact-inline{
+    display:grid;
+    gap:8px;
   }
-  .site-footer .footer-contact a{grid-template-columns:68px minmax(0,1fr)}
-  .site-footer .footer-links{max-width:360px}
-  .site-footer .footer-bottom{align-items:flex-start;flex-direction:column;gap:8px}
+  .site-footer .footer-contact-inline a{
+    display:grid;
+    grid-template-columns:70px minmax(0,1fr);
+    gap:8px;
+  }
+  .site-footer .footer-contact-sep{display:none}
+  .site-footer .footer-links{gap:7px 16px!important}
+  .site-footer .footer-bottom{
+    align-items:flex-start;
+    flex-direction:column;
+    gap:7px;
+    margin-top:20px;
+  }
 }
 </style>
 </head>
@@ -1414,43 +1420,43 @@ body{color:var(--ink-strong)!important}
   </main>
 
   <footer class="site-footer">
-    <div class="shell footer-layout">
-      <div class="footer-profile">
-        <div class="brand footer-brand">
-          <img class="footer-emblem" src="assets/ptt-emblem.svg" alt="" loading="lazy" decoding="async">
-          <span class="brand-copy"><strong>PHAN TẤN TÀI</strong><small>GEOLOGY · GEOPHYSICS</small></span>
-        </div>
-      </div>
+    <div class="shell footer-clean">
+      <div class="footer-main">
+        <div class="footer-left">
+          <div class="brand footer-brand">
+            <img class="footer-emblem" src="assets/ptt-emblem.svg" alt="" loading="lazy" decoding="async">
+            <span class="brand-copy">
+              <strong>PHAN TẤN TÀI</strong>
+              <small>GEOLOGY · GEOPHYSICS</small>
+            </span>
+          </div>
 
-      <div class="footer-contact-block" aria-label="Thông tin liên hệ">
-        <span class="footer-column-title">Liên hệ</span>
-        <div class="footer-contact">
-          <a href="mailto:phantantai1101@gmail.com">
-            <small>Email</small>
-            <strong>phantantai1101@gmail.com</strong>
-          </a>
-          <a href="tel:0911230016">
-            <small>Điện thoại</small>
-            <strong>0911 230 016</strong>
-          </a>
+          <div class="footer-contact-inline" aria-label="Thông tin liên hệ">
+            <a href="mailto:phantantai1101@gmail.com">
+              <span>Email</span>
+              <strong>phantantai1101@gmail.com</strong>
+            </a>
+            <span class="footer-contact-sep" aria-hidden="true"></span>
+            <a href="tel:0911230016">
+              <span>Điện thoại</span>
+              <strong>0911 230 016</strong>
+            </a>
+          </div>
         </div>
-      </div>
 
-      <nav class="footer-nav" aria-label="Điều hướng cuối trang">
-        <span class="footer-column-title">Điều hướng</span>
-        <div class="footer-links">
+        <nav class="footer-links" aria-label="Điều hướng cuối trang">
           <a href="#about">Giới thiệu</a>
           <a href="#projects">Dự án</a>
           <a href="#assignments">Bài tập</a>
           <a href="#geo-ai">Geo AI</a>
           <a href="#contact">Liên hệ</a>
-          <a href="admin-login.html">Quản trị viên</a>
-        </div>
-      </nav>
+          <a href="admin-login.html">Quản trị</a>
+        </nav>
+      </div>
 
       <div class="footer-bottom">
-        <p class="footer-copyright">© 2026 Phan Tấn Tài · Academic Geoscience Portfolio</p>
-        <a class="footer-top-link" href="#home">Lên đầu trang ↑</a>
+        <p>© 2026 Phan Tấn Tài · Academic Geoscience Portfolio</p>
+        <a href="#home">Lên đầu trang ↑</a>
       </div>
     </div>
   </footer>
