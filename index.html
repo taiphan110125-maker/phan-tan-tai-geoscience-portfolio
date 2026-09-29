@@ -1035,8 +1035,7 @@ async function openAssignmentFile(assignment){
     return;
   }
   const url=`assignment-viewer.html?id=${encodeURIComponent(assignment.id)}`;
-  const opened=window.open(url,'_blank','noopener');
-  if(!opened) location.href=url;
+  location.href=url;
 }
 
 document.addEventListener('click', event => {
