@@ -964,15 +964,70 @@ body{color:var(--ink-strong)!important}
 }
 </style>
 <style id="ptt-assignment-font-size-tune">
-#assignments .assignment-day-head span{font-size:8.5px!important;letter-spacing:.12em!important}
-#assignments .assignment-day-head>strong{font-size:9px!important;padding:6px 9px!important}
-#assignments .assignment-meta{gap:6px!important;margin-bottom:4px!important}
+/* Larger assignment text, more compact date header */
+#assignments .assignment-day-head{
+  padding:8px 12px!important;
+  min-height:0!important;
+}
+#assignments .assignment-day-head span{
+  font-size:7.5px!important;
+  letter-spacing:.11em!important;
+}
+#assignments .assignment-day-head h3{
+  font-size:17px!important;
+  line-height:1.1!important;
+  margin-top:2px!important;
+}
+#assignments .assignment-day-head>strong{
+  font-size:8px!important;
+  padding:5px 8px!important;
+}
+
+#assignments .assignment-item{
+  padding:13px 14px!important;
+}
+#assignments .assignment-content h4{
+  font-size:17px!important;
+  line-height:1.25!important;
+  margin:5px 0 4px!important;
+}
+#assignments .assignment-content>p:not(.assignment-content-text){
+  font-size:13px!important;
+  line-height:1.5!important;
+  margin-bottom:6px!important;
+}
+#assignments .assignment-content small{
+  font-size:10.5px!important;
+  line-height:1.5!important;
+}
+#assignments .subject-pill,
+#assignments .file-pill{
+  font-size:8.5px!important;
+  padding:4px 7px!important;
+}
+#assignments .assignment-meta{
+  gap:6px!important;
+  margin-bottom:5px!important;
+}
+#assignments .assignment-actions .mini-btn{
+  font-size:10.5px!important;
+  padding:7px 10px!important;
+}
+#assignments .assignment-index span{
+  font-size:7px!important;
+}
+#assignments .assignment-index strong{
+  font-size:19px!important;
+}
+
 @media(max-width:600px){
-  #assignments .assignment-content h4{font-size:14px!important}
-  #assignments .assignment-content>p:not(.assignment-content-text){font-size:10.5px!important}
-  #assignments .assignment-content small{font-size:9px!important}
-  #assignments .subject-pill,#assignments .file-pill{font-size:7.5px!important}
-  #assignments .assignment-actions .mini-btn{font-size:9px!important}
+  #assignments .assignment-day-head{padding:7px 10px!important}
+  #assignments .assignment-day-head h3{font-size:16px!important}
+  #assignments .assignment-content h4{font-size:16px!important}
+  #assignments .assignment-content>p:not(.assignment-content-text){font-size:12px!important}
+  #assignments .assignment-content small{font-size:10px!important}
+  #assignments .subject-pill,#assignments .file-pill{font-size:8px!important}
+  #assignments .assignment-actions .mini-btn{font-size:10px!important}
 }
 </style>
 </head>
