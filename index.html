@@ -574,6 +574,268 @@ body{color:var(--ink-strong)!important}
 .chat-status{min-height:12px;margin:4px 0 0!important;color:#8a6430!important;font-size:8px!important}
 
 </style>
+<style id="ptt-assignment-workspace-polish">
+
+/* Standardized assignment workspace */
+#assignments .workspace-grid{
+  display:grid!important;
+  grid-template-columns:minmax(0,1.58fr) minmax(340px,.92fr)!important;
+  gap:22px!important;
+  align-items:stretch!important;
+}
+#assignments .repository-card,
+#assignments .feedback-card{
+  height:660px!important;
+  min-height:660px!important;
+  background:#fff!important;
+  border:1px solid #dce5ec!important;
+  border-radius:18px!important;
+  box-shadow:0 12px 34px rgba(22,50,74,.065)!important;
+  overflow:hidden!important;
+}
+#assignments .repository-card{
+  display:flex!important;
+  flex-direction:column!important;
+}
+#assignments .toolbar{
+  min-height:66px!important;
+  flex:0 0 auto!important;
+  padding:13px 14px!important;
+  background:#fff!important;
+  border-bottom:1px solid #e5ecf1!important;
+}
+#assignments .search-control,
+#assignments .toolbar select{
+  min-height:40px!important;
+  border-radius:10px!important;
+}
+#assignments .assignment-groups{
+  flex:1 1 auto!important;
+  min-height:0!important;
+  max-height:none!important;
+  padding:14px!important;
+  gap:14px!important;
+  background:#fff!important;
+}
+#assignments .assignment-day{
+  border-radius:14px!important;
+  border-color:#dfe7ed!important;
+}
+#assignments .assignment-day-head{
+  padding:14px 16px!important;
+  background:#f7f9fb!important;
+}
+#assignments .assignment-day-head h3{font-size:19px!important}
+#assignments .assignment-item{
+  grid-template-columns:52px minmax(0,1fr) auto!important;
+  gap:13px!important;
+  padding:14px 15px!important;
+}
+#assignments .assignment-index{
+  width:46px!important;height:46px!important;border-radius:11px!important;
+}
+#assignments .assignment-index strong{font-size:17px!important}
+#assignments .assignment-content h4{
+  font-size:13px!important;
+  margin:4px 0 3px!important;
+}
+#assignments .assignment-content>p:not(.assignment-content-text){
+  display:-webkit-box!important;
+  -webkit-box-orient:vertical!important;
+  -webkit-line-clamp:2!important;
+  overflow:hidden!important;
+  font-size:10px!important;
+  line-height:1.55!important;
+}
+#assignments .assignment-content-text{
+  -webkit-line-clamp:2!important;
+  font-size:9px!important;
+  line-height:1.5!important;
+}
+#assignments .assignment-content small{font-size:8px!important}
+#assignments .subject-pill,#assignments .file-pill{
+  font-size:7px!important;padding:3px 6px!important;
+}
+#assignments .assignment-actions .mini-btn{
+  padding:7px 9px!important;
+  border-radius:8px!important;
+  font-size:8px!important;
+  white-space:nowrap!important;
+}
+
+/* Academic exchange card */
+#assignments .feedback-card{
+  display:grid!important;
+  grid-template-rows:142px minmax(0,1fr)!important;
+}
+#assignments .feedback-image{
+  height:142px!important;
+  min-height:142px!important;
+  background:#0d2c3b!important;
+  border-bottom:1px solid #dfe7ed!important;
+  overflow:hidden!important;
+}
+#assignments .feedback-image img{
+  width:100%!important;
+  height:100%!important;
+  object-fit:contain!important;
+  padding:8px 18px!important;
+  filter:none!important;
+}
+#assignments .feedback-body{
+  padding:18px!important;
+  min-height:0!important;
+  display:flex!important;
+  flex-direction:column!important;
+  overflow:hidden!important;
+}
+#assignments .feedback-body>.eyebrow{
+  margin:0 0 4px!important;
+  font-size:8px!important;
+  letter-spacing:.14em!important;
+}
+#assignments .feedback-body h3{
+  margin:0 0 6px!important;
+  font-family:var(--font-display)!important;
+  font-size:25px!important;
+  line-height:1.08!important;
+  color:#17324a!important;
+}
+#assignments .feedback-body>p:not(.eyebrow){
+  margin:0!important;
+  font-size:9px!important;
+  line-height:1.55!important;
+  color:#607789!important;
+}
+#assignments .unified-exchange-head{
+  margin:11px 0 7px!important;
+  padding-top:9px!important;
+  flex:0 0 auto!important;
+}
+#assignments .unified-exchange-head strong{font-size:9px!important}
+#assignments .unified-exchange-head small{
+  font-size:7px!important;
+  max-width:145px!important;
+  text-align:right!important;
+  line-height:1.35!important;
+}
+#assignments .live-dot{
+  width:7px!important;height:7px!important;
+  box-shadow:0 0 0 3px rgba(43,154,104,.10)!important;
+}
+#assignments .unified-exchange-stream{
+  flex:1 1 auto!important;
+  min-height:0!important;
+  max-height:none!important;
+  padding:8px!important;
+  gap:7px!important;
+  border-radius:11px!important;
+  background:#f7f9fb!important;
+}
+#assignments .exchange-entry{
+  padding:9px 10px!important;
+  border-radius:10px!important;
+  box-shadow:none!important;
+}
+#assignments .assignment-exchange{border-left:2px solid #4f86ad!important}
+#assignments .chat-exchange{border-left:2px solid #a9bac6!important}
+#assignments .exchange-person strong{font-size:8px!important}
+#assignments .exchange-person span{font-size:7px!important}
+#assignments .exchange-person time{font-size:6.5px!important}
+#assignments .exchange-assignment{margin:6px 0 4px!important}
+#assignments .exchange-assignment span{
+  font-size:6.5px!important;padding:3px 5px!important;
+}
+#assignments .exchange-entry h4{
+  font-size:8px!important;margin:0 0 3px!important;
+}
+#assignments .exchange-entry p{
+  margin:3px 0 0!important;
+  font-size:8px!important;
+  line-height:1.45!important;
+}
+#assignments .unified-chat-form{
+  flex:0 0 auto!important;
+  margin-top:8px!important;
+  padding-top:0!important;
+}
+#assignments .chat-fields{
+  grid-template-columns:minmax(0,1fr) 104px!important;
+  gap:6px!important;
+}
+#assignments .academic-chat-form input,
+#assignments .academic-chat-form select,
+#assignments .academic-chat-form textarea{
+  min-height:34px!important;
+  padding:7px 9px!important;
+  border-radius:8px!important;
+  font-size:8px!important;
+}
+#assignments .chat-send-row{
+  grid-template-columns:minmax(0,1fr) 48px!important;
+  gap:6px!important;
+  margin-top:6px!important;
+}
+#assignments .chat-send-row textarea{
+  min-height:46px!important;
+  max-height:80px!important;
+  resize:none!important;
+}
+#assignments .chat-send-row button{
+  border-radius:8px!important;
+  font-size:8px!important;
+}
+#assignments .chat-status{
+  min-height:0!important;
+  margin:3px 0 0!important;
+  font-size:7px!important;
+}
+
+/* Shared scrollbars */
+#assignments .assignment-groups,
+#assignments .unified-exchange-stream{
+  scrollbar-width:thin!important;
+  scrollbar-color:#b9c8d3 transparent!important;
+}
+#assignments .assignment-groups::-webkit-scrollbar,
+#assignments .unified-exchange-stream::-webkit-scrollbar{width:7px!important}
+#assignments .assignment-groups::-webkit-scrollbar-thumb,
+#assignments .unified-exchange-stream::-webkit-scrollbar-thumb{
+  background:#b9c8d3!important;border-radius:999px!important;
+}
+
+@media(max-width:1050px){
+  #assignments .workspace-grid{
+    grid-template-columns:minmax(0,1.4fr) minmax(315px,.9fr)!important;
+    gap:16px!important;
+  }
+}
+@media(max-width:860px){
+  #assignments .workspace-grid{grid-template-columns:1fr!important}
+  #assignments .repository-card,
+  #assignments .feedback-card{
+    height:620px!important;
+    min-height:620px!important;
+  }
+  #assignments .feedback-card{grid-template-rows:125px minmax(0,1fr)!important}
+  #assignments .feedback-image{height:125px!important;min-height:125px!important}
+}
+@media(max-width:600px){
+  #assignments .repository-card,
+  #assignments .feedback-card{
+    height:590px!important;
+    min-height:590px!important;
+    border-radius:15px!important;
+  }
+  #assignments .toolbar{padding:10px!important}
+  #assignments .assignment-groups{padding:10px!important}
+  #assignments .feedback-body{padding:14px!important}
+  #assignments .feedback-body h3{font-size:22px!important}
+  #assignments .feedback-image{display:none!important}
+  #assignments .feedback-card{grid-template-rows:1fr!important}
+}
+
+</style>
 </head>
 <body>
   <a class="skip-link" href="#main">Bỏ qua menu</a>
