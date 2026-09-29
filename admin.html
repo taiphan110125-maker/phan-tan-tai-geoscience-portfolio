@@ -304,23 +304,6 @@ body.admin-body,.admin-body{background:#f6f8fb!important;color:#183247!important
 .primary-edit{background:#17324a!important;color:#fff!important;border-color:#17324a!important}
 .primary-edit:hover{background:#244b68!important;border-color:#244b68!important}
 </style>
-<style id="ptt-site-images-admin">
-
-.site-images-panel{padding:16px!important}
-.site-images-note{display:flex;justify-content:space-between;gap:18px;flex-wrap:wrap;padding:12px 14px;margin-bottom:14px;border:1px solid #dfe7ed;border-radius:11px;background:#f7fafc;color:#6b7f8e;font-size:10px}
-.site-images-note strong{color:#17324a}.site-image-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
-.site-image-card{overflow:hidden;border:1px solid #dfe7ed;border-radius:14px;background:#fff;box-shadow:0 8px 24px rgba(22,50,74,.045)}
-.site-image-preview{height:170px;display:grid;place-items:center;background:linear-gradient(135deg,#eef3f7,#fafcfd);border-bottom:1px solid #e4ebf0;overflow:hidden}
-.site-image-preview img{width:100%;height:100%;object-fit:cover}
-.site-image-card-body{padding:12px}.site-image-card-title{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:11px}
-.site-image-card-title strong{display:block;color:#17324a;font-size:11px}.site-image-card-title small{display:block;margin-top:2px;color:#83939f;font-size:8px}
-.site-image-card-title>span{padding:4px 6px;border-radius:999px;background:#eef4f8;color:#547187;font-size:6.5px;font-weight:900;letter-spacing:.08em}
-.site-image-actions{display:flex;gap:7px;flex-wrap:wrap}.site-image-actions button{flex:1 1 auto;min-width:110px}
-.site-image-actions button:disabled{opacity:.42;cursor:not-allowed}
-@media(max-width:1100px){.site-image-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:680px){.site-image-grid{grid-template-columns:1fr}.site-image-preview{height:190px}}
-
-</style>
 </head>
 <body class="admin-body">
   <header class="admin-topbar">
@@ -337,7 +320,6 @@ body.admin-body,.admin-body{background:#f6f8fb!important;color:#183247!important
       <button class="side-link active" data-view="dashboard">▦ <span>Dashboard</span></button>
       <button class="side-link" data-view="assignments">▤ <span>Bài tập</span></button>
       <button class="side-link" data-view="projects">⌁ <span>Dự án</span></button>
-      <button class="side-link" data-view="images">▣ <span>Hình ảnh website</span></button>
       <button class="side-link" data-view="feedback">◌ <span>Nhận xét</span></button>
       <button class="side-link" data-view="messages">✉ <span>Lời nhắn</span></button>
       <button class="side-link" data-view="security">⌾ <span>Bảo mật</span></button>
@@ -383,26 +365,6 @@ body.admin-body,.admin-body{background:#f6f8fb!important;color:#183247!important
               <thead><tr><th>Dự án</th><th>Lĩnh vực</th><th>Tags</th><th>Hình ảnh</th><th>Thao tác</th></tr></thead>
               <tbody id="adminProjectRows"></tbody>
             </table>
-          </div>
-        </div>
-      </section>
-
-      <section class="admin-view" data-panel="images">
-        <div class="admin-heading">
-          <div>
-            <p class="eyebrow">SITE MEDIA</p>
-            <h1>Hình ảnh website</h1>
-            <p>Thay các ảnh cố định trên website mà không cần chỉnh sửa mã nguồn.</p>
-          </div>
-          <a class="btn btn-outline" href="index.html" target="_blank" rel="noopener">Xem website ↗</a>
-        </div>
-        <div class="admin-panel site-images-panel">
-          <div class="site-images-note">
-            <strong>Ảnh JPG, PNG hoặc WebP · tối đa 8 MB.</strong>
-            <span>Ảnh mới sẽ cập nhật cho website công khai. Bạn luôn có thể khôi phục ảnh mặc định.</span>
-          </div>
-          <div id="siteImageGrid" class="site-image-grid">
-            <div class="empty-state">Đang tải danh sách hình ảnh…</div>
           </div>
         </div>
       </section>
@@ -575,7 +537,7 @@ window.PTT_CONFIG = {
 const $ = (selector, root = document) => root.querySelector(selector);
 const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
 const sb = window.pttSupabase;
-let projects = [], assignments = [], comments = [], chatMessages = [], messages = [], subjects = [], siteImages = [];
+let projects = [], assignments = [], comments = [], chatMessages = [], messages = [], subjects = [];
 let adminUser = null;
 let pendingProjectImageFile = null;
 let pendingProjectReportFiles = [];
@@ -629,7 +591,6 @@ function requireSupabase(){ if(!sb) throw new Error('Chưa cấu hình Supabase.
 function safeName(name='file'){ return name.normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^A-Za-z0-9._-]+/g,'-').replace(/^-+|-+$/g,'').slice(-100) || 'file'; }
 function notifyPublicContentChanged(kind){ try { new BroadcastChannel('ptt-content-sync').postMessage({kind,at:Date.now()}); } catch {} }
 function mapProject(r){ return {id:r.id,title:r.title,type:r.type,image:r.image_url||'',imagePath:r.image_path||'',summary:r.summary||'',tags:r.tags||[],objective:r.objective||'',data:r.data_text||'',method:r.method||'',output:r.output||'',reportFiles:Array.isArray(r.report_files)?r.report_files:[],sortOrder:r.sort_order||0}; }
-function mapSiteImage(r){ return {key:r.key,label:r.label,imageUrl:r.image_url||r.default_url||'',imagePath:r.image_path||'',defaultUrl:r.default_url||'',sortOrder:Number(r.sort_order||0),updatedAt:r.updated_at||''}; }
 function formatAssignmentDate(value=''){ const p=String(value||'').split('-'); return p.length===3?`${p[2]}/${p[1]}/${p[0]}`:String(value||''); }
 function localToday(){ const d=new Date(); const y=d.getFullYear(); const m=String(d.getMonth()+1).padStart(2,'0'); const day=String(d.getDate()).padStart(2,'0'); return `${y}-${m}-${day}`; }
 function mapAssignment(r, counts){ return {id:r.id,type:r.type,title:r.title,topic:r.topic||'',contentText:r.content_text||'',contentPlain:richPlainText(r.content_text||''),externalUrl:r.external_url||'',subject:r.subject||'other',assignmentDate:r.assignment_date||'',assignmentNumber:Number(r.assignment_number||1),date:r.assignment_date?formatAssignmentDate(r.assignment_date):(r.date_text||''),fileName:r.file_name||'',fileUrl:r.file_url||'',filePath:r.file_path||'',commentCount:counts[r.id]||0}; }
@@ -666,21 +627,19 @@ $('#logoutBtn')?.addEventListener('click',async()=>{ try{ if(sb) await sb.auth.s
 
 async function loadAdminData(){
   const client=requireSupabase();
-  const [pRes,aRes,cRes,chatRes,mRes,sRes,iRes]=await Promise.all([
+  const [pRes,aRes,cRes,chatRes,mRes,sRes]=await Promise.all([
     client.from('projects').select('*').order('sort_order',{ascending:true}).order('created_at',{ascending:false}),
     client.from('assignments').select('*').order('assignment_date',{ascending:true}).order('assignment_number',{ascending:true}).order('created_at',{ascending:true}),
     client.from('comments').select('id,assignment_id,name,role,body,created_at,assignment_title,assignment_date,assignment_number,assignment_subject').order('created_at',{ascending:false}),
     client.from('academic_chat_messages').select('id,user_id,name,role,body,created_at').order('created_at',{ascending:false}).limit(200),
     client.from('messages').select('*').order('created_at',{ascending:false}),
-    client.from('assignment_subjects').select('*').order('sort_order',{ascending:true}).order('name',{ascending:true}),
-    client.from('site_images').select('*').order('sort_order',{ascending:true}).order('label',{ascending:true})
+    client.from('assignment_subjects').select('*').order('sort_order',{ascending:true}).order('name',{ascending:true})
   ]);
-  for(const res of [pRes,aRes,cRes,chatRes,mRes,sRes,iRes]) if(res.error) throw res.error;
+  for(const res of [pRes,aRes,cRes,chatRes,mRes,sRes]) if(res.error) throw res.error;
   const counts={}; for(const c of cRes.data||[]) counts[c.assignment_id]=(counts[c.assignment_id]||0)+1;
   projects=(pRes.data||[]).map(mapProject);
   assignments=(aRes.data||[]).map(r=>mapAssignment(r,counts));
   subjects=(sRes.data||[]).map(r=>({slug:r.slug,name:r.name,sortOrder:Number(r.sort_order||0),active:Boolean(r.active)}));
-  siteImages=(iRes.data||[]).map(mapSiteImage);
   comments=(cRes.data||[]).map(r=>({id:r.id,assignmentId:r.assignment_id,assignmentTitle:r.assignment_title||'Bài tập',assignmentDate:r.assignment_date||'',assignmentNumber:Number(r.assignment_number||0),assignmentSubject:r.assignment_subject||'',name:r.name,role:r.role,text:r.body,createdAt:r.created_at}));
   chatMessages=(chatRes.data||[]).map(r=>({id:r.id,userId:r.user_id,name:r.name,role:r.role,text:r.body,createdAt:r.created_at}));
   messages=(mRes.data||[]).map(r=>({id:r.id,name:r.name,email:r.email,topic:r.topic,message:r.message,createdAt:r.created_at}));
@@ -729,78 +688,7 @@ function renderFeedback(){
   }).join('');
 }
 function renderMessages(){ $('#messageList').innerHTML=messages.length?messages.map(m=>`<div class="message-item"><div class="message-item-head"><strong>${esc(m.name)} · ${esc(m.topic||'Liên hệ')}</strong><small>${new Date(m.createdAt).toLocaleString('vi-VN')}</small></div><p>${esc(m.email)}<br>${esc(m.message)}</p><button class="danger-btn" data-delete-message="${esc(m.id)}">Xóa lời nhắn</button></div>`).join(''):'<div class="empty-state">Chưa có lời nhắn.</div>'; }
-
-function renderSiteImages(){
-  const host=$('#siteImageGrid'); if(!host)return;
-  host.innerHTML=siteImages.length?siteImages.map(item=>`
-    <article class="site-image-card">
-      <div class="site-image-preview">
-        <img src="${esc(item.imageUrl||item.defaultUrl)}" alt="${esc(item.label)}" loading="lazy">
-      </div>
-      <div class="site-image-card-body">
-        <div class="site-image-card-title">
-          <div><strong>${esc(item.label)}</strong><small>${item.imagePath?'Ảnh tùy chỉnh':'Đang dùng ảnh mặc định'}</small></div>
-          <span>${item.imagePath?'CUSTOM':'DEFAULT'}</span>
-        </div>
-        <div class="site-image-actions">
-          <button type="button" class="edit-btn primary-edit" data-change-site-image="${esc(item.key)}">Thay ảnh</button>
-          <button type="button" class="edit-btn" data-reset-site-image="${esc(item.key)}" ${item.imagePath?'':'disabled'}>Khôi phục mặc định</button>
-        </div>
-      </div>
-    </article>`).join(''):'<div class="empty-state">Chưa có vị trí ảnh nào được cấu hình.</div>';
-}
-
-async function chooseAndReplaceSiteImage(item){
-  if(!item)return;
-  const input=document.createElement('input');
-  input.type='file';
-  input.accept='image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp';
-  input.onchange=async()=>{
-    const file=input.files?.[0]; if(!file)return;
-    const allowed=['image/jpeg','image/png','image/webp'];
-    if(!allowed.includes(file.type)){toast('Chỉ hỗ trợ JPG, PNG hoặc WebP.');return;}
-    if(file.size>8*1024*1024){toast('Ảnh vượt quá 8 MB.');return;}
-    const path=`${item.key}/${Date.now()}-${safeName(file.name)}`;
-    try{
-      toast('Đang tải ảnh mới…');
-      const up=await sb.storage.from('site-images').upload(path,file,{upsert:false,contentType:file.type});
-      if(up.error)throw up.error;
-      const url=sb.storage.from('site-images').getPublicUrl(path).data.publicUrl;
-      const {error}=await sb.from('site_images').update({
-        image_url:url,image_path:path,updated_at:new Date().toISOString()
-      }).eq('key',item.key);
-      if(error){
-        try{await sb.storage.from('site-images').remove([path]);}catch{}
-        throw error;
-      }
-      if(item.imagePath&&item.imagePath!==path){
-        try{await sb.storage.from('site-images').remove([item.imagePath]);}catch{}
-      }
-      await loadAdminData();
-      notifyPublicContentChanged('site_images');
-      toast('Đã thay ảnh website.');
-    }catch(error){toast(error.message||'Không thay được ảnh.');}
-  };
-  input.click();
-}
-
-async function resetSiteImage(item){
-  if(!item||!item.imagePath)return;
-  if(!confirm(`Khôi phục ảnh mặc định cho “${item.label}”?`))return;
-  const oldPath=item.imagePath;
-  try{
-    const {error}=await sb.from('site_images').update({
-      image_url:item.defaultUrl,image_path:'',updated_at:new Date().toISOString()
-    }).eq('key',item.key);
-    if(error)throw error;
-    try{await sb.storage.from('site-images').remove([oldPath]);}catch{}
-    await loadAdminData();
-    notifyPublicContentChanged('site_images');
-    toast('Đã khôi phục ảnh mặc định.');
-  }catch(error){toast(error.message||'Không khôi phục được ảnh.');}
-}
-
-function renderAll(){ renderMetrics();renderDashboard();renderAssignments();renderProjects();renderFeedback();renderMessages();renderSubjects();renderSiteImages();populateAssignmentSubjectSelect(); }
+function renderAll(){ renderMetrics();renderDashboard();renderAssignments();renderProjects();renderFeedback();renderMessages();renderSubjects();populateAssignmentSubjectSelect(); }
 $('#projectSearch')?.addEventListener('input',renderProjects);
 
 async function openStoredAssignment(item){
@@ -891,16 +779,6 @@ document.addEventListener('change',async event=>{
 });
 
 document.addEventListener('click',async event=>{
-  const changeImage=event.target.closest('[data-change-site-image]');
-  if(changeImage){
-    const item=siteImages.find(x=>x.key===changeImage.dataset.changeSiteImage);
-    await chooseAndReplaceSiteImage(item); return;
-  }
-  const resetImage=event.target.closest('[data-reset-site-image]');
-  if(resetImage){
-    const item=siteImages.find(x=>x.key===resetImage.dataset.resetSiteImage);
-    await resetSiteImage(item); return;
-  }
   const rs=event.target.closest('[data-rename-subject]');
   if(rs){
     const s=subjects.find(x=>x.slug===rs.dataset.renameSubject); if(!s)return;
