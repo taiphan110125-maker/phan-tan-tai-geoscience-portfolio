@@ -549,10 +549,6 @@ body{color:var(--ink-strong)!important}
 .exchange-empty{padding:15px;text-align:center;border:1px dashed #d8e2e9;border-radius:12px;color:#788b99;font-size:10px;background:#fafcfd}
 
 </style>
-<style id="ptt-assignment-content-text">
-.assignment-content-text{white-space:pre-wrap;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
-.assignment-content-text strong{color:#173a55}
-</style>
 <style id="ptt-live-academic-chat">
 
 .unified-exchange-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:13px 0 8px;padding-top:12px;border-top:1px solid #dfe8ee}
@@ -1653,7 +1649,6 @@ function renderAssignments(){
               <div class="assignment-meta"><span class="subject-pill">${escapeHtml(assignmentSubjectName(a.subject))}</span><span class="file-pill">${escapeHtml(a.type)}</span></div>
               <h4>${escapeHtml(a.title)}</h4>
               ${a.topic?`<p>${escapeHtml(a.topic)}</p>`:''}
-              ${a.contentPlain?`<p class="assignment-content-text"><strong>Nội dung:</strong> ${escapeHtml(a.contentPlain)}</p>`:''}
               <small>${escapeHtml(a.fileName || (a.externalUrl?'Có link tài liệu':'Không có file đính kèm'))} · ${Number(a.commentCount||0)} trao đổi</small>
             </div>
             <div class="assignment-actions">
