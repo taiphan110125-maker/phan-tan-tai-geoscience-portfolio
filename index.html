@@ -1185,6 +1185,128 @@ body{color:var(--ink-strong)!important}
   }
 }
 </style>
+<style id="ptt-hero-full-image-v2">
+/* Full-image petroleum hero */
+#home.hero{
+  position:relative!important;
+  margin-top:78px!important;
+  min-height:680px!important;
+  height:calc(100vh - 78px)!important;
+  max-height:820px!important;
+  background:#0c2537!important;
+  color:#fff!important;
+  isolation:isolate;
+}
+#home .hero-media{
+  position:absolute!important;
+  inset:0!important;
+  width:100%!important;
+  height:100%!important;
+  object-fit:cover!important;
+  object-position:center 48%!important;
+  filter:saturate(.98) contrast(1.04) brightness(.92)!important;
+  opacity:1!important;
+  z-index:0!important;
+}
+#home .hero-overlay{
+  position:absolute!important;
+  inset:0!important;
+  z-index:1!important;
+  background:
+    linear-gradient(90deg,
+      rgba(7,24,39,.91) 0%,
+      rgba(7,28,45,.78) 31%,
+      rgba(9,35,52,.50) 52%,
+      rgba(7,28,43,.16) 76%,
+      rgba(5,22,34,.08) 100%),
+    linear-gradient(180deg,
+      rgba(5,20,31,.08) 0%,
+      rgba(5,20,31,.03) 52%,
+      rgba(4,18,29,.48) 100%)!important;
+}
+#home .hero-content{
+  position:relative!important;
+  z-index:2!important;
+  align-items:center!important;
+  gap:54px!important;
+  padding-top:0!important;
+}
+#home .hero-copy{
+  max-width:720px!important;
+  background:transparent!important;
+  border:0!important;
+  box-shadow:none!important;
+  padding:0!important;
+  backdrop-filter:none!important;
+}
+#home .kicker{
+  color:#f1c76d!important;
+  text-shadow:0 2px 18px rgba(0,0,0,.38)!important;
+}
+#home h1{
+  color:#fff!important;
+  text-shadow:0 5px 30px rgba(0,0,0,.34)!important;
+}
+#home h2{
+  color:#f2f7fa!important;
+  text-shadow:0 3px 22px rgba(0,0,0,.28)!important;
+}
+#home h2 span{color:#f1c76d!important}
+#home .hero-lead{
+  color:#eaf1f5!important;
+  text-shadow:0 2px 15px rgba(0,0,0,.35)!important;
+}
+#home .hero-actions .btn-gold{
+  background:#f1c76d!important;
+  color:#17324a!important;
+  border-color:#f1c76d!important;
+  box-shadow:0 10px 28px rgba(0,0,0,.18)!important;
+}
+#home .hero-actions .btn-glass{
+  background:rgba(9,32,49,.40)!important;
+  color:#fff!important;
+  border:1px solid rgba(255,255,255,.62)!important;
+  backdrop-filter:blur(8px)!important;
+}
+#home .hero-tags span{
+  color:#f3f7fa!important;
+  background:rgba(8,31,48,.46)!important;
+  border-color:rgba(255,255,255,.28)!important;
+  backdrop-filter:blur(6px)!important;
+}
+#home .hero-brief{
+  background:rgba(255,255,255,.92)!important;
+  color:#183247!important;
+  border:1px solid rgba(255,255,255,.78)!important;
+  box-shadow:0 20px 55px rgba(0,0,0,.20)!important;
+  backdrop-filter:blur(16px)!important;
+}
+#home .hero-brief>p{color:#8f641c!important}
+#home .hero-brief dt{color:#667d8f!important}
+#home .hero-brief dd{color:#17324a!important}
+#home .hero-brief dl>div{border-color:#dfe7ed!important}
+
+@media(max-width:900px){
+  #home.hero{height:auto!important;min-height:760px!important}
+  #home .hero-content{grid-template-columns:1fr!important;padding-top:60px!important;padding-bottom:60px!important}
+  #home .hero-overlay{
+    background:
+      linear-gradient(90deg,rgba(7,24,39,.88),rgba(7,29,46,.55) 72%,rgba(7,28,43,.28)),
+      linear-gradient(180deg,rgba(5,20,31,.10),rgba(5,20,31,.45))!important;
+  }
+}
+@media(max-width:700px){
+  #home.hero{margin-top:70px!important;min-height:700px!important}
+  #home .hero-media{object-position:62% center!important}
+  #home .hero-overlay{
+    background:linear-gradient(180deg,rgba(6,24,39,.72),rgba(6,24,39,.78) 58%,rgba(5,21,34,.88))!important;
+  }
+  #home h1{font-size:54px!important}
+  #home h2{font-size:25px!important}
+  #home .hero-lead{font-size:14px!important}
+  #home .hero-brief{display:none!important}
+}
+</style>
 </head>
 <body>
   <a class="skip-link" href="#main">Bỏ qua menu</a>
