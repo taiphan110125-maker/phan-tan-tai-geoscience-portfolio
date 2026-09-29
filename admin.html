@@ -398,7 +398,7 @@ body.admin-body,.admin-body{background:#f6f8fb!important;color:#183247!important
         </div>
         <div class="project-report-editor">
           <div class="project-report-editor-head">
-            <div><strong>File báo cáo dự án</strong><small>Có thể tải nhiều PDF, DOCX, PPTX hoặc XLSX. Tối đa 24 MB mỗi file.</small></div>
+            <div><strong>File báo cáo dự án</strong><small>Có thể tải nhiều PDF, DOCX, PPTX hoặc XLSX. Tối đa 50 MB mỗi file.</small></div>
             <label class="project-report-picker">+ Chọn file<input id="projectReportFiles" type="file" multiple accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx"></label>
           </div>
           <div id="projectReportPreview" class="project-report-preview">Chưa có file báo cáo.</div>
@@ -611,7 +611,7 @@ function reuploadAssignmentFile(item){
   input.onchange=async()=>{
     const file=input.files?.[0];
     if(!file) return;
-    if(file.size>24*1024*1024){ toast('File vượt quá 24 MB.'); return; }
+    if(file.size>50*1024*1024){ toast('File vượt quá 50 MB.'); return; }
     const newPath=`${item.id}/${Date.now()}-${safeName(file.name)}`;
     try{
       toast('Đang tải file lên…');
@@ -751,8 +751,8 @@ $('#assignmentForm')?.addEventListener('submit',async event=>{
   if(!assignmentDate){$('#assignmentStatus').textContent='Hãy chọn ngày học.';return;}
   if(!subject){$('#assignmentStatus').textContent='Hãy chọn môn học.';return;}
   if(!files.length && titlePrefix.length<2){$('#assignmentStatus').textContent='Nếu không chọn file, hãy nhập tiêu đề bài tập.';return;}
-  const tooLarge=files.find(file=>file.size>24*1024*1024);
-  if(tooLarge){$('#assignmentStatus').textContent=`File “${tooLarge.name}” vượt quá 24 MB.`;return;}
+  const tooLarge=files.find(file=>file.size>50*1024*1024);
+  if(tooLarge){$('#assignmentStatus').textContent=`File “${tooLarge.name}” vượt quá 50 MB.`;return;}
   const button=form.querySelector('button[type="submit"]');button.disabled=true;
   const uploadedPaths=[];const insertedIds=[];
   try{
@@ -819,8 +819,8 @@ $('#projectImage')?.addEventListener('input',e=>{const v=e.target.value.trim();i
 $('#projectImageFile')?.addEventListener('change',event=>{const file=event.target.files[0];if(!file)return;if(!file.type.startsWith('image/')){$('#projectStatus').textContent='Tệp đã chọn không phải ảnh.';return;}if(file.size>6*1024*1024){$('#projectStatus').textContent='Ảnh vượt quá 6 MB.';return;}pendingProjectImageFile=file;$('#projectImage').value='';setProjectPreview(URL.createObjectURL(file));$('#projectStatus').textContent=`Đã chọn ảnh: ${file.name}`;});
 $('#projectReportFiles')?.addEventListener('change',event=>{
   const selected=[...(event.target.files||[])];
-  const invalid=selected.find(file=>file.size>24*1024*1024);
-  if(invalid){$('#projectStatus').textContent=`File “${invalid.name}” vượt quá 24 MB.`;event.target.value='';return;}
+  const invalid=selected.find(file=>file.size>50*1024*1024);
+  if(invalid){$('#projectStatus').textContent=`File “${invalid.name}” vượt quá 50 MB.`;event.target.value='';return;}
   pendingProjectReportFiles=[...pendingProjectReportFiles,...selected];
   event.target.value='';
   renderProjectReportPreview(currentEditingProject());
