@@ -286,6 +286,20 @@ body.admin-body,.admin-body{background:#f6f8fb!important;color:#183247!important
 #feedbackList{display:grid;gap:9px}.feedback-item{margin:0}.feedback-item .admin-row-actions{align-items:center;justify-content:space-between}
 
 </style>
+<style id="ptt-assignment-rich-editor">
+
+.rich-field{display:grid;gap:7px}.rich-field-label{font-size:10px;font-weight:900;letter-spacing:.04em;color:#405158}
+.rich-toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:5px;padding:7px;background:#f5f8fa;border:1px solid #d8e2e9;border-bottom:0;border-radius:11px 11px 0 0}
+.rich-toolbar button,.rich-toolbar select{min-height:30px;border:1px solid #d3dfe7;background:#fff;color:#29485f;border-radius:7px;padding:5px 8px;font-size:9px;font-weight:750;cursor:pointer}
+.rich-toolbar button:hover{background:#eaf2f7;border-color:#b9ccda}.rich-toolbar select{cursor:pointer}
+.rich-sep{width:1px;height:22px;background:#d8e2e9;margin:0 2px}
+.rich-editor{min-height:150px;max-height:280px;overflow-y:auto;border:1px solid #d8e2e9;border-radius:0 0 11px 11px;background:#fff;padding:12px 13px;color:#29485f;font-size:12px;line-height:1.65;outline:none}
+.rich-editor:focus{border-color:#91aec3;box-shadow:0 0 0 3px rgba(44,109,164,.08)}
+.rich-editor:empty::before{content:attr(data-placeholder);color:#9aa8b2;pointer-events:none}
+.rich-editor p,.rich-editor div{margin:0 0 8px}.rich-editor h2{font-size:20px;margin:8px 0}.rich-editor h3{font-size:16px;margin:7px 0}.rich-editor ul,.rich-editor ol{margin:7px 0;padding-left:24px}
+@media(max-width:680px){.rich-toolbar{gap:4px}.rich-toolbar button,.rich-toolbar select{font-size:8px;padding:5px 6px}.rich-editor{min-height:135px}}
+
+</style>
 </head>
 <body class="admin-body">
   <header class="admin-topbar">
@@ -428,7 +442,29 @@ body.admin-body,.admin-body{background:#f6f8fb!important;color:#183247!important
         </div>
         <label>Tiêu đề chung <small class="muted">(không bắt buộc)</small><input id="assignmentTitle" placeholder="Ví dụ: Bài tập Petrophysics"></label>
         <label>Chủ đề / mô tả chung <small class="muted">(không bắt buộc)</small><input id="assignmentTopic" placeholder="Ví dụ: Formation Evaluation · Chương 2"></label>
-        <label>Nội dung <small class="muted">(không bắt buộc)</small><textarea id="assignmentContent" rows="5" placeholder="Có thể để trống hoặc nhập nội dung bài tập tại đây..."></textarea></label>
+        <div class="rich-field">
+          <div class="rich-field-label">Nội dung <small class="muted">(không bắt buộc)</small></div>
+          <div class="rich-toolbar" id="assignmentContentToolbar" role="toolbar" aria-label="Định dạng nội dung bài tập">
+            <button type="button" data-rich-cmd="bold" title="Đậm"><b>B</b></button>
+            <button type="button" data-rich-cmd="italic" title="Nghiêng"><i>I</i></button>
+            <button type="button" data-rich-cmd="underline" title="Gạch chân"><u>U</u></button>
+            <span class="rich-sep"></span>
+            <button type="button" data-rich-cmd="insertUnorderedList" title="Danh sách chấm">• Danh sách</button>
+            <button type="button" data-rich-cmd="insertOrderedList" title="Danh sách số">1. Danh sách</button>
+            <span class="rich-sep"></span>
+            <button type="button" data-rich-cmd="justifyLeft" title="Căn trái">≡←</button>
+            <button type="button" data-rich-cmd="justifyCenter" title="Căn giữa">≡</button>
+            <button type="button" data-rich-cmd="justifyRight" title="Căn phải">→≡</button>
+            <span class="rich-sep"></span>
+            <select id="assignmentContentFormat" aria-label="Kiểu đoạn">
+              <option value="p">Văn bản</option>
+              <option value="h2">Tiêu đề</option>
+              <option value="h3">Tiêu đề nhỏ</option>
+            </select>
+            <button type="button" data-rich-cmd="removeFormat" title="Xóa định dạng">Xóa format</button>
+          </div>
+          <div id="assignmentContent" class="rich-editor" contenteditable="true" role="textbox" aria-multiline="true" data-placeholder="Có thể để trống hoặc nhập nội dung bài tập tại đây..."></div>
+        </div>
         <label>Link tài liệu <small class="muted">(không bắt buộc)</small><input id="assignmentLink" type="url" placeholder="https://drive.google.com/... hoặc https://..."></label>
         <label>File đính kèm <small class="muted">(không bắt buộc · có thể chọn nhiều file)</small><input id="assignmentFile" type="file" multiple accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx"></label>
         <div id="selectedFilesPreview" class="selected-files-preview">Chưa chọn file — bạn vẫn có thể lưu bài tập.</div>
@@ -503,6 +539,48 @@ let pendingProjectReportFiles = [];
 let removedProjectReportPaths = new Set();
 
 function esc(value = ''){ return String(value).replace(/[&<>'"]/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[char])); }
+function sanitizeRichHtml(html=''){
+  const doc=new DOMParser().parseFromString('<div>'+String(html)+'</div>','text/html');
+  const root=doc.body.firstElementChild;
+  const allowed=new Set(['P','DIV','BR','B','STRONG','I','EM','U','UL','OL','LI','H2','H3']);
+  const walk=node=>{
+    [...node.childNodes].forEach(child=>{
+      if(child.nodeType===Node.ELEMENT_NODE){
+        if(!allowed.has(child.tagName)){
+          const frag=doc.createDocumentFragment();
+          while(child.firstChild) frag.appendChild(child.firstChild);
+          child.replaceWith(frag);
+          return;
+        }
+        [...child.attributes].forEach(attr=>{
+          if(attr.name==='style'){
+            const align=child.style.textAlign;
+            child.removeAttribute('style');
+            if(['left','center','right','justify'].includes(align)) child.style.textAlign=align;
+          }else if(attr.name==='align'){
+            const align=String(attr.value).toLowerCase();
+            child.removeAttribute('align');
+            if(['left','center','right','justify'].includes(align)) child.style.textAlign=align;
+          }else child.removeAttribute(attr.name);
+        });
+        walk(child);
+      }else if(child.nodeType!==Node.TEXT_NODE) child.remove();
+    });
+  };
+  walk(root);
+  return root.innerHTML.trim();
+}
+function richPlainText(html=''){
+  const div=document.createElement('div');
+  div.innerHTML=sanitizeRichHtml(html);
+  return (div.textContent||'').replace(/\s+/g,' ').trim();
+}
+function resetAssignmentRichEditor(){
+  const editor=$('#assignmentContent');
+  if(editor) editor.innerHTML='';
+  const format=$('#assignmentContentFormat');
+  if(format) format.value='p';
+}
 function toast(message){ const el=$('#toast'); if(!el)return; el.textContent=message; el.classList.add('show'); clearTimeout(toast.timer); toast.timer=setTimeout(()=>el.classList.remove('show'),2200); }
 function requireSupabase(){ if(!sb) throw new Error('Chưa cấu hình Supabase.'); return sb; }
 function safeName(name='file'){ return name.normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^A-Za-z0-9._-]+/g,'-').replace(/^-+|-+$/g,'').slice(-100) || 'file'; }
@@ -510,7 +588,7 @@ function notifyPublicContentChanged(kind){ try { new BroadcastChannel('ptt-conte
 function mapProject(r){ return {id:r.id,title:r.title,type:r.type,image:r.image_url||'',imagePath:r.image_path||'',summary:r.summary||'',tags:r.tags||[],objective:r.objective||'',data:r.data_text||'',method:r.method||'',output:r.output||'',reportFiles:Array.isArray(r.report_files)?r.report_files:[],sortOrder:r.sort_order||0}; }
 function formatAssignmentDate(value=''){ const p=String(value||'').split('-'); return p.length===3?`${p[2]}/${p[1]}/${p[0]}`:String(value||''); }
 function localToday(){ const d=new Date(); const y=d.getFullYear(); const m=String(d.getMonth()+1).padStart(2,'0'); const day=String(d.getDate()).padStart(2,'0'); return `${y}-${m}-${day}`; }
-function mapAssignment(r, counts){ return {id:r.id,type:r.type,title:r.title,topic:r.topic||'',contentText:r.content_text||'',externalUrl:r.external_url||'',subject:r.subject||'other',assignmentDate:r.assignment_date||'',assignmentNumber:Number(r.assignment_number||1),date:r.assignment_date?formatAssignmentDate(r.assignment_date):(r.date_text||''),fileName:r.file_name||'',fileUrl:r.file_url||'',filePath:r.file_path||'',commentCount:counts[r.id]||0}; }
+function mapAssignment(r, counts){ return {id:r.id,type:r.type,title:r.title,topic:r.topic||'',contentText:r.content_text||'',contentPlain:richPlainText(r.content_text||''),externalUrl:r.external_url||'',subject:r.subject||'other',assignmentDate:r.assignment_date||'',assignmentNumber:Number(r.assignment_number||1),date:r.assignment_date?formatAssignmentDate(r.assignment_date):(r.date_text||''),fileName:r.file_name||'',fileUrl:r.file_url||'',filePath:r.file_path||'',commentCount:counts[r.id]||0}; }
 function subjectLabel(slug){ return subjects.find(s=>s.slug===slug)?.name || slug || 'Khác'; }
 function subjectSlug(name=''){ return name.normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/đ/g,'d').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,60); }
 function fileBaseName(name=''){ return name.replace(/\.[^.]+$/,'').replace(/[_-]+/g,' ').replace(/\s+/g,' ').trim() || 'Bài tập'; }
@@ -568,7 +646,7 @@ function renderAssignments(){
   const rows=[...assignments].sort((a,b)=>String(a.assignmentDate).localeCompare(String(b.assignmentDate))||a.assignmentNumber-b.assignmentNumber);
   $('#adminAssignmentRows').innerHTML=rows.length?rows.map(i=>`
     <tr>
-      <td><strong>${esc(formatAssignmentDate(i.assignmentDate))} · Bài ${i.assignmentNumber}</strong><small>${esc(i.title)} · ${esc(i.type)}${i.fileName?` · ${esc(i.fileName)}`:''}${i.externalUrl?' · Link':''}${i.contentText?` · ${esc(i.contentText.slice(0,70))}${i.contentText.length>70?'…':''}`:''}</small></td>
+      <td><strong>${esc(formatAssignmentDate(i.assignmentDate))} · Bài ${i.assignmentNumber}</strong><small>${esc(i.title)} · ${esc(i.type)}${i.fileName?` · ${esc(i.fileName)}`:''}${i.externalUrl?' · Link':''}${i.contentPlain?` · ${esc(i.contentPlain.slice(0,70))}${i.contentPlain.length>70?'…':''}`:''}</small></td>
       <td><select class="admin-inline-select" data-assignment-subject="${esc(i.id)}">${subjectOptions(i.subject,false)}</select></td>
       <td><label class="inline-day-control"><span>Ngày</span><input type="date" value="${esc(i.assignmentDate)}" data-assignment-date="${esc(i.id)}"></label></td>
       <td>${esc(i.topic||'—')}</td>
@@ -777,6 +855,27 @@ $('#subjectForm')?.addEventListener('submit',async event=>{
   await loadAdminData();notifyPublicContentChanged('assignment_subjects');renderSubjects();
 });
 
+$('#assignmentContentToolbar')?.addEventListener('mousedown',event=>{
+  if(event.target.closest('button')) event.preventDefault();
+});
+$('#assignmentContentToolbar')?.addEventListener('click',event=>{
+  const button=event.target.closest('[data-rich-cmd]');
+  if(!button)return;
+  const editor=$('#assignmentContent');
+  editor?.focus();
+  document.execCommand(button.dataset.richCmd,false,null);
+});
+$('#assignmentContentFormat')?.addEventListener('change',event=>{
+  const editor=$('#assignmentContent');
+  editor?.focus();
+  document.execCommand('formatBlock',false,event.target.value);
+});
+$('#assignmentContent')?.addEventListener('paste',event=>{
+  event.preventDefault();
+  const text=event.clipboardData?.getData('text/plain')||'';
+  document.execCommand('insertText',false,text);
+});
+
 $('#assignmentForm')?.addEventListener('submit',async event=>{
   event.preventDefault();
   const form=event.currentTarget;
@@ -784,7 +883,8 @@ $('#assignmentForm')?.addEventListener('submit',async event=>{
   const subject=$('#assignmentSubject').value;
   const titlePrefix=$('#assignmentTitle').value.trim();
   const topic=$('#assignmentTopic').value.trim();
-  const contentText=$('#assignmentContent').value.trim();
+  const rawContent=$('#assignmentContent').innerHTML;
+  const contentText=richPlainText(rawContent) ? sanitizeRichHtml(rawContent) : '';
   const externalUrl=$('#assignmentLink').value.trim();
   const files=[...($('#assignmentFile').files||[])];
   if(!assignmentDate){$('#assignmentStatus').textContent='Hãy chọn ngày học.';return;}
@@ -830,7 +930,7 @@ $('#assignmentForm')?.addEventListener('submit',async event=>{
       if(error)throw error;
       insertedIds.push(id);
     }
-    form.reset();$('#selectedFilesPreview').textContent='Chưa chọn file — bạn vẫn có thể lưu bài tập.';
+    form.reset();resetAssignmentRichEditor();$('#selectedFilesPreview').textContent='Chưa chọn file — bạn vẫn có thể lưu bài tập.';
     const savedCount=items.length;
     $('#assignmentStatus').textContent=`Đã lưu ${savedCount} bài vào ngày ${formatAssignmentDate(assignmentDate)}.`;
     await loadAdminData();notifyPublicContentChanged('assignments');

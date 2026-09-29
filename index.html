@@ -1350,6 +1350,42 @@ let publicContentLoadedOnce = false;
 function escapeHtml(value = ''){
   return String(value).replace(/[&<>'"]/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[char]));
 }
+function sanitizeRichHtml(html=''){
+  const doc=new DOMParser().parseFromString('<div>'+String(html)+'</div>','text/html');
+  const root=doc.body.firstElementChild;
+  const allowed=new Set(['P','DIV','BR','B','STRONG','I','EM','U','UL','OL','LI','H2','H3']);
+  const walk=node=>{
+    [...node.childNodes].forEach(child=>{
+      if(child.nodeType===Node.ELEMENT_NODE){
+        if(!allowed.has(child.tagName)){
+          const frag=doc.createDocumentFragment();
+          while(child.firstChild) frag.appendChild(child.firstChild);
+          child.replaceWith(frag);
+          return;
+        }
+        [...child.attributes].forEach(attr=>{
+          if(attr.name==='style'){
+            const align=child.style.textAlign;
+            child.removeAttribute('style');
+            if(['left','center','right','justify'].includes(align)) child.style.textAlign=align;
+          }else if(attr.name==='align'){
+            const align=String(attr.value).toLowerCase();
+            child.removeAttribute('align');
+            if(['left','center','right','justify'].includes(align)) child.style.textAlign=align;
+          }else child.removeAttribute(attr.name);
+        });
+        walk(child);
+      }else if(child.nodeType!==Node.TEXT_NODE) child.remove();
+    });
+  };
+  walk(root);
+  return root.innerHTML.trim();
+}
+function richPlainText(html=''){
+  const div=document.createElement('div');
+  div.innerHTML=sanitizeRichHtml(html);
+  return (div.textContent||'').replace(/\s+/g,' ').trim();
+}
 function showToast(message){
   const toast = $('#toast');
   if (!toast) return;
@@ -1589,7 +1625,7 @@ function renderAssignments(){
   const rows=assignments
     .filter(a=>{
       const subjectName=assignmentSubjectName(a.subject);
-      const haystack=`${a.title} ${a.topic} ${a.contentText} ${a.externalUrl} ${a.fileName} ${subjectName} ${formatAssignmentDate(a.assignmentDate)} bài ${a.assignmentNumber}`.toLowerCase();
+      const haystack=`${a.title} ${a.topic} ${a.contentPlain} ${a.externalUrl} ${a.fileName} ${subjectName} ${formatAssignmentDate(a.assignmentDate)} bài ${a.assignmentNumber}`.toLowerCase();
       return (subject==='all'||a.subject===subject) && haystack.includes(q);
     })
     .sort((a,b)=>String(a.assignmentDate).localeCompare(String(b.assignmentDate)) || a.assignmentNumber-b.assignmentNumber || a.title.localeCompare(b.title,'vi'));
@@ -1617,7 +1653,7 @@ function renderAssignments(){
               <div class="assignment-meta"><span class="subject-pill">${escapeHtml(assignmentSubjectName(a.subject))}</span><span class="file-pill">${escapeHtml(a.type)}</span></div>
               <h4>${escapeHtml(a.title)}</h4>
               ${a.topic?`<p>${escapeHtml(a.topic)}</p>`:''}
-              ${a.contentText?`<p class="assignment-content-text"><strong>Nội dung:</strong> ${escapeHtml(a.contentText)}</p>`:''}
+              ${a.contentPlain?`<p class="assignment-content-text"><strong>Nội dung:</strong> ${escapeHtml(a.contentPlain)}</p>`:''}
               <small>${escapeHtml(a.fileName || (a.externalUrl?'Có link tài liệu':'Không có file đính kèm'))} · ${Number(a.commentCount||0)} trao đổi</small>
             </div>
             <div class="assignment-actions">
@@ -1759,6 +1795,7 @@ function mapAssignment(row, countMap){
     title:row.title,
     topic:row.topic || '',
     contentText:row.content_text || '',
+    contentPlain:richPlainText(row.content_text || ''),
     externalUrl:row.external_url || '',
     subject:row.subject || 'other',
     assignmentDate:row.assignment_date || '',
