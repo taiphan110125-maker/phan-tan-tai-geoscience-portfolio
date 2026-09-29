@@ -832,6 +832,141 @@ body{color:var(--ink-strong)!important}
   #assignments .unified-exchange-stream{max-height:280px!important}
 }
 </style>
+<style id="ptt-exchange-cleanup">
+#assignments .feedback-card{
+  display:block!important;
+  height:auto!important;
+  min-height:0!important;
+  background:#fff!important;
+}
+#assignments .feedback-body{
+  padding:18px!important;
+  display:flex!important;
+  flex-direction:column!important;
+  gap:10px!important;
+  overflow:hidden!important;
+}
+#assignments .exchange-title-row{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:space-between!important;
+  gap:12px!important;
+  padding-bottom:10px!important;
+  border-bottom:1px solid #e2e9ef!important;
+}
+#assignments .exchange-title-row h3{
+  margin:0!important;
+  color:#17324a!important;
+  font-family:var(--font-display)!important;
+  font-size:27px!important;
+  line-height:1.05!important;
+  letter-spacing:-.025em!important;
+}
+#assignments .exchange-live-status{
+  display:inline-flex!important;
+  align-items:center!important;
+  gap:6px!important;
+  color:#3c6a58!important;
+  font-size:9px!important;
+  font-weight:800!important;
+  white-space:nowrap!important;
+}
+#assignments .live-dot{
+  width:7px!important;
+  height:7px!important;
+  flex:0 0 auto!important;
+}
+#assignments .unified-exchange-stream{
+  min-height:210px!important;
+  max-height:320px!important;
+  overflow-y:auto!important;
+  padding:9px!important;
+  gap:8px!important;
+  border-radius:12px!important;
+  background:#f7f9fb!important;
+  border:1px solid #dce5ec!important;
+}
+#assignments .exchange-entry{
+  padding:11px 12px!important;
+  border-radius:11px!important;
+  background:#fff!important;
+}
+#assignments .exchange-person strong{
+  font-size:10.5px!important;
+  line-height:1.35!important;
+}
+#assignments .exchange-person span{
+  font-size:8.5px!important;
+  line-height:1.35!important;
+}
+#assignments .exchange-person time{
+  font-size:7.5px!important;
+}
+#assignments .exchange-assignment{
+  margin:7px 0 5px!important;
+  gap:5px!important;
+}
+#assignments .exchange-assignment span{
+  font-size:7.5px!important;
+  padding:3px 6px!important;
+}
+#assignments .exchange-entry h4{
+  font-size:10px!important;
+  margin:0 0 4px!important;
+}
+#assignments .exchange-entry p{
+  margin:4px 0 0!important;
+  font-size:10px!important;
+  line-height:1.55!important;
+  color:#405d72!important;
+}
+#assignments .unified-chat-form{
+  margin-top:0!important;
+}
+#assignments .chat-fields{
+  grid-template-columns:minmax(0,1fr) 112px!important;
+  gap:7px!important;
+}
+#assignments .academic-chat-form input,
+#assignments .academic-chat-form select,
+#assignments .academic-chat-form textarea{
+  min-height:38px!important;
+  padding:9px 10px!important;
+  border-radius:9px!important;
+  font-size:10px!important;
+  color:#27465d!important;
+}
+#assignments .chat-send-row{
+  grid-template-columns:minmax(0,1fr) 56px!important;
+  gap:7px!important;
+  margin-top:7px!important;
+}
+#assignments .chat-send-row textarea{
+  min-height:52px!important;
+  max-height:90px!important;
+}
+#assignments .chat-send-row button{
+  min-height:52px!important;
+  border-radius:9px!important;
+  font-size:10px!important;
+  font-weight:800!important;
+}
+#assignments .chat-status{
+  min-height:0!important;
+  margin:2px 0 0!important;
+  font-size:8px!important;
+}
+@media(max-width:860px){
+  #assignments .exchange-title-row h3{font-size:25px!important}
+  #assignments .unified-exchange-stream{max-height:300px!important}
+}
+@media(max-width:600px){
+  #assignments .feedback-body{padding:14px!important}
+  #assignments .exchange-title-row h3{font-size:22px!important}
+  #assignments .exchange-live-status{font-size:8px!important}
+  #assignments .chat-fields{grid-template-columns:1fr 100px!important}
+}
+</style>
 </head>
 <body>
   <a class="skip-link" href="#main">Bỏ qua menu</a>
@@ -995,14 +1130,10 @@ body{color:var(--ink-strong)!important}
           </div>
 
           <aside class="feedback-card reveal delay-1">
-            <div class="feedback-image"><img src="assets/assignments-review.svg" alt="Minh họa trao đổi học thuật về bài tập"></div>
             <div class="feedback-body">
-              <p class="eyebrow">TRAO ĐỔI HỌC THUẬT</p>
-              <h3>Trao đổi học thuật</h3>
-              <p>Lịch sử trao đổi được lưu theo từng bài tập, người gửi và thời gian để có thể xem lại lâu dài.</p>
-              <div class="unified-exchange-head">
-                <div><span class="live-dot"></span><strong>Luồng trao đổi</strong></div>
-                <small>Tất cả trao đổi được lưu theo thời gian</small>
+              <div class="exchange-title-row">
+                <h3>Trao đổi học thuật</h3>
+                <span class="exchange-live-status"><span class="live-dot"></span> Trực tiếp</span>
               </div>
               <div id="academicExchangeHistory" class="academic-exchange-history unified-exchange-stream" aria-live="polite">
                 <div class="exchange-empty">Chưa có trao đổi học thuật.</div>
