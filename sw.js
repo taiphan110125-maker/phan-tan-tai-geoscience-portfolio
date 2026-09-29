@@ -1,13 +1,13 @@
 'use strict';
 
-const CACHE_NAME='ptt-static-v3-20260930';
+const CACHE_NAME='ptt-static-v4-20260930';
 const PRECACHE=[
   '/',
   '/index.html',
   '/assignment-viewer.html',
   '/assets/ptt-brand.svg',
   '/assets/ptt-emblem.svg',
-  '/assets/hero-oil-geology-v2.webp',
+  '/assets/hero-oil-geology-exact.webp',
   '/assets/about-fieldwork.svg',
   '/assets/assignments-review.svg',
   '/assets/geo-ai.svg'
