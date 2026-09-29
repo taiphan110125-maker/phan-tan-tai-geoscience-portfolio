@@ -1148,7 +1148,7 @@ function renderAssignments(){
             </div>
             <div class="assignment-actions">
               ${a.filePath||a.fileUrl||a.externalUrl||a.contentText
-  ? `<a class="mini-btn assignment-view" href="assignment-viewer.html?id=${encodeURIComponent(a.id)}" target="_blank" rel="noopener">${a.filePath||a.fileUrl?'Xem trước':(a.externalUrl?'Mở link':'Xem nội dung')}</a>`
+  ? `<a class="mini-btn assignment-view" href="assignment-viewer.html?id=${encodeURIComponent(a.id)}" target="_blank" rel="noopener">${a.filePath||a.fileUrl?'Nội dung':(a.externalUrl?'Mở link':'Nội dung')}</a>`
   : '<span class="mini-btn assignment-view is-disabled" aria-disabled="true">Chưa có nội dung</span>'}
               <button class="mini-btn comment-open" data-id="${escapeHtml(a.id)}">Nhận xét</button>
             </div>
