@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#ffffff">
+  <title>Xem trước bài tập · Phan Tấn Tài</title>
+  <link rel="icon" href="assets/ptt-emblem.svg" type="image/svg+xml">
+  <style>
+    :root{--navy:#17324a;--blue:#2c6da4;--gold:#9a7127;--text:#29485f;--muted:#6f8291;--line:#dce5ec;--soft:#f5f8fb;--white:#fff;--shadow:0 18px 55px rgba(22,50,74,.09)}
+    *{box-sizing:border-box}html,body{margin:0;min-height:100%;font-family:"Segoe UI",Arial,Helvetica,sans-serif;color:var(--text);background:var(--soft)}
+    a{text-decoration:none;color:inherit}button,a{font:inherit}
+    .topbar{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.95);border-bottom:1px solid var(--line);backdrop-filter:blur(14px)}
+    .topbar-inner{width:min(1220px,calc(100% - 32px));min-height:74px;margin:auto;display:flex;align-items:center;gap:18px}
+    .brand img{width:210px;height:52px;object-fit:contain;object-position:left center}.spacer{flex:1}
+    .back{display:inline-flex;align-items:center;gap:7px;padding:10px 13px;border:1px solid #d4e0e8;border-radius:10px;background:#fff;color:var(--navy);font-weight:750;font-size:12px}
+    .page{width:min(1220px,calc(100% - 32px));margin:26px auto 44px;display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:20px;align-items:start}
+    .viewer-card,.info-card{background:#fff;border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow)}
+    .viewer-head{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;padding:20px 22px;border-bottom:1px solid var(--line)}
+    .eyebrow{margin:0 0 5px;color:var(--gold);font-size:9px;font-weight:900;letter-spacing:.16em}.viewer-head h1{margin:0;color:var(--navy);font-size:clamp(24px,3vw,38px);letter-spacing:-.035em}
+    .viewer-head p{margin:7px 0 0;color:var(--muted);font-size:12px}
+    .type-badge{flex:0 0 auto;padding:8px 10px;border-radius:999px;background:#edf4fa;color:#285f8e;font-size:10px;font-weight:900}
+    .preview-shell{height:min(72vh,760px);min-height:540px;background:#edf2f5;position:relative;overflow:hidden;border-radius:0 0 18px 18px}
+    .preview-shell iframe{width:100%;height:100%;border:0;background:#fff}
+    .preview-state{position:absolute;inset:0;display:grid;place-items:center;padding:34px;text-align:center}
+    .preview-state>div{max-width:520px}.preview-state h2{margin:0 0 8px;color:var(--navy);font-size:24px}.preview-state p{margin:0;color:var(--muted);line-height:1.7;font-size:13px}
+    .loader{width:42px;height:42px;border-radius:50%;border:4px solid #dbe5ec;border-top-color:var(--blue);margin:0 auto 15px;animation:spin .8s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}
+    .info-card{padding:20px;position:sticky;top:94px}.info-card h2{font-size:16px;color:var(--navy);margin:0 0 14px}
+    .meta{display:grid;gap:0;margin:0 0 18px}.meta div{padding:11px 0;border-bottom:1px solid #edf1f4}.meta div:first-child{padding-top:0}.meta dt{font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:#8797a3;font-weight:800}.meta dd{margin:3px 0 0;color:#29485f;font-size:12px;font-weight:650;word-break:break-word}
+    .download{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:12px 14px;border:0;border-radius:11px;background:var(--navy);color:#fff;font-weight:800;font-size:12px;cursor:pointer}
+    .download[aria-disabled="true"]{opacity:.45;pointer-events:none}.open-direct{display:flex;justify-content:center;margin-top:8px;padding:10px;color:#2b6899;font-size:11px;font-weight:750}
+    .note{margin:15px 0 0;padding:11px;border-radius:10px;background:#f6f9fb;color:#6f8291;font-size:10px;line-height:1.6}
+    .error{color:#9f3c31}
+    @media(max-width:900px){.page{grid-template-columns:1fr}.info-card{position:static;order:-1}.preview-shell{height:68vh;min-height:480px}}
+    @media(max-width:600px){.topbar-inner,.page{width:min(100% - 20px,1220px)}.brand img{width:170px}.back{padding:9px 10px}.viewer-head{padding:16px}.preview-shell{min-height:430px;height:65vh}}
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="index.html" aria-label="Về trang chủ"><img src="assets/ptt-brand.svg" alt="Phan Tấn Tài · Geology & Geophysics"></a>
+      <div class="spacer"></div>
+      <a class="back" href="index.html#assignments">← Quay lại bài tập</a>
+    </div>
+  </header>
+
+  <main class="page">
+    <section class="viewer-card">
+      <header class="viewer-head">
+        <div>
+          <p class="eyebrow">ASSIGNMENT PREVIEW</p>
+          <h1 id="title">Đang tải tài liệu…</h1>
+          <p id="subtitle">Vui lòng chờ trong giây lát.</p>
+        </div>
+        <span class="type-badge" id="typeBadge">FILE</span>
+      </header>
+      <div class="preview-shell" id="previewShell">
+        <div class="preview-state" id="previewState"><div><div class="loader"></div><h2>Đang chuẩn bị bản xem trước</h2><p>Hệ thống đang tạo đường dẫn an toàn cho tài liệu.</p></div></div>
+      </div>
+    </section>
+
+    <aside class="info-card">
+      <h2>Thông tin tài liệu</h2>
+      <dl class="meta">
+        <div><dt>Ngày học</dt><dd id="dateText">—</dd></div>
+        <div><dt>Số bài</dt><dd id="numberText">—</dd></div>
+        <div><dt>Môn học</dt><dd id="subjectText">—</dd></div>
+        <div><dt>Chủ đề</dt><dd id="topicText">—</dd></div>
+        <div><dt>Tên file</dt><dd id="fileNameText">—</dd></div>
+      </dl>
+      <a class="download" id="downloadBtn" href="#" aria-disabled="true">↓ Tải file</a>
+      <a class="open-direct" id="openDirect" href="#" target="_blank" rel="noopener" hidden>Mở file ở tab mới ↗</a>
+      <p class="note">Bạn đang ở trang xem trước. File chỉ được tải xuống khi bạn bấm nút <strong>Tải file</strong>.</p>
+    </aside>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+  'use strict';
+  const cfg={
+    SUPABASE_URL:'https://aqkasetqystwvpassidd.supabase.co',
+    SUPABASE_ANON_KEY:'sb_publishable_f2yw7xfbADdzj9iCfcnxqA_yHG5AqVo'
+  };
+  const sb=window.supabase.createClient(cfg.SUPABASE_URL,cfg.SUPABASE_ANON_KEY,{auth:{persistSession:false}});
+  const $=s=>document.querySelector(s);
+  const params=new URLSearchParams(location.search);
+  const assignmentId=params.get('id');
+
+  function formatDate(v=''){
+    const p=String(v).split('-');
+    return p.length===3?`${p[2]}/${p[1]}/${p[0]}`:String(v||'—');
+  }
+  function extension(name='',type=''){
+    return (name.split('.').pop()||type||'').toLowerCase();
+  }
+  function showState(title,message,isError=false){
+    $('#previewShell').innerHTML=`<div class="preview-state"><div><h2 class="${isError?'error':''}">${title}</h2><p>${message}</p></div></div>`;
+  }
+  function renderFrame(src,title){
+    $('#previewShell').innerHTML='';
+    const frame=document.createElement('iframe');
+    frame.src=src;
+    frame.title=title;
+    frame.loading='eager';
+    frame.referrerPolicy='no-referrer';
+    $('#previewShell').appendChild(frame);
+  }
+
+  async function load(){
+    if(!assignmentId){showState('Thiếu mã bài tập','Đường dẫn xem trước không hợp lệ.',true);return;}
+    try{
+      const {data:a,error}=await sb.from('assignments').select('*').eq('id',assignmentId).eq('published',true).single();
+      if(error||!a) throw error||new Error('Không tìm thấy bài tập.');
+
+      let subjectName=a.subject||'Khác';
+      if(a.subject){
+        const {data:s}=await sb.from('assignment_subjects').select('name').eq('slug',a.subject).maybeSingle();
+        if(s?.name) subjectName=s.name;
+      }
+
+      $('#title').textContent=a.title||'Bài tập';
+      $('#subtitle').textContent=(a.topic||'Tài liệu học tập')+' · '+formatDate(a.assignment_date);
+      $('#typeBadge').textContent=(a.type||extension(a.file_name)||'FILE').toUpperCase();
+      $('#dateText').textContent=formatDate(a.assignment_date);
+      $('#numberText').textContent='Bài '+Number(a.assignment_number||1);
+      $('#subjectText').textContent=subjectName;
+      $('#topicText').textContent=a.topic||'—';
+      $('#fileNameText').textContent=a.file_name||'Chưa có file';
+
+      if(!a.file_path&&!a.file_url){
+        showState('Bài tập chưa có file','Quản trị viên chưa đính kèm tài liệu cho bài tập này.');
+        return;
+      }
+
+      let previewUrl=a.file_url||'';
+      let downloadUrl=a.file_url||'';
+      if(a.file_path){
+        const [previewRes,downloadRes]=await Promise.all([
+          sb.storage.from('assignments').createSignedUrl(a.file_path,3600),
+          sb.storage.from('assignments').createSignedUrl(a.file_path,3600,{download:a.file_name||true})
+        ]);
+        if(previewRes.error||!previewRes.data?.signedUrl) throw previewRes.error||new Error('Không tạo được đường dẫn xem trước.');
+        previewUrl=previewRes.data.signedUrl;
+        downloadUrl=downloadRes.data?.signedUrl||previewUrl;
+      }
+
+      const download=$('#downloadBtn');
+      download.href=downloadUrl;
+      download.setAttribute('aria-disabled','false');
+      if(a.file_name) download.setAttribute('download',a.file_name);
+      $('#openDirect').href=previewUrl;
+      $('#openDirect').hidden=false;
+
+      const ext=extension(a.file_name,a.type);
+      if(ext==='pdf'){
+        renderFrame(previewUrl,'Xem trước '+(a.file_name||a.title));
+      }else if(['doc','docx','ppt','pptx','xls','xlsx'].includes(ext)){
+        const office='https://view.officeapps.live.com/op/embed.aspx?src='+encodeURIComponent(previewUrl);
+        renderFrame(office,'Xem trước '+(a.file_name||a.title));
+      }else{
+        showState('Không hỗ trợ xem trực tiếp','Định dạng này chưa thể hiển thị trong trình xem trước. Bạn vẫn có thể mở ở tab mới hoặc tải file bằng các nút bên phải.');
+      }
+    }catch(error){
+      console.error(error);
+      $('#title').textContent='Không mở được tài liệu';
+      $('#subtitle').textContent='Có lỗi khi tải thông tin bài tập.';
+      showState('Không thể xem trước',error?.message||'File hiện không khả dụng. Vui lòng thử lại sau.',true);
+    }
+  }
+  load();
+  </script>
+</body>
+</html>

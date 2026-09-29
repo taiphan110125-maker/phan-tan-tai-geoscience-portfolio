@@ -529,6 +529,9 @@ body{color:var(--ink-strong)!important}
   .hero-overlay{background:linear-gradient(180deg,rgba(255,255,255,.96),rgba(255,255,255,.84) 56%,rgba(255,255,255,.55))!important}
 }
 </style>
+<style id="ptt-assignment-preview-btn">
+.mini-btn:disabled{opacity:.48;cursor:not-allowed;background:#f3f5f7!important;color:#8797a4!important;border-color:#dfe6eb!important}
+</style>
 </head>
 <body>
   <a class="skip-link" href="#main">Bỏ qua menu</a>
@@ -1031,19 +1034,9 @@ async function openAssignmentFile(assignment){
     showToast(`“${assignment.title}” chưa có file đính kèm.`);
     return;
   }
-  try{
-    let target = assignment.fileUrl || '';
-    if (assignment.filePath){
-      const {data,error} = await sb.storage.from('assignments').createSignedUrl(assignment.filePath, 120);
-      if (error || !data?.signedUrl) throw error || new Error('File không tồn tại trong Storage.');
-      target = data.signedUrl;
-    }
-    const opened = window.open(target, '_blank', 'noopener');
-    if (!opened) location.href = target;
-  }catch(error){
-    console.warn('Assignment file unavailable:', error);
-    showToast('File bài tập này hiện không còn trên hệ thống. Quản trị viên cần tải lại file.');
-  }
+  const url=`assignment-viewer.html?id=${encodeURIComponent(assignment.id)}`;
+  const opened=window.open(url,'_blank','noopener');
+  if(!opened) location.href=url;
 }
 
 document.addEventListener('click', event => {
@@ -1110,7 +1103,7 @@ function renderAssignments(){
               <small>${escapeHtml(a.fileName || 'Chưa có file đính kèm')} · ${Number(a.commentCount||0)} nhận xét</small>
             </div>
             <div class="assignment-actions">
-              <button class="mini-btn assignment-view" data-id="${escapeHtml(a.id)}">Xem file</button>
+              <button class="mini-btn assignment-view" data-id="${escapeHtml(a.id)}" ${a.filePath||a.fileUrl?'':'disabled'}>${a.filePath||a.fileUrl?'Xem trước':'Chưa có file'}</button>
               <button class="mini-btn comment-open" data-id="${escapeHtml(a.id)}">Nhận xét</button>
             </div>
           </article>`).join('')}
