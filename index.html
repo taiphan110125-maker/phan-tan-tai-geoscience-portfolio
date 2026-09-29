@@ -536,6 +536,19 @@ body{color:var(--ink-strong)!important}
 .assignment-actions .assignment-view{text-decoration:none;display:inline-flex;align-items:center;justify-content:center}
 .assignment-view.is-disabled{opacity:.48;cursor:not-allowed;background:#f3f5f7!important;color:#8797a4!important;border-color:#dfe6eb!important;pointer-events:none}
 </style>
+<style id="ptt-academic-exchanges">
+
+.academic-exchange-history{display:grid;gap:10px;max-height:310px;overflow-y:auto;padding-right:4px;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:#c1ced8 transparent}
+.academic-exchange-history::-webkit-scrollbar{width:7px}.academic-exchange-history::-webkit-scrollbar-thumb{background:#c1ced8;border-radius:999px}
+.exchange-entry{padding:13px 14px;border:1px solid #dfe8ee;border-radius:13px;background:#f7fafc}
+.exchange-person{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.exchange-person strong{display:block;color:#173a55;font-size:11px}.exchange-person span{display:block;color:#657d8f;font-size:9px;margin-top:2px}
+.exchange-person time{color:#7d8f9c;font-size:8px;white-space:nowrap}
+.exchange-assignment{display:flex;gap:5px;flex-wrap:wrap;margin:9px 0 6px}.exchange-assignment span{padding:4px 6px;border-radius:999px;background:#eaf2f7;color:#315d7a;font-size:8px;font-weight:800}
+.exchange-entry h4{margin:0 0 6px;color:#173a55;font-size:10px}.exchange-entry p{margin:0!important;color:#4f687a!important;font-size:10px!important;line-height:1.55;white-space:pre-wrap;word-break:break-word}
+.exchange-empty{padding:15px;text-align:center;border:1px dashed #d8e2e9;border-radius:12px;color:#788b99;font-size:10px;background:#fafcfd}
+
+</style>
 </head>
 <body>
   <a class="skip-link" href="#main">Bỏ qua menu</a>
@@ -699,12 +712,14 @@ body{color:var(--ink-strong)!important}
           </div>
 
           <aside class="feedback-card reveal delay-1">
-            <div class="feedback-image"><img src="assets/assignments-review.svg" alt="Minh họa quy trình xem và nhận xét bài tập"></div>
+            <div class="feedback-image"><img src="assets/assignments-review.svg" alt="Minh họa trao đổi học thuật về bài tập"></div>
             <div class="feedback-body">
-              <p class="eyebrow">RECENT FEEDBACK</p>
-              <h3>Trao đổi học thuật có cấu trúc</h3>
-              <p>Nhận xét được gắn với từng bài, người gửi và thời điểm để bạn theo dõi quá trình hoàn thiện.</p>
-              <div id="latestComment" class="latest-comment">Chưa có nhận xét mới trong phiên này.</div>
+              <p class="eyebrow">TRAO ĐỔI HỌC THUẬT</p>
+              <h3>Trao đổi học thuật</h3>
+              <p>Lịch sử trao đổi được lưu theo từng bài tập, người gửi và thời gian để có thể xem lại lâu dài.</p>
+              <div id="academicExchangeHistory" class="academic-exchange-history" aria-live="polite">
+                <div class="exchange-empty">Chưa có trao đổi học thuật.</div>
+              </div>
             </div>
           </aside>
         </div>
@@ -894,6 +909,7 @@ let currentUser = null;
 let projects = [];
 let assignments = [];
 let assignmentSubjects = [];
+let academicExchanges = [];
 let publicContentLoading = false;
 let publicContentLoadedOnce = false;
 
@@ -922,6 +938,36 @@ function formatAssignmentDate(value){
   const parts=String(value).split('-');
   if(parts.length===3) return `${parts[2]}/${parts[1]}/${parts[0]}`;
   return String(value);
+}
+function formatExchangeTime(value){
+  if(!value) return '';
+  try{
+    return new Date(value).toLocaleString('vi-VN',{
+      day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'
+    });
+  }catch{return String(value);}
+}
+function renderAcademicExchanges(){
+  const host=$('#academicExchangeHistory');
+  if(!host) return;
+  if(!academicExchanges.length){
+    host.innerHTML='<div class="exchange-empty">Chưa có trao đổi học thuật.</div>';
+    return;
+  }
+  host.innerHTML=academicExchanges.map(item=>`
+    <article class="exchange-entry">
+      <div class="exchange-person">
+        <div><strong>${escapeHtml(item.name)}</strong><span>${escapeHtml(item.role||'Người xem')}</span></div>
+        <time>${escapeHtml(formatExchangeTime(item.createdAt))}</time>
+      </div>
+      <div class="exchange-assignment">
+        <span>${item.assignmentNumber ? `Bài ${Number(item.assignmentNumber)}` : 'Bài tập'}</span>
+        ${item.assignmentDate ? `<span>${escapeHtml(formatAssignmentDate(item.assignmentDate))}</span>` : ''}
+        ${item.assignmentSubject ? `<span>${escapeHtml(item.assignmentSubject)}</span>` : ''}
+      </div>
+      <h4>${escapeHtml(item.assignmentTitle||'Bài tập')}</h4>
+      <p>${escapeHtml(item.body)}</p>
+    </article>`).join('');
 }
 
 // Header + navigation
@@ -1138,15 +1184,19 @@ $('#commentForm')?.addEventListener('submit', async event => {
   try {
     const client = requireSupabase();
     const { data: authData } = await client.auth.getUser();
+    const assignment=assignments.find(item=>item.id===assignmentId);
     const { error } = await client.from('comments').insert({
       assignment_id: assignmentId,
       user_id: authData?.user?.id || null,
-      name, role, body: text
+      name, role, body: text,
+      assignment_title: assignment?.title || 'Bài tập',
+      assignment_date: assignment?.assignmentDate || null,
+      assignment_number: assignment?.assignmentNumber || null,
+      assignment_subject: assignment ? assignmentSubjectName(assignment.subject) : ''
     });
     if (error) throw error;
     form.reset();
     $('#commentStatus').textContent = 'Đã lưu nhận xét vào hệ thống.';
-    $('#latestComment').innerHTML = `<strong>${escapeHtml(name)} · ${escapeHtml(role)}</strong><br>${escapeHtml(text)}`;
     await loadPublicContent({silent:true});
     showToast('Đã gửi nhận xét');
     setTimeout(() => closeModal(commentModal), 650);
@@ -1216,19 +1266,30 @@ async function loadPublicContent({silent = false} = {}){
   publicContentLoading = true;
   try {
     const client = requireSupabase();
-    const [pRes, aRes, cRes, latestRes, sRes] = await Promise.all([
+    const [pRes, aRes, cRes, sRes] = await Promise.all([
       client.from('projects').select('*').eq('published', true).order('sort_order', {ascending:true}).order('created_at', {ascending:false}),
       client.from('assignments').select('*').eq('published', true).order('assignment_date', {ascending:true}).order('assignment_number', {ascending:true}).order('created_at', {ascending:true}),
-      client.from('comments').select('assignment_id'),
-      client.from('comments').select('name,role,body,created_at').order('created_at', {ascending:false}).limit(1).maybeSingle(),
+      client.from('comments').select('id,assignment_id,name,role,body,created_at,assignment_title,assignment_date,assignment_number,assignment_subject').order('created_at', {ascending:false}),
       client.from('assignment_subjects').select('slug,name,sort_order').eq('active', true).order('sort_order', {ascending:true}).order('name', {ascending:true})
     ]);
-    for (const res of [pRes,aRes,cRes,latestRes,sRes]) if (res.error) throw res.error;
+    for (const res of [pRes,aRes,cRes,sRes]) if (res.error) throw res.error;
     const counts = {};
-    for (const c of cRes.data || []) counts[c.assignment_id] = (counts[c.assignment_id] || 0) + 1;
+    for (const c of cRes.data || []) if(c.assignment_id) counts[c.assignment_id] = (counts[c.assignment_id] || 0) + 1;
     projects = (pRes.data || []).map(mapProject);
     assignments = (aRes.data || []).map(row => mapAssignment(row, counts));
     assignmentSubjects = (sRes.data || []).map(row => ({slug:row.slug,name:row.name,sortOrder:Number(row.sort_order||0)}));
+    academicExchanges=(cRes.data||[]).map(row=>({
+      id:row.id,
+      assignmentId:row.assignment_id,
+      assignmentTitle:row.assignment_title||'Bài tập',
+      assignmentDate:row.assignment_date||'',
+      assignmentNumber:Number(row.assignment_number||0),
+      assignmentSubject:row.assignment_subject||'',
+      name:row.name||'Người xem',
+      role:row.role||'Người xem',
+      body:row.body||'',
+      createdAt:row.created_at
+    }));
     populateSubjectFilter();
     const statProjects = $('#statProjects');
     const statAssignments = $('#statAssignments');
@@ -1236,10 +1297,7 @@ async function loadPublicContent({silent = false} = {}){
     if (statAssignments) statAssignments.textContent = assignments.length + '+';
     renderProjects();
     renderAssignments();
-    if (latestRes.data){
-      const c = latestRes.data;
-      $('#latestComment').innerHTML = `<strong>${escapeHtml(c.name)} · ${escapeHtml(c.role)}</strong><br>${escapeHtml(c.body)}`;
-    }
+    renderAcademicExchanges();
     publicContentLoadedOnce = true;
   } catch (error){
     console.error(error);

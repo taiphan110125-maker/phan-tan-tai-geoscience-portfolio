@@ -539,7 +539,7 @@ async function loadAdminData(){
   const [pRes,aRes,cRes,mRes,sRes]=await Promise.all([
     client.from('projects').select('*').order('sort_order',{ascending:true}).order('created_at',{ascending:false}),
     client.from('assignments').select('*').order('assignment_date',{ascending:true}).order('assignment_number',{ascending:true}).order('created_at',{ascending:true}),
-    client.from('comments').select('id,assignment_id,name,role,body,created_at,assignments(title)').order('created_at',{ascending:false}),
+    client.from('comments').select('id,assignment_id,name,role,body,created_at,assignment_title,assignment_date,assignment_number,assignment_subject').order('created_at',{ascending:false}),
     client.from('messages').select('*').order('created_at',{ascending:false}),
     client.from('assignment_subjects').select('*').order('sort_order',{ascending:true}).order('name',{ascending:true})
   ]);
@@ -548,7 +548,7 @@ async function loadAdminData(){
   projects=(pRes.data||[]).map(mapProject);
   assignments=(aRes.data||[]).map(r=>mapAssignment(r,counts));
   subjects=(sRes.data||[]).map(r=>({slug:r.slug,name:r.name,sortOrder:Number(r.sort_order||0),active:Boolean(r.active)}));
-  comments=(cRes.data||[]).map(r=>({id:r.id,assignmentId:r.assignment_id,assignmentTitle:r.assignments?.title||'Bài tập',name:r.name,role:r.role,text:r.body,createdAt:r.created_at}));
+  comments=(cRes.data||[]).map(r=>({id:r.id,assignmentId:r.assignment_id,assignmentTitle:r.assignment_title||'Bài tập',assignmentDate:r.assignment_date||'',assignmentNumber:Number(r.assignment_number||0),assignmentSubject:r.assignment_subject||'',name:r.name,role:r.role,text:r.body,createdAt:r.created_at}));
   messages=(mRes.data||[]).map(r=>({id:r.id,name:r.name,email:r.email,topic:r.topic,message:r.message,createdAt:r.created_at}));
   renderAll();
 }
@@ -580,7 +580,7 @@ function renderSubjects(){
     </div>`).join(''):'<div class="empty-state">Chưa có môn học.</div>';
 }
 function renderProjects(){ const q=($('#projectSearch')?.value||'').trim().toLowerCase(); const filtered=projects.filter(p=>`${p.title} ${p.type} ${(p.tags||[]).join(' ')}`.toLowerCase().includes(q)); $('#adminProjectRows').innerHTML=filtered.length?filtered.map(p=>`<tr><td><div class="admin-project-title"><img src="${esc(p.image||'assets/hero-geoscience.svg')}" alt=""><div><strong>${esc(p.title)}</strong><small>${esc((p.summary||'').slice(0,105))}${(p.summary||'').length>105?'…':''} · ${p.reportFiles.length} file báo cáo</small></div></div></td><td>${esc(p.type||'—')}</td><td><div class="admin-tag-list">${(p.tags||[]).slice(0,3).map(t=>`<span>${esc(t)}</span>`).join('')||'<span>Chưa có</span>'}</div></td><td><small>${p.imagePath?'Supabase Storage':esc(p.image||'Mặc định')}</small></td><td><div class="admin-row-actions"><button class="edit-btn" data-edit-project="${esc(p.id)}">Sửa</button><button class="danger-btn" data-delete-project="${esc(p.id)}">Xóa</button></div></td></tr>`).join(''):'<tr><td colspan="5"><div class="empty-state">Không tìm thấy dự án phù hợp.</div></td></tr>'; }
-function renderFeedback(){ $('#feedbackList').innerHTML=comments.length?comments.map(c=>`<div class="feedback-item"><div class="feedback-item-head"><strong>${esc(c.name)} · ${esc(c.role)}</strong><small>${new Date(c.createdAt).toLocaleString('vi-VN')}</small></div><p><b>${esc(c.assignmentTitle||'Bài tập')}</b><br>${esc(c.text)}</p><button class="danger-btn" data-delete-comment="${esc(c.id)}">Xóa nhận xét</button></div>`).join(''):'<div class="empty-state">Chưa có nhận xét.</div>'; }
+function renderFeedback(){ $('#feedbackList').innerHTML=comments.length?comments.map(c=>`<div class="feedback-item"><div class="feedback-item-head"><strong>${esc(c.name)} · ${esc(c.role)}</strong><small>${new Date(c.createdAt).toLocaleString('vi-VN')}</small></div><p><b>${c.assignmentNumber?`Bài ${c.assignmentNumber} · `:''}${esc(c.assignmentTitle||'Bài tập')}</b>${c.assignmentDate?`<br>Ngày học: ${esc(formatAssignmentDate(c.assignmentDate))}`:''}${c.assignmentSubject?` · ${esc(c.assignmentSubject)}`:''}<br>${esc(c.text)}</p><small class="muted">Trao đổi được lưu cố định trong lịch sử.</small></div>`).join(''):'<div class="empty-state">Chưa có trao đổi học thuật.</div>'; }
 function renderMessages(){ $('#messageList').innerHTML=messages.length?messages.map(m=>`<div class="message-item"><div class="message-item-head"><strong>${esc(m.name)} · ${esc(m.topic||'Liên hệ')}</strong><small>${new Date(m.createdAt).toLocaleString('vi-VN')}</small></div><p>${esc(m.email)}<br>${esc(m.message)}</p><button class="danger-btn" data-delete-message="${esc(m.id)}">Xóa lời nhắn</button></div>`).join(''):'<div class="empty-state">Chưa có lời nhắn.</div>'; }
 function renderAll(){ renderMetrics();renderDashboard();renderAssignments();renderProjects();renderFeedback();renderMessages();renderSubjects();populateAssignmentSubjectSelect(); }
 $('#projectSearch')?.addEventListener('input',renderProjects);
@@ -703,7 +703,6 @@ document.addEventListener('click',async event=>{
   const ep=event.target.closest('[data-edit-project]'); if(ep){ const p=projects.find(x=>x.id===ep.dataset.editProject); if(p)openProjectEditor(p); return; }
   const dp=event.target.closest('[data-delete-project]');
   if(dp){ const id=dp.dataset.deleteProject; const p=projects.find(x=>x.id===id); if(!p||!confirm(`Xóa dự án “${p.title}”?\n\nDự án, ảnh và các file báo cáo đính kèm sẽ bị xóa.`))return; try{ if(p.imagePath) await sb.storage.from('project-images').remove([p.imagePath]); const reportPaths=(p.reportFiles||[]).map(f=>f.path).filter(Boolean); if(reportPaths.length) await sb.storage.from('project-reports').remove(reportPaths); const {error}=await sb.from('projects').delete().eq('id',id); if(error)throw error; await loadAdminData();notifyPublicContentChanged('projects');toast('Đã xóa dự án'); }catch(e){toast(e.message);} return; }
-  const dc=event.target.closest('[data-delete-comment]'); if(dc){ if(!confirm('Xóa nhận xét này?'))return; const {error}=await sb.from('comments').delete().eq('id',dc.dataset.deleteComment); if(error)toast(error.message); else{await loadAdminData();toast('Đã xóa nhận xét');} return; }
   const dm=event.target.closest('[data-delete-message]'); if(dm){ if(!confirm('Xóa lời nhắn này?'))return; const {error}=await sb.from('messages').delete().eq('id',dm.dataset.deleteMessage); if(error)toast(error.message); else{await loadAdminData();toast('Đã xóa lời nhắn');} }
 });
 
