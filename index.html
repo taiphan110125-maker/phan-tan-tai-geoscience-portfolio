@@ -532,6 +532,10 @@ body{color:var(--ink-strong)!important}
 <style id="ptt-assignment-preview-btn">
 .mini-btn:disabled{opacity:.48;cursor:not-allowed;background:#f3f5f7!important;color:#8797a4!important;border-color:#dfe6eb!important}
 </style>
+<style id="ptt-assignment-preview-link">
+.assignment-actions .assignment-view{text-decoration:none;display:inline-flex;align-items:center;justify-content:center}
+.assignment-view.is-disabled{opacity:.48;cursor:not-allowed;background:#f3f5f7!important;color:#8797a4!important;border-color:#dfe6eb!important;pointer-events:none}
+</style>
 </head>
 <body>
   <a class="skip-link" href="#main">Bỏ qua menu</a>
@@ -1028,16 +1032,6 @@ async function openProjectReport(projectId,index){
   }
 }
 
-async function openAssignmentFile(assignment){
-  if (!assignment) return;
-  if (!assignment.filePath && !assignment.fileUrl){
-    showToast(`“${assignment.title}” chưa có file đính kèm.`);
-    return;
-  }
-  const url=`assignment-viewer.html?id=${encodeURIComponent(assignment.id)}`;
-  location.href=url;
-}
-
 document.addEventListener('click', event => {
   const trigger = event.target.closest('.project-open');
   if (trigger){ event.preventDefault(); openProject(trigger.dataset.projectId); return; }
@@ -1102,7 +1096,9 @@ function renderAssignments(){
               <small>${escapeHtml(a.fileName || 'Chưa có file đính kèm')} · ${Number(a.commentCount||0)} nhận xét</small>
             </div>
             <div class="assignment-actions">
-              <button class="mini-btn assignment-view" data-id="${escapeHtml(a.id)}" ${a.filePath||a.fileUrl?'':'disabled'}>${a.filePath||a.fileUrl?'Xem trước':'Chưa có file'}</button>
+              ${a.filePath||a.fileUrl
+  ? `<a class="mini-btn assignment-view" href="assignment-viewer.html?id=${encodeURIComponent(a.id)}" target="_blank" rel="noopener">Xem trước</a>`
+  : '<span class="mini-btn assignment-view is-disabled" aria-disabled="true">Chưa có file</span>'}
               <button class="mini-btn comment-open" data-id="${escapeHtml(a.id)}">Nhận xét</button>
             </div>
           </article>`).join('')}
@@ -1113,12 +1109,6 @@ assignmentSearch?.addEventListener('input', renderAssignments);
 subjectFilter?.addEventListener('change', renderAssignments);
 
 document.addEventListener('click', event => {
-  const view = event.target.closest('.assignment-view');
-  if (view){
-    const assignment = assignments.find(item => item.id === view.dataset.id);
-    if (!assignment) return;
-    openAssignmentFile(assignment);
-  }
   const comment = event.target.closest('.comment-open');
   if (comment) openComment(comment.dataset.id);
 });
