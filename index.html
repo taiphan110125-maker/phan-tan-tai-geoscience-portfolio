@@ -6,6 +6,11 @@
   <meta name="description" content="Portfolio học thuật của Phan Tấn Tài - sinh viên Địa chất và Địa vật lý.">
   <meta name="theme-color" content="#ffffff">
   <link rel="icon" href="assets/ptt-emblem.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://aqkasetqystwvpassidd.supabase.co" crossorigin>
+  <link rel="dns-prefetch" href="//aqkasetqystwvpassidd.supabase.co">
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="dns-prefetch" href="//cdn.jsdelivr.net">
+  <link rel="preload" as="image" href="assets/hero-oil-geology.webp" type="image/webp" fetchpriority="high">
   <title>Phan Tấn Tài | Geology & Geophysics</title>
   <style>
 :root{
@@ -1030,6 +1035,15 @@ body{color:var(--ink-strong)!important}
   #assignments .assignment-actions .mini-btn{font-size:10px!important}
 }
 </style>
+<style id="ptt-performance-v1">
+#highlights,#about,#projects,#assignments,#geo-ai,#contact{
+  content-visibility:auto;
+  contain-intrinsic-size:auto 760px;
+}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+}
+</style>
 </head>
 <body>
   <a class="skip-link" href="#main">Bỏ qua menu</a>
@@ -1037,7 +1051,7 @@ body{color:var(--ink-strong)!important}
   <header class="site-header" id="siteHeader">
     <div class="shell nav-row">
       <a class="brand brand-header" href="#home" aria-label="Phan Tấn Tài - Trang chủ">
-        <img class="brand-lockup" src="assets/ptt-brand.svg" alt="Phan Tấn Tài — Geology & Geophysics">
+        <img class="brand-lockup" src="assets/ptt-brand.svg" alt="Phan Tấn Tài — Geology & Geophysics" decoding="async">
       </a>
 
       <button class="nav-toggle" id="navToggle" aria-label="Mở menu" aria-expanded="false">☰</button>
@@ -1067,7 +1081,7 @@ body{color:var(--ink-strong)!important}
 
   <main id="main">
     <section class="hero" id="home" aria-labelledby="heroTitle">
-      <img class="hero-media" src="assets/hero-oil-geology.webp" alt="Địa tầng ven biển và giàn khoan dầu khí ngoài khơi">
+      <img class="hero-media" src="assets/hero-oil-geology.webp" alt="Địa tầng ven biển và giàn khoan dầu khí ngoài khơi" fetchpriority="high" decoding="async">
       <div class="hero-overlay"></div>
       <div class="shell hero-content">
         <div class="hero-copy reveal">
@@ -1267,7 +1281,7 @@ body{color:var(--ink-strong)!important}
   <footer class="site-footer">
     <div class="shell footer-grid">
       <div class="brand footer-brand">
-        <img class="footer-emblem" src="assets/ptt-emblem.svg" alt="">
+        <img class="footer-emblem" src="assets/ptt-emblem.svg" alt="" loading="lazy" decoding="async">
         <span class="brand-copy"><strong>PHAN TẤN TÀI</strong><small>GEOLOGY · GEOPHYSICS</small></span>
       </div>
       <div class="footer-links"><a href="#about">Giới thiệu</a><a href="#projects">Dự án</a><a href="#assignments">Bài tập</a><a href="#geo-ai">Geo AI</a><a href="admin-login.html">Quản trị viên</a></div>
@@ -1324,7 +1338,7 @@ body{color:var(--ink-strong)!important}
   <div class="modal" id="userLoginModal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="userLoginTitle">
     <div class="modal-card login-card">
       <button class="modal-close" id="userLoginClose" aria-label="Đóng">×</button>
-      <div class="login-brand"><img class="modal-emblem" src="assets/ptt-emblem.svg" alt="Logo Phan Tấn Tài"></div>
+      <div class="login-brand"><img class="modal-emblem" src="assets/ptt-emblem.svg" alt="Logo Phan Tấn Tài" loading="lazy" decoding="async"></div>
       <p class="eyebrow">USER ACCOUNT</p>
       <h3 id="userLoginTitle">Đăng nhập người dùng</h3>
       <p class="muted">Đăng nhập là tùy chọn. Bạn vẫn có thể xem toàn bộ dự án và bài tập công khai mà không cần tài khoản.</p>
@@ -1409,6 +1423,12 @@ let academicExchanges = [];
 let academicChatMessages = [];
 let publicContentLoading = false;
 let publicContentLoadedOnce = false;
+let publicRefreshPending = false;
+let publicRefreshTimer = null;
+let lastPublicSync = 0;
+let academicChatLoaded = false;
+const PUBLIC_CACHE_KEY = 'ptt-public-cache-v1';
+const PUBLIC_CACHE_TTL = 10 * 60 * 1000;
 
 function escapeHtml(value = ''){
   return String(value).replace(/[&<>'"]/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[char]));
@@ -1448,6 +1468,42 @@ function richPlainText(html=''){
   const div=document.createElement('div');
   div.innerHTML=sanitizeRichHtml(html);
   return (div.textContent||'').replace(/\s+/g,' ').trim();
+}
+function renderPublicState(){
+  populateSubjectFilter();
+  const statProjects=$('#statProjects');
+  const statAssignments=$('#statAssignments');
+  if(statProjects)statProjects.textContent=projects.length+'+';
+  if(statAssignments)statAssignments.textContent=assignments.length+'+';
+  renderProjects();
+  renderAssignments();
+  renderAcademicExchanges();
+}
+function savePublicCache(){
+  try{
+    localStorage.setItem(PUBLIC_CACHE_KEY,JSON.stringify({
+      at:Date.now(),projects,assignments,assignmentSubjects,academicExchanges
+    }));
+  }catch{}
+}
+function restorePublicCache(){
+  try{
+    const raw=localStorage.getItem(PUBLIC_CACHE_KEY);
+    if(!raw)return false;
+    const cached=JSON.parse(raw);
+    if(!cached?.at||Date.now()-cached.at>PUBLIC_CACHE_TTL)return false;
+    projects=Array.isArray(cached.projects)?cached.projects:[];
+    assignments=Array.isArray(cached.assignments)?cached.assignments:[];
+    assignmentSubjects=Array.isArray(cached.assignmentSubjects)?cached.assignmentSubjects:[];
+    academicExchanges=Array.isArray(cached.academicExchanges)?cached.academicExchanges:[];
+    renderPublicState();
+    publicContentLoadedOnce=true;
+    return true;
+  }catch{return false;}
+}
+function schedulePublicRefresh(delay=220){
+  clearTimeout(publicRefreshTimer);
+  publicRefreshTimer=setTimeout(()=>loadPublicContent({silent:true}),delay);
 }
 function showToast(message){
   const toast = $('#toast');
@@ -1532,6 +1588,7 @@ function renderAcademicExchanges({stickToBottom=false}={}){
 }
 async function loadAcademicChat({stickToBottom=false}={}){
   if(!sb)return;
+  academicChatLoaded=true;
   try{
     const {data,error}=await sb.from('academic_chat_messages')
       .select('id,user_id,name,role,body,created_at')
@@ -1576,7 +1633,7 @@ function renderProjects(){
   const side = projects.slice(1);
   host.innerHTML = `
     <article class="project-feature reveal visible" data-project-id="${escapeHtml(featured.id)}">
-      <img src="${escapeHtml(featured.image || 'assets/hero-geoscience.svg')}" alt="Minh họa ${escapeHtml(featured.title)}">
+      <img src="${escapeHtml(featured.image || 'assets/hero-geoscience.svg')}" alt="Minh họa ${escapeHtml(featured.title)}" loading="lazy" decoding="async">
       <div class="project-feature-overlay"></div>
       <div class="project-feature-content">
         <span class="pill">${escapeHtml(featured.type || 'PROJECT')}</span>
@@ -1588,7 +1645,7 @@ function renderProjects(){
     <div class="project-side ${side.length > 2 ? 'project-side-scroll' : ''}">
       ${side.length ? side.map(project => `
         <article class="project-mini reveal visible" data-project-id="${escapeHtml(project.id)}">
-          <img src="${escapeHtml(project.image || 'assets/hero-geoscience.svg')}" alt="Minh họa ${escapeHtml(project.title)}">
+          <img src="${escapeHtml(project.image || 'assets/hero-geoscience.svg')}" alt="Minh họa ${escapeHtml(project.title)}" loading="lazy" decoding="async">
           <div>
             <span class="pill soft">${escapeHtml(project.type || 'PROJECT')}</span>
             <h3>${escapeHtml(project.title)}</h3>
@@ -1606,7 +1663,7 @@ function openProject(projectId){
   const tags = Array.isArray(project.tags) ? project.tags : [];
   $('#projectModalContent').innerHTML = `
     <div class="project-modal-visual">
-      <img src="${escapeHtml(project.image || 'assets/hero-geoscience.svg')}" alt="Minh họa ${escapeHtml(project.title)}">
+      <img src="${escapeHtml(project.image || 'assets/hero-geoscience.svg')}" alt="Minh họa ${escapeHtml(project.title)}" loading="lazy" decoding="async">
       <span class="project-modal-badge">${escapeHtml(project.type || 'Project')}</span>
     </div>
     <h3 id="projectModalTitle">${escapeHtml(project.title)}</h3>
@@ -1870,8 +1927,8 @@ function mapAssignment(row, countMap){
   };
 }
 async function loadPublicContent({silent = false} = {}){
-  if (publicContentLoading) return;
-  publicContentLoading = true;
+  if(publicContentLoading){publicRefreshPending=true;return;}
+  publicContentLoading=true;
   try {
     const client = requireSupabase();
     const [pRes, aRes, cRes, sRes] = await Promise.all([
@@ -1898,15 +1955,10 @@ async function loadPublicContent({silent = false} = {}){
       body:row.body||'',
       createdAt:row.created_at
     }));
-    populateSubjectFilter();
-    const statProjects = $('#statProjects');
-    const statAssignments = $('#statAssignments');
-    if (statProjects) statProjects.textContent = projects.length + '+';
-    if (statAssignments) statAssignments.textContent = assignments.length + '+';
-    renderProjects();
-    renderAssignments();
-    renderAcademicExchanges();
-    publicContentLoadedOnce = true;
+    renderPublicState();
+    publicContentLoadedOnce=true;
+    lastPublicSync=Date.now();
+    savePublicCache();
   } catch (error){
     console.error(error);
     if (!silent || !publicContentLoadedOnce){
@@ -1914,24 +1966,55 @@ async function loadPublicContent({silent = false} = {}){
       const assignmentHost=$('#assignmentGroups');
       if(assignmentHost) assignmentHost.innerHTML='<div class="assignment-empty">Chưa kết nối được kho bài tập cloud.</div>';
     }
-  } finally { publicContentLoading = false; }
+  } finally {
+    publicContentLoading=false;
+    if(publicRefreshPending){
+      publicRefreshPending=false;
+      schedulePublicRefresh(80);
+    }
+  }
 }
 
-// Realtime + polling fallback
+// Realtime-first updates + lightweight safety refresh
 function subscribeRealtime(){
-  if (!sb) return;
-  try {
+  if(!sb)return;
+  try{
     sb.channel('ptt-public-content')
-      .on('postgres_changes', {event:'*',schema:'public',table:'projects'}, () => loadPublicContent({silent:true}))
-      .on('postgres_changes', {event:'*',schema:'public',table:'assignments'}, () => loadPublicContent({silent:true}))
-      .on('postgres_changes', {event:'*',schema:'public',table:'comments'}, () => loadPublicContent({silent:true}))
-      .on('postgres_changes', {event:'*',schema:'public',table:'assignment_subjects'}, () => loadPublicContent({silent:true}))
-      .on('postgres_changes', {event:'*',schema:'public',table:'academic_chat_messages'}, () => loadAcademicChat({stickToBottom:true}))
+      .on('postgres_changes',{event:'*',schema:'public',table:'projects'},()=>schedulePublicRefresh())
+      .on('postgres_changes',{event:'*',schema:'public',table:'assignments'},()=>schedulePublicRefresh())
+      .on('postgres_changes',{event:'*',schema:'public',table:'comments'},()=>schedulePublicRefresh())
+      .on('postgres_changes',{event:'*',schema:'public',table:'assignment_subjects'},()=>schedulePublicRefresh())
+      .on('postgres_changes',{event:'*',schema:'public',table:'academic_chat_messages'},()=>{
+        if(academicChatLoaded)loadAcademicChat({stickToBottom:true});
+      })
       .subscribe();
-  } catch (error){ console.warn('Realtime unavailable:', error); }
+  }catch(error){console.warn('Realtime unavailable:',error);}
 }
-setInterval(() => { if (document.visibilityState === 'visible') loadPublicContent({silent:true}); }, 12000);
-window.addEventListener('focus', () => loadPublicContent({silent:true}));
+function initLazyAcademicChat(){
+  const target=$('#assignments');
+  const load=()=>{
+    if(academicChatLoaded)return;
+    loadAcademicChat({stickToBottom:true});
+  };
+  if(!target||!('IntersectionObserver' in window)){load();return;}
+  const observer=new IntersectionObserver(entries=>{
+    if(entries.some(entry=>entry.isIntersecting)){
+      observer.disconnect();
+      load();
+    }
+  },{rootMargin:'500px 0px'});
+  observer.observe(target);
+}
+// Safety refresh is intentionally slow because realtime handles normal updates.
+setInterval(()=>{
+  if(document.visibilityState==='visible'&&Date.now()-lastPublicSync>55000) schedulePublicRefresh(0);
+},60000);
+window.addEventListener('focus',()=>{
+  if(Date.now()-lastPublicSync>30000)schedulePublicRefresh(0);
+});
+document.addEventListener('visibilitychange',()=>{
+  if(document.visibilityState==='visible'&&Date.now()-lastPublicSync>45000)schedulePublicRefresh(0);
+});
 
 // Geo AI
 const aiPanel = $('#aiPanel');
@@ -2144,8 +2227,10 @@ $$('.modal').forEach(modal => modal.addEventListener('click', event => { if (eve
 document.addEventListener('keydown', event => { if (event.key === 'Escape') $$('.modal.open').forEach(closeModal); });
 
 (async function boot(){
-  await Promise.all([loadPublicContent(), loadUserSession(), loadAcademicChat({stickToBottom:true})]);
+  restorePublicCache();
   subscribeRealtime();
+  initLazyAcademicChat();
+  await Promise.allSettled([loadPublicContent(),loadUserSession()]);
 })();
 
 </script>
@@ -2163,6 +2248,14 @@ document.addEventListener('keydown', event => { if (event.key === 'Escape') $$('
     if(btn) btn.click();
   });
 })();
+</script>
+
+<script>
+if('serviceWorker' in navigator){
+  window.addEventListener('load',()=>{
+    navigator.serviceWorker.register('/sw.js',{scope:'/'}).catch(error=>console.warn('Service worker unavailable:',error));
+  },{once:true});
+}
 </script>
 </body>
 </html>
