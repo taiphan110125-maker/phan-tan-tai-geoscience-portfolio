@@ -1009,12 +1009,17 @@ $('#assignmentForm')?.addEventListener('submit',async event=>{
       }
 
       // Keep preserved discussion metadata in sync while the assignment still exists.
-      await sb.from('comments').update({
-        assignment_title:title,
-        assignment_date:assignmentDate,
-        assignment_number:assignmentNumber,
-        assignment_subject:subjectLabel(subject)
-      }).eq('assignment_id',editId).catch(()=>{});
+      try{
+        const {error:commentSyncError}=await sb.from('comments').update({
+          assignment_title:title,
+          assignment_date:assignmentDate,
+          assignment_number:assignmentNumber,
+          assignment_subject:subjectLabel(subject)
+        }).eq('assignment_id',editId);
+        if(commentSyncError) console.warn('Không đồng bộ được metadata trao đổi:',commentSyncError);
+      }catch(syncError){
+        console.warn('Không đồng bộ được metadata trao đổi:',syncError);
+      }
 
       await loadAdminData();
       notifyPublicContentChanged('assignments');
@@ -1059,7 +1064,9 @@ $('#assignmentForm')?.addEventListener('submit',async event=>{
     toast(files.length?`Đã tải lên ${savedCount} bài tập`:'Đã tạo bài tập không cần file');
     setTimeout(closeAssignmentModal,900);
   }catch(e){
-    if(insertedIds.length) await sb.from('assignments').delete().in('id',insertedIds).catch(()=>{});
+    if(insertedIds.length){
+      try{ await sb.from('assignments').delete().in('id',insertedIds); }catch{}
+    }
     if(uploadedPaths.length) await sb.storage.from('assignments').remove(uploadedPaths).catch(()=>{});
     $('#assignmentStatus').textContent=e.message||'Không lưu được bài tập.';
   }finally{button.disabled=false;}
