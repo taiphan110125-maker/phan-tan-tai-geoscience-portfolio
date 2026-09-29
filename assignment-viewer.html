@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="theme-color" content="#ffffff">
-  <title>Xem trước bài tập · Phan Tấn Tài</title>
+  <title>Nội dung bài tập · Phan Tấn Tài</title>
   <link rel="icon" href="assets/ptt-emblem.svg" type="image/svg+xml">
   <style>
     :root{--navy:#17324a;--blue:#2c6da4;--gold:#9a7127;--text:#29485f;--muted:#6f8291;--line:#dce5ec;--soft:#f5f8fb;--white:#fff;--shadow:0 18px 55px rgba(22,50,74,.09)}
@@ -52,14 +52,14 @@
     <section class="viewer-card">
       <header class="viewer-head">
         <div>
-          <p class="eyebrow">ASSIGNMENT PREVIEW</p>
+          <p class="eyebrow">NỘI DUNG BÀI TẬP</p>
           <h1 id="title">Đang tải tài liệu…</h1>
           <p id="subtitle">Vui lòng chờ trong giây lát.</p>
         </div>
         <span class="type-badge" id="typeBadge">FILE</span>
       </header>
       <div class="preview-shell" id="previewShell">
-        <div class="preview-state" id="previewState"><div><div class="loader"></div><h2>Đang chuẩn bị bản xem trước</h2><p>Hệ thống đang tạo đường dẫn an toàn cho tài liệu.</p></div></div>
+        <div class="preview-state" id="previewState"><div><div class="loader"></div><h2>Đang chuẩn bị nội dung</h2><p>Hệ thống đang tạo nội dung tài liệu.</p></div></div>
       </div>
     </section>
 
@@ -77,7 +77,7 @@
       <a class="download" id="downloadBtn" href="#" aria-disabled="true">↓ Tải file</a>
       <a class="download" id="externalLinkBtn" href="#" target="_blank" rel="noopener" aria-disabled="true" style="margin-top:8px;background:#2c6da4">↗ Mở liên kết</a>
       <a class="open-direct" id="openDirect" href="#" target="_blank" rel="noopener" hidden>Mở file ở tab mới ↗</a>
-      <p class="note">Bạn đang ở trang xem trước. Nếu bài có file, dùng <strong>Tải file</strong>. Nếu bài dùng liên kết ngoài, dùng <strong>Mở liên kết</strong>.</p>
+      <p class="note">Bạn đang ở trang nội dung bài tập. Nếu bài có file, dùng <strong>Tải file</strong>. Nếu bài dùng liên kết ngoài, dùng <strong>Mở liên kết</strong>.</p>
     </aside>
   </main>
 
@@ -180,10 +180,10 @@
 
       const ext=extension(a.file_name,a.type);
       if(ext==='pdf'){
-        renderFrame(previewUrl,'Xem trước '+(a.file_name||a.title));
+        renderFrame(previewUrl,'Nội dung '+(a.file_name||a.title));
       }else if(['doc','docx','ppt','pptx','xls','xlsx'].includes(ext)){
         const office='https://view.officeapps.live.com/op/embed.aspx?src='+encodeURIComponent(previewUrl);
-        renderFrame(office,'Xem trước '+(a.file_name||a.title));
+        renderFrame(office,'Nội dung '+(a.file_name||a.title));
       }else{
         showState('Không hỗ trợ xem trực tiếp','Định dạng này chưa thể hiển thị trong trình xem trước. Bạn vẫn có thể mở ở tab mới hoặc tải file bằng các nút bên phải.');
       }
@@ -191,7 +191,7 @@
       console.error(error);
       $('#title').textContent='Không mở được tài liệu';
       $('#subtitle').textContent='Có lỗi khi tải thông tin bài tập.';
-      showState('Không thể xem trước',error?.message||'File hiện không khả dụng. Vui lòng thử lại sau.',true);
+      showState('Không thể mở nội dung',error?.message||'File hiện không khả dụng. Vui lòng thử lại sau.',true);
     }
   }
   load();
