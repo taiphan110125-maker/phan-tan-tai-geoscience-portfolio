@@ -549,6 +549,10 @@ body{color:var(--ink-strong)!important}
 .exchange-empty{padding:15px;text-align:center;border:1px dashed #d8e2e9;border-radius:12px;color:#788b99;font-size:10px;background:#fafcfd}
 
 </style>
+<style id="ptt-assignment-content-text">
+.assignment-content-text{white-space:pre-wrap;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.assignment-content-text strong{color:#173a55}
+</style>
 </head>
 <body>
   <a class="skip-link" href="#main">Bỏ qua menu</a>
@@ -1111,7 +1115,7 @@ function renderAssignments(){
   const rows=assignments
     .filter(a=>{
       const subjectName=assignmentSubjectName(a.subject);
-      const haystack=`${a.title} ${a.topic} ${a.fileName} ${subjectName} ${formatAssignmentDate(a.assignmentDate)} bài ${a.assignmentNumber}`.toLowerCase();
+      const haystack=`${a.title} ${a.topic} ${a.contentText} ${a.fileName} ${subjectName} ${formatAssignmentDate(a.assignmentDate)} bài ${a.assignmentNumber}`.toLowerCase();
       return (subject==='all'||a.subject===subject) && haystack.includes(q);
     })
     .sort((a,b)=>String(a.assignmentDate).localeCompare(String(b.assignmentDate)) || a.assignmentNumber-b.assignmentNumber || a.title.localeCompare(b.title,'vi'));
@@ -1139,12 +1143,13 @@ function renderAssignments(){
               <div class="assignment-meta"><span class="subject-pill">${escapeHtml(assignmentSubjectName(a.subject))}</span><span class="file-pill">${escapeHtml(a.type)}</span></div>
               <h4>${escapeHtml(a.title)}</h4>
               ${a.topic?`<p>${escapeHtml(a.topic)}</p>`:''}
-              <small>${escapeHtml(a.fileName || 'Chưa có file đính kèm')} · ${Number(a.commentCount||0)} nhận xét</small>
+              ${a.contentText?`<p class="assignment-content-text"><strong>Nội dung:</strong> ${escapeHtml(a.contentText)}</p>`:''}
+              <small>${escapeHtml(a.fileName || 'Không có file đính kèm')} · ${Number(a.commentCount||0)} trao đổi</small>
             </div>
             <div class="assignment-actions">
-              ${a.filePath||a.fileUrl
-  ? `<a class="mini-btn assignment-view" href="assignment-viewer.html?id=${encodeURIComponent(a.id)}" target="_blank" rel="noopener">Xem trước</a>`
-  : '<span class="mini-btn assignment-view is-disabled" aria-disabled="true">Chưa có file</span>'}
+              ${a.filePath||a.fileUrl||a.contentText
+  ? `<a class="mini-btn assignment-view" href="assignment-viewer.html?id=${encodeURIComponent(a.id)}" target="_blank" rel="noopener">${a.filePath||a.fileUrl?'Xem trước':'Xem nội dung'}</a>`
+  : '<span class="mini-btn assignment-view is-disabled" aria-disabled="true">Chưa có nội dung</span>'}
               <button class="mini-btn comment-open" data-id="${escapeHtml(a.id)}">Nhận xét</button>
             </div>
           </article>`).join('')}
@@ -1251,6 +1256,7 @@ function mapAssignment(row, countMap){
     type:row.type,
     title:row.title,
     topic:row.topic || '',
+    contentText:row.content_text || '',
     subject:row.subject || 'other',
     assignmentDate:row.assignment_date || '',
     assignmentNumber:Number(row.assignment_number || 1),

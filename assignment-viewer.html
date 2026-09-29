@@ -26,7 +26,7 @@
     .preview-state>div{max-width:520px}.preview-state h2{margin:0 0 8px;color:var(--navy);font-size:24px}.preview-state p{margin:0;color:var(--muted);line-height:1.7;font-size:13px}
     .loader{width:42px;height:42px;border-radius:50%;border:4px solid #dbe5ec;border-top-color:var(--blue);margin:0 auto 15px;animation:spin .8s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}
     .info-card{padding:20px;position:sticky;top:94px}.info-card h2{font-size:16px;color:var(--navy);margin:0 0 14px}
-    .meta{display:grid;gap:0;margin:0 0 18px}.meta div{padding:11px 0;border-bottom:1px solid #edf1f4}.meta div:first-child{padding-top:0}.meta dt{font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:#8797a3;font-weight:800}.meta dd{margin:3px 0 0;color:#29485f;font-size:12px;font-weight:650;word-break:break-word}
+    .meta{display:grid;gap:0;margin:0 0 18px}.meta div{padding:11px 0;border-bottom:1px solid #edf1f4}.meta div:first-child{padding-top:0}.meta dt{font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:#8797a3;font-weight:800}.meta dd{margin:3px 0 0;color:#29485f;font-size:12px;font-weight:650;word-break:break-word;white-space:pre-wrap}
     .download{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:12px 14px;border:0;border-radius:11px;background:var(--navy);color:#fff;font-weight:800;font-size:12px;cursor:pointer}
     .download[aria-disabled="true"]{opacity:.45;pointer-events:none}.open-direct{display:flex;justify-content:center;margin-top:8px;padding:10px;color:#2b6899;font-size:11px;font-weight:750}
     .note{margin:15px 0 0;padding:11px;border-radius:10px;background:#f6f9fb;color:#6f8291;font-size:10px;line-height:1.6}
@@ -66,6 +66,7 @@
         <div><dt>Số bài</dt><dd id="numberText">—</dd></div>
         <div><dt>Môn học</dt><dd id="subjectText">—</dd></div>
         <div><dt>Chủ đề</dt><dd id="topicText">—</dd></div>
+        <div><dt>Nội dung</dt><dd id="contentText">—</dd></div>
         <div><dt>Tên file</dt><dd id="fileNameText">—</dd></div>
       </dl>
       <a class="download" id="downloadBtn" href="#" aria-disabled="true">↓ Tải file</a>
@@ -94,7 +95,13 @@
     return (name.split('.').pop()||type||'').toLowerCase();
   }
   function showState(title,message,isError=false){
-    $('#previewShell').innerHTML=`<div class="preview-state"><div><h2 class="${isError?'error':''}">${title}</h2><p>${message}</p></div></div>`;
+    const shell=$('#previewShell');
+    shell.innerHTML='';
+    const wrap=document.createElement('div');wrap.className='preview-state';
+    const inner=document.createElement('div');
+    const h=document.createElement('h2');if(isError)h.className='error';h.textContent=title;
+    const p=document.createElement('p');p.textContent=message;p.style.whiteSpace='pre-wrap';
+    inner.append(h,p);wrap.append(inner);shell.append(wrap);
   }
   function renderFrame(src,title){
     $('#previewShell').innerHTML='';
@@ -125,10 +132,15 @@
       $('#numberText').textContent='Bài '+Number(a.assignment_number||1);
       $('#subjectText').textContent=subjectName;
       $('#topicText').textContent=a.topic||'—';
-      $('#fileNameText').textContent=a.file_name||'Chưa có file';
+      $('#contentText').textContent=a.content_text||'—';
+      $('#fileNameText').textContent=a.file_name||'Không có file đính kèm';
 
       if(!a.file_path&&!a.file_url){
-        showState('Bài tập chưa có file','Quản trị viên chưa đính kèm tài liệu cho bài tập này.');
+        if(a.content_text){
+          showState('Nội dung bài tập',a.content_text);
+        }else{
+          showState('Bài tập chưa có nội dung hoặc file','Bài tập này đã được tạo nhưng hiện chưa có nội dung và file đính kèm.');
+        }
         return;
       }
 
