@@ -621,7 +621,7 @@ body{color:var(--ink-strong)!important}
   padding:12px 14px!important;
   background:#f7f9fb!important;
 }
-#assignments .assignment-day-head h3{font-size:18px!important}
+#assignments .assignment-day-head h3{font-size:20px!important}
 #assignments .assignment-item{
   grid-template-columns:48px minmax(0,1fr) auto!important;
   gap:12px!important;
@@ -630,19 +630,19 @@ body{color:var(--ink-strong)!important}
 #assignments .assignment-index{
   width:43px!important;height:43px!important;border-radius:10px!important;
 }
-#assignments .assignment-index strong{font-size:16px!important}
+#assignments .assignment-index strong{font-size:18px!important}
 #assignments .assignment-content h4{
-  font-size:12px!important;
-  margin:3px 0 2px!important;
+  font-size:15px!important;
+  margin:4px 0 3px!important;
 }
 #assignments .assignment-content>p:not(.assignment-content-text){
   display:-webkit-box!important;
   -webkit-box-orient:vertical!important;
   -webkit-line-clamp:2!important;
   overflow:hidden!important;
-  font-size:9px!important;
-  line-height:1.5!important;
-  margin-bottom:3px!important;
+  font-size:11.5px!important;
+  line-height:1.55!important;
+  margin-bottom:5px!important;
 }
 #assignments .assignment-content-text{
   -webkit-line-clamp:2!important;
@@ -650,14 +650,14 @@ body{color:var(--ink-strong)!important}
   line-height:1.45!important;
   margin-bottom:3px!important;
 }
-#assignments .assignment-content small{font-size:7.5px!important}
+#assignments .assignment-content small{font-size:9.5px!important;line-height:1.45!important}
 #assignments .subject-pill,#assignments .file-pill{
-  font-size:6.5px!important;padding:3px 5px!important;
+  font-size:8px!important;padding:4px 7px!important;
 }
 #assignments .assignment-actions .mini-btn{
   padding:6px 8px!important;
   border-radius:8px!important;
-  font-size:7.5px!important;
+  font-size:9.5px!important;
   white-space:nowrap!important;
 }
 
@@ -961,6 +961,18 @@ body{color:var(--ink-strong)!important}
   #assignments .exchange-title-row h3{font-size:22px!important}
   #assignments .exchange-live-status{font-size:8px!important}
   #assignments .chat-fields{grid-template-columns:1fr 100px!important}
+}
+</style>
+<style id="ptt-assignment-font-size-tune">
+#assignments .assignment-day-head span{font-size:8.5px!important;letter-spacing:.12em!important}
+#assignments .assignment-day-head>strong{font-size:9px!important;padding:6px 9px!important}
+#assignments .assignment-meta{gap:6px!important;margin-bottom:4px!important}
+@media(max-width:600px){
+  #assignments .assignment-content h4{font-size:14px!important}
+  #assignments .assignment-content>p:not(.assignment-content-text){font-size:10.5px!important}
+  #assignments .assignment-content small{font-size:9px!important}
+  #assignments .subject-pill,#assignments .file-pill{font-size:7.5px!important}
+  #assignments .assignment-actions .mini-btn{font-size:9px!important}
 }
 </style>
 </head>
