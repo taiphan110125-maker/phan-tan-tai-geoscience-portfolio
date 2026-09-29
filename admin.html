@@ -424,9 +424,10 @@ body.admin-body,.admin-body{background:#f6f8fb!important;color:#183247!important
         <label>Tiêu đề chung <small class="muted">(không bắt buộc)</small><input id="assignmentTitle" placeholder="Ví dụ: Bài tập Petrophysics"></label>
         <label>Chủ đề / mô tả chung <small class="muted">(không bắt buộc)</small><input id="assignmentTopic" placeholder="Ví dụ: Formation Evaluation · Chương 2"></label>
         <label>Nội dung <small class="muted">(không bắt buộc)</small><textarea id="assignmentContent" rows="5" placeholder="Có thể để trống hoặc nhập nội dung bài tập tại đây..."></textarea></label>
+        <label>Link tài liệu <small class="muted">(không bắt buộc)</small><input id="assignmentLink" type="url" placeholder="https://drive.google.com/... hoặc https://..."></label>
         <label>File đính kèm <small class="muted">(không bắt buộc · có thể chọn nhiều file)</small><input id="assignmentFile" type="file" multiple accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx"></label>
         <div id="selectedFilesPreview" class="selected-files-preview">Chưa chọn file — bạn vẫn có thể lưu bài tập.</div>
-        <small class="muted">Không bắt buộc chọn file. Bạn có thể chỉ nhập nội dung, chỉ nhập tiêu đề hoặc để cả nội dung và file trống; hệ thống vẫn tạo bài tập bình thường.</small>
+        <small class="muted">Bạn có thể dùng file, link, cả hai hoặc không dùng gì. File và link đều không bắt buộc.</small>
         <button class="btn btn-dark" type="submit">Tải lên & lưu tất cả</button>
         <p class="form-status" id="assignmentStatus"></p>
       </form>
@@ -504,7 +505,7 @@ function notifyPublicContentChanged(kind){ try { new BroadcastChannel('ptt-conte
 function mapProject(r){ return {id:r.id,title:r.title,type:r.type,image:r.image_url||'',imagePath:r.image_path||'',summary:r.summary||'',tags:r.tags||[],objective:r.objective||'',data:r.data_text||'',method:r.method||'',output:r.output||'',reportFiles:Array.isArray(r.report_files)?r.report_files:[],sortOrder:r.sort_order||0}; }
 function formatAssignmentDate(value=''){ const p=String(value||'').split('-'); return p.length===3?`${p[2]}/${p[1]}/${p[0]}`:String(value||''); }
 function localToday(){ const d=new Date(); const y=d.getFullYear(); const m=String(d.getMonth()+1).padStart(2,'0'); const day=String(d.getDate()).padStart(2,'0'); return `${y}-${m}-${day}`; }
-function mapAssignment(r, counts){ return {id:r.id,type:r.type,title:r.title,topic:r.topic||'',contentText:r.content_text||'',subject:r.subject||'other',assignmentDate:r.assignment_date||'',assignmentNumber:Number(r.assignment_number||1),date:r.assignment_date?formatAssignmentDate(r.assignment_date):(r.date_text||''),fileName:r.file_name||'',fileUrl:r.file_url||'',filePath:r.file_path||'',commentCount:counts[r.id]||0}; }
+function mapAssignment(r, counts){ return {id:r.id,type:r.type,title:r.title,topic:r.topic||'',contentText:r.content_text||'',externalUrl:r.external_url||'',subject:r.subject||'other',assignmentDate:r.assignment_date||'',assignmentNumber:Number(r.assignment_number||1),date:r.assignment_date?formatAssignmentDate(r.assignment_date):(r.date_text||''),fileName:r.file_name||'',fileUrl:r.file_url||'',filePath:r.file_path||'',commentCount:counts[r.id]||0}; }
 function subjectLabel(slug){ return subjects.find(s=>s.slug===slug)?.name || slug || 'Khác'; }
 function subjectSlug(name=''){ return name.normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/đ/g,'d').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,60); }
 function fileBaseName(name=''){ return name.replace(/\.[^.]+$/,'').replace(/[_-]+/g,' ').replace(/\s+/g,' ').trim() || 'Bài tập'; }
@@ -560,7 +561,7 @@ function renderAssignments(){
   const rows=[...assignments].sort((a,b)=>String(a.assignmentDate).localeCompare(String(b.assignmentDate))||a.assignmentNumber-b.assignmentNumber);
   $('#adminAssignmentRows').innerHTML=rows.length?rows.map(i=>`
     <tr>
-      <td><strong>${esc(formatAssignmentDate(i.assignmentDate))} · Bài ${i.assignmentNumber}</strong><small>${esc(i.title)} · ${esc(i.type)}${i.fileName?` · ${esc(i.fileName)}`:''}${i.contentText?` · ${esc(i.contentText.slice(0,70))}${i.contentText.length>70?'…':''}`:''}</small></td>
+      <td><strong>${esc(formatAssignmentDate(i.assignmentDate))} · Bài ${i.assignmentNumber}</strong><small>${esc(i.title)} · ${esc(i.type)}${i.fileName?` · ${esc(i.fileName)}`:''}${i.externalUrl?' · Link':''}${i.contentText?` · ${esc(i.contentText.slice(0,70))}${i.contentText.length>70?'…':''}`:''}</small></td>
       <td><select class="admin-inline-select" data-assignment-subject="${esc(i.id)}">${subjectOptions(i.subject,false)}</select></td>
       <td><label class="inline-day-control"><span>Ngày</span><input type="date" value="${esc(i.assignmentDate)}" data-assignment-date="${esc(i.id)}"></label></td>
       <td>${esc(i.topic||'—')}</td>
@@ -756,9 +757,19 @@ $('#assignmentForm')?.addEventListener('submit',async event=>{
   const titlePrefix=$('#assignmentTitle').value.trim();
   const topic=$('#assignmentTopic').value.trim();
   const contentText=$('#assignmentContent').value.trim();
+  const externalUrl=$('#assignmentLink').value.trim();
   const files=[...($('#assignmentFile').files||[])];
   if(!assignmentDate){$('#assignmentStatus').textContent='Hãy chọn ngày học.';return;}
   if(!subject){$('#assignmentStatus').textContent='Hãy chọn môn học.';return;}
+  if(externalUrl){
+    try{
+      const parsed=new URL(externalUrl);
+      if(!['http:','https:'].includes(parsed.protocol)) throw new Error('invalid');
+    }catch{
+      $('#assignmentStatus').textContent='Link tài liệu chưa hợp lệ. Hãy dùng địa chỉ bắt đầu bằng http:// hoặc https://';
+      return;
+    }
+  }
   const tooLarge=files.find(file=>file.size>50*1024*1024);
   if(tooLarge){$('#assignmentStatus').textContent=`File “${tooLarge.name}” vượt quá 50 MB.`;return;}
   const button=form.querySelector('button[type="submit"]');button.disabled=true;
@@ -786,7 +797,7 @@ $('#assignmentForm')?.addEventListener('submit',async event=>{
       const title=file
         ? (titlePrefix ? (items.length===1?titlePrefix:`${titlePrefix} ${number}`) : fileBaseName(file.name))
         : (titlePrefix || `Bài tập ${number}`);
-      const row={id,type:ext,title,topic,content_text:contentText,subject,assignment_date:assignmentDate,assignment_number:number,date_text:formatAssignmentDate(assignmentDate),file_name:fileName,file_url:fileUrl,file_path:path,published:true};
+      const row={id,type:ext,title,topic,content_text:contentText,external_url:externalUrl,subject,assignment_date:assignmentDate,assignment_number:number,date_text:formatAssignmentDate(assignmentDate),file_name:fileName,file_url:fileUrl,file_path:path,published:true};
       const {error}=await sb.from('assignments').insert(row);
       if(error)throw error;
       insertedIds.push(id);

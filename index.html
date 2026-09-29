@@ -1115,7 +1115,7 @@ function renderAssignments(){
   const rows=assignments
     .filter(a=>{
       const subjectName=assignmentSubjectName(a.subject);
-      const haystack=`${a.title} ${a.topic} ${a.contentText} ${a.fileName} ${subjectName} ${formatAssignmentDate(a.assignmentDate)} bài ${a.assignmentNumber}`.toLowerCase();
+      const haystack=`${a.title} ${a.topic} ${a.contentText} ${a.externalUrl} ${a.fileName} ${subjectName} ${formatAssignmentDate(a.assignmentDate)} bài ${a.assignmentNumber}`.toLowerCase();
       return (subject==='all'||a.subject===subject) && haystack.includes(q);
     })
     .sort((a,b)=>String(a.assignmentDate).localeCompare(String(b.assignmentDate)) || a.assignmentNumber-b.assignmentNumber || a.title.localeCompare(b.title,'vi'));
@@ -1144,11 +1144,11 @@ function renderAssignments(){
               <h4>${escapeHtml(a.title)}</h4>
               ${a.topic?`<p>${escapeHtml(a.topic)}</p>`:''}
               ${a.contentText?`<p class="assignment-content-text"><strong>Nội dung:</strong> ${escapeHtml(a.contentText)}</p>`:''}
-              <small>${escapeHtml(a.fileName || 'Không có file đính kèm')} · ${Number(a.commentCount||0)} trao đổi</small>
+              <small>${escapeHtml(a.fileName || (a.externalUrl?'Có link tài liệu':'Không có file đính kèm'))} · ${Number(a.commentCount||0)} trao đổi</small>
             </div>
             <div class="assignment-actions">
-              ${a.filePath||a.fileUrl||a.contentText
-  ? `<a class="mini-btn assignment-view" href="assignment-viewer.html?id=${encodeURIComponent(a.id)}" target="_blank" rel="noopener">${a.filePath||a.fileUrl?'Xem trước':'Xem nội dung'}</a>`
+              ${a.filePath||a.fileUrl||a.externalUrl||a.contentText
+  ? `<a class="mini-btn assignment-view" href="assignment-viewer.html?id=${encodeURIComponent(a.id)}" target="_blank" rel="noopener">${a.filePath||a.fileUrl?'Xem trước':(a.externalUrl?'Mở link':'Xem nội dung')}</a>`
   : '<span class="mini-btn assignment-view is-disabled" aria-disabled="true">Chưa có nội dung</span>'}
               <button class="mini-btn comment-open" data-id="${escapeHtml(a.id)}">Nhận xét</button>
             </div>
@@ -1257,6 +1257,7 @@ function mapAssignment(row, countMap){
     title:row.title,
     topic:row.topic || '',
     contentText:row.content_text || '',
+    externalUrl:row.external_url || '',
     subject:row.subject || 'other',
     assignmentDate:row.assignment_date || '',
     assignmentNumber:Number(row.assignment_number || 1),

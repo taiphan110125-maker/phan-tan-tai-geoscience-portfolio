@@ -67,11 +67,13 @@
         <div><dt>Môn học</dt><dd id="subjectText">—</dd></div>
         <div><dt>Chủ đề</dt><dd id="topicText">—</dd></div>
         <div><dt>Nội dung</dt><dd id="contentText">—</dd></div>
+        <div><dt>Link tài liệu</dt><dd id="linkText">—</dd></div>
         <div><dt>Tên file</dt><dd id="fileNameText">—</dd></div>
       </dl>
       <a class="download" id="downloadBtn" href="#" aria-disabled="true">↓ Tải file</a>
+      <a class="download" id="externalLinkBtn" href="#" target="_blank" rel="noopener" aria-disabled="true" style="margin-top:8px;background:#2c6da4">↗ Mở liên kết</a>
       <a class="open-direct" id="openDirect" href="#" target="_blank" rel="noopener" hidden>Mở file ở tab mới ↗</a>
-      <p class="note">Bạn đang ở trang xem trước. File chỉ được tải xuống khi bạn bấm nút <strong>Tải file</strong>.</p>
+      <p class="note">Bạn đang ở trang xem trước. Nếu bài có file, dùng <strong>Tải file</strong>. Nếu bài dùng liên kết ngoài, dùng <strong>Mở liên kết</strong>.</p>
     </aside>
   </main>
 
@@ -127,19 +129,28 @@
 
       $('#title').textContent=a.title||'Bài tập';
       $('#subtitle').textContent=(a.topic||'Tài liệu học tập')+' · '+formatDate(a.assignment_date);
-      $('#typeBadge').textContent=(a.type||extension(a.file_name)||'FILE').toUpperCase();
+      $('#typeBadge').textContent=(a.file_path||a.file_url ? (a.type||extension(a.file_name)||'FILE') : (a.external_url?'LINK':'BÀI')).toUpperCase();
       $('#dateText').textContent=formatDate(a.assignment_date);
       $('#numberText').textContent='Bài '+Number(a.assignment_number||1);
       $('#subjectText').textContent=subjectName;
       $('#topicText').textContent=a.topic||'—';
       $('#contentText').textContent=a.content_text||'—';
+      $('#linkText').textContent=a.external_url||'—';
       $('#fileNameText').textContent=a.file_name||'Không có file đính kèm';
 
+      const externalBtn=$('#externalLinkBtn');
+      if(a.external_url){
+        externalBtn.href=a.external_url;
+        externalBtn.setAttribute('aria-disabled','false');
+      }
+
       if(!a.file_path&&!a.file_url){
-        if(a.content_text){
+        if(a.external_url){
+          showState('Liên kết tài liệu','Bài tập này sử dụng liên kết ngoài. Bấm “Mở liên kết” để xem tài liệu.');
+        }else if(a.content_text){
           showState('Nội dung bài tập',a.content_text);
         }else{
-          showState('Bài tập chưa có nội dung hoặc file','Bài tập này đã được tạo nhưng hiện chưa có nội dung và file đính kèm.');
+          showState('Bài tập chưa có nội dung, file hoặc link','Bài tập này đã được tạo nhưng hiện chưa có nội dung, file đính kèm hoặc liên kết.');
         }
         return;
       }
