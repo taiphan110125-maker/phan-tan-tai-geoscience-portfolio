@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="description" content="Portfolio học thuật của Phan Tấn Tài - sinh viên Địa chất và Địa vật lý.">
   <meta name="theme-color" content="#ffffff">
-  <link rel="icon" href="assets/ptt-emblem.svg" type="image/svg+xml">
+  <link rel="icon" href="assets/ptt-emblem.svg" type="image/svg+xml" data-site-favicon>
   <link rel="preconnect" href="https://aqkasetqystwvpassidd.supabase.co" crossorigin>
   <link rel="dns-prefetch" href="//aqkasetqystwvpassidd.supabase.co">
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
@@ -1192,7 +1192,7 @@ body{color:var(--ink-strong)!important}
   <header class="site-header" id="siteHeader">
     <div class="shell nav-row">
       <a class="brand brand-header" href="#home" aria-label="Phan Tấn Tài - Trang chủ">
-        <img class="brand-lockup" src="assets/ptt-brand.svg" alt="Phan Tấn Tài — Geology & Geophysics" decoding="async">
+        <img class="brand-lockup" data-site-image="brand_logo" src="assets/ptt-brand.svg" alt="Phan Tấn Tài — Geology & Geophysics" decoding="async">
       </a>
 
       <button class="nav-toggle" id="navToggle" aria-label="Mở menu" aria-expanded="false">☰</button>
@@ -1222,7 +1222,7 @@ body{color:var(--ink-strong)!important}
 
   <main id="main">
     <section class="hero" id="home" aria-labelledby="heroTitle">
-      <img class="hero-media" src="assets/hero-oil-geology.webp" alt="Địa tầng ven biển và giàn khoan dầu khí ngoài khơi" fetchpriority="high" decoding="async">
+      <img class="hero-media" data-site-image="hero_main" src="assets/hero-oil-geology.webp" alt="Địa tầng ven biển và giàn khoan dầu khí ngoài khơi" fetchpriority="high" decoding="async">
       <div class="hero-overlay"></div>
       <div class="shell hero-content">
         <div class="hero-copy reveal">
@@ -1259,7 +1259,7 @@ body{color:var(--ink-strong)!important}
 
         <div class="feature-grid">
           <article class="visual-card reveal">
-            <img src="assets/about-fieldwork.svg" alt="Sinh viên khảo sát địa chất thực địa">
+            <img data-site-image="feature_projects" src="assets/about-fieldwork.svg" alt="Minh họa dự án và nghiên cứu">
             <div class="visual-card-overlay"></div>
             <div class="visual-card-body">
               <span class="icon-box">⌁</span>
@@ -1269,7 +1269,7 @@ body{color:var(--ink-strong)!important}
             </div>
           </article>
           <article class="visual-card reveal delay-1">
-            <img src="assets/assignments-review.svg" alt="Không gian học tập với tài liệu địa chất và hệ thống nhận xét">
+            <img data-site-image="feature_assignments" src="assets/assignments-review.svg" alt="Minh họa bài tập và nhận xét">
             <div class="visual-card-overlay"></div>
             <div class="visual-card-body">
               <span class="icon-box">▤</span>
@@ -1279,7 +1279,7 @@ body{color:var(--ink-strong)!important}
             </div>
           </article>
           <article class="visual-card reveal delay-2">
-            <img src="assets/geo-ai.svg" alt="Giao diện trợ lý AI chuyên ngành địa chất và địa vật lý">
+            <img data-site-image="feature_geo_ai" src="assets/geo-ai.svg" alt="Minh họa Geo AI Assistant">
             <div class="visual-card-overlay"></div>
             <div class="visual-card-body">
               <span class="icon-box">AI</span>
@@ -1295,7 +1295,7 @@ body{color:var(--ink-strong)!important}
     <section class="section about-section" id="about">
       <div class="shell about-layout">
         <div class="about-media reveal">
-          <img src="assets/about-fieldwork.svg" alt="Khảo sát địa chất ngoài thực địa">
+          <img data-site-image="about_main" src="assets/about-fieldwork.svg" alt="Khảo sát địa chất ngoài thực địa">
           <div class="media-caption"><span>FIELD NOTE 01</span><strong>Observe · Measure · Interpret</strong></div>
         </div>
         <div class="about-copy reveal delay-1">
@@ -1392,7 +1392,7 @@ body{color:var(--ink-strong)!important}
           <button class="btn btn-gold" id="aiOpenFromSection">Mở Geo AI →</button>
         </div>
         <div class="ai-media reveal delay-1">
-          <img src="assets/geo-ai.svg" alt="Trợ lý AI kết hợp dữ liệu địa chấn, bản đồ và well log">
+          <img data-site-image="geo_ai_main" src="assets/geo-ai.svg" alt="Trợ lý AI kết hợp dữ liệu địa chấn, bản đồ và well log">
           <div class="ai-badge"><span class="pulse"></span> GEO AI FREE · 0₫</div>
         </div>
       </div>
@@ -1424,7 +1424,7 @@ body{color:var(--ink-strong)!important}
       <div class="footer-main">
         <div class="footer-left">
           <div class="brand footer-brand">
-            <img class="footer-emblem" src="assets/ptt-emblem.svg" alt="" loading="lazy" decoding="async">
+            <img class="footer-emblem" data-site-image="brand_emblem" src="assets/ptt-emblem.svg" alt="" loading="lazy" decoding="async">
             <span class="brand-copy">
               <strong>PHAN TẤN TÀI</strong>
               <small>GEOLOGY · GEOPHYSICS</small>
@@ -1510,7 +1510,7 @@ body{color:var(--ink-strong)!important}
   <div class="modal" id="userLoginModal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="userLoginTitle">
     <div class="modal-card login-card">
       <button class="modal-close" id="userLoginClose" aria-label="Đóng">×</button>
-      <div class="login-brand"><img class="modal-emblem" src="assets/ptt-emblem.svg" alt="Logo Phan Tấn Tài" loading="lazy" decoding="async"></div>
+      <div class="login-brand"><img class="modal-emblem" data-site-image="brand_emblem" src="assets/ptt-emblem.svg" alt="Logo Phan Tấn Tài" loading="lazy" decoding="async"></div>
       <p class="eyebrow">USER ACCOUNT</p>
       <h3 id="userLoginTitle">Đăng nhập người dùng</h3>
       <p class="muted">Đăng nhập là tùy chọn. Bạn vẫn có thể xem toàn bộ dự án và bài tập công khai mà không cần tài khoản.</p>
@@ -1593,13 +1593,14 @@ let assignments = [];
 let assignmentSubjects = [];
 let academicExchanges = [];
 let academicChatMessages = [];
+let siteImages = [];
 let publicContentLoading = false;
 let publicContentLoadedOnce = false;
 let publicRefreshPending = false;
 let publicRefreshTimer = null;
 let lastPublicSync = 0;
 let academicChatLoaded = false;
-const PUBLIC_CACHE_KEY = 'ptt-public-cache-v1';
+const PUBLIC_CACHE_KEY = 'ptt-public-cache-v2';
 const PUBLIC_CACHE_TTL = 10 * 60 * 1000;
 
 function escapeHtml(value = ''){
@@ -1641,7 +1642,18 @@ function richPlainText(html=''){
   div.innerHTML=sanitizeRichHtml(html);
   return (div.textContent||'').replace(/\s+/g,' ').trim();
 }
+function applySiteImages(){
+  const map=new Map(siteImages.map(item=>[item.key,item.imageUrl||item.defaultUrl||'']));
+  $('[data-site-image]').forEach(img=>{
+    const url=map.get(img.dataset.siteImage);
+    if(url&&img.getAttribute('src')!==url)img.setAttribute('src',url);
+  });
+  const emblem=map.get('brand_emblem');
+  const favicon=$('[data-site-favicon]');
+  if(emblem&&favicon&&favicon.getAttribute('href')!==emblem)favicon.setAttribute('href',emblem);
+}
 function renderPublicState(){
+  applySiteImages();
   populateSubjectFilter();
   const statProjects=$('#statProjects');
   const statAssignments=$('#statAssignments');
@@ -1654,7 +1666,7 @@ function renderPublicState(){
 function savePublicCache(){
   try{
     localStorage.setItem(PUBLIC_CACHE_KEY,JSON.stringify({
-      at:Date.now(),projects,assignments,assignmentSubjects,academicExchanges
+      at:Date.now(),projects,assignments,assignmentSubjects,academicExchanges,siteImages
     }));
   }catch{}
 }
@@ -1668,6 +1680,7 @@ function restorePublicCache(){
     assignments=Array.isArray(cached.assignments)?cached.assignments:[];
     assignmentSubjects=Array.isArray(cached.assignmentSubjects)?cached.assignmentSubjects:[];
     academicExchanges=Array.isArray(cached.academicExchanges)?cached.academicExchanges:[];
+    siteImages=Array.isArray(cached.siteImages)?cached.siteImages:[];
     renderPublicState();
     publicContentLoadedOnce=true;
     return true;
@@ -2103,18 +2116,20 @@ async function loadPublicContent({silent = false} = {}){
   publicContentLoading=true;
   try {
     const client = requireSupabase();
-    const [pRes, aRes, cRes, sRes] = await Promise.all([
+    const [pRes, aRes, cRes, sRes, iRes] = await Promise.all([
       client.from('projects').select('*').eq('published', true).order('sort_order', {ascending:true}).order('created_at', {ascending:false}),
       client.from('assignments').select('*').eq('published', true).order('assignment_date', {ascending:true}).order('assignment_number', {ascending:true}).order('created_at', {ascending:true}),
       client.from('comments').select('id,assignment_id,name,role,body,created_at,assignment_title,assignment_date,assignment_number,assignment_subject').order('created_at', {ascending:false}),
-      client.from('assignment_subjects').select('slug,name,sort_order').eq('active', true).order('sort_order', {ascending:true}).order('name', {ascending:true})
+      client.from('assignment_subjects').select('slug,name,sort_order').eq('active', true).order('sort_order', {ascending:true}).order('name', {ascending:true}),
+      client.from('site_images').select('key,label,image_url,image_path,default_url,sort_order,updated_at').order('sort_order',{ascending:true})
     ]);
-    for (const res of [pRes,aRes,cRes,sRes]) if (res.error) throw res.error;
+    for (const res of [pRes,aRes,cRes,sRes,iRes]) if (res.error) throw res.error;
     const counts = {};
     for (const c of cRes.data || []) if(c.assignment_id) counts[c.assignment_id] = (counts[c.assignment_id] || 0) + 1;
     projects = (pRes.data || []).map(mapProject);
     assignments = (aRes.data || []).map(row => mapAssignment(row, counts));
     assignmentSubjects = (sRes.data || []).map(row => ({slug:row.slug,name:row.name,sortOrder:Number(row.sort_order||0)}));
+    siteImages=(iRes.data||[]).map(row=>({key:row.key,label:row.label,imageUrl:row.image_url||row.default_url||'',imagePath:row.image_path||'',defaultUrl:row.default_url||'',sortOrder:Number(row.sort_order||0),updatedAt:row.updated_at||''}));
     academicExchanges=(cRes.data||[]).map(row=>({
       id:row.id,
       assignmentId:row.assignment_id,
@@ -2156,6 +2171,7 @@ function subscribeRealtime(){
       .on('postgres_changes',{event:'*',schema:'public',table:'assignments'},()=>schedulePublicRefresh())
       .on('postgres_changes',{event:'*',schema:'public',table:'comments'},()=>schedulePublicRefresh())
       .on('postgres_changes',{event:'*',schema:'public',table:'assignment_subjects'},()=>schedulePublicRefresh())
+      .on('postgres_changes',{event:'*',schema:'public',table:'site_images'},()=>schedulePublicRefresh())
       .on('postgres_changes',{event:'*',schema:'public',table:'academic_chat_messages'},()=>{
         if(academicChatLoaded)loadAcademicChat({stickToBottom:true});
       })
