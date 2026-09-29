@@ -283,7 +283,7 @@ body.admin-body,.admin-body{background:#f6f8fb!important;color:#183247!important
 </style>
 <style id="ptt-admin-chat">
 
-.admin-feedback-section{display:grid;gap:8px;margin-bottom:20px}.admin-feedback-section>h4{margin:0 0 2px;color:#173a55;font-size:12px;border-bottom:1px solid #dfe7ed;padding-bottom:8px}
+#feedbackList{display:grid;gap:9px}.feedback-item{margin:0}.feedback-item .admin-row-actions{align-items:center;justify-content:space-between}
 
 </style>
 </head>
@@ -591,19 +591,17 @@ function renderSubjects(){
 function renderProjects(){ const q=($('#projectSearch')?.value||'').trim().toLowerCase(); const filtered=projects.filter(p=>`${p.title} ${p.type} ${(p.tags||[]).join(' ')}`.toLowerCase().includes(q)); $('#adminProjectRows').innerHTML=filtered.length?filtered.map(p=>`<tr><td><div class="admin-project-title"><img src="${esc(p.image||'assets/hero-geoscience.svg')}" alt=""><div><strong>${esc(p.title)}</strong><small>${esc((p.summary||'').slice(0,105))}${(p.summary||'').length>105?'…':''} · ${p.reportFiles.length} file báo cáo</small></div></div></td><td>${esc(p.type||'—')}</td><td><div class="admin-tag-list">${(p.tags||[]).slice(0,3).map(t=>`<span>${esc(t)}</span>`).join('')||'<span>Chưa có</span>'}</div></td><td><small>${p.imagePath?'Supabase Storage':esc(p.image||'Mặc định')}</small></td><td><div class="admin-row-actions"><button class="edit-btn" data-edit-project="${esc(p.id)}">Sửa</button><button class="danger-btn" data-delete-project="${esc(p.id)}">Xóa</button></div></td></tr>`).join(''):'<tr><td colspan="5"><div class="empty-state">Không tìm thấy dự án phù hợp.</div></td></tr>'; }
 function renderFeedback(){
   const host=$('#feedbackList');
-  const assignmentHtml=comments.length?comments.map(c=>`
-    <div class="feedback-item">
-      <div class="feedback-item-head"><strong>${esc(c.name)} · ${esc(c.role)}</strong><small>${new Date(c.createdAt).toLocaleString('vi-VN')}</small></div>
-      <p><b>${c.assignmentNumber?`Bài ${c.assignmentNumber} · `:''}${esc(c.assignmentTitle||'Bài tập')}</b>${c.assignmentDate?`<br>Ngày học: ${esc(formatAssignmentDate(c.assignmentDate))}`:''}${c.assignmentSubject?` · ${esc(c.assignmentSubject)}`:''}<br>${esc(c.text)}</p>
-      <div class="admin-row-actions"><small class="muted">Trao đổi theo bài tập</small><button class="danger-btn" data-delete-comment="${esc(c.id)}">Xóa trao đổi</button></div>
-    </div>`).join(''):'<div class="empty-state">Chưa có trao đổi theo bài tập.</div>';
-  const chatHtml=chatMessages.length?chatMessages.map(c=>`
-    <div class="feedback-item">
-      <div class="feedback-item-head"><strong>${esc(c.name)} · ${esc(c.role)}</strong><small>${new Date(c.createdAt).toLocaleString('vi-VN')}</small></div>
-      <p><b>Chat trực tiếp</b><br>${esc(c.text)}</p>
-      <div class="admin-row-actions"><small class="muted">Tin nhắn chat trực tiếp</small><button class="danger-btn" data-delete-chat="${esc(c.id)}">Xóa tin chat</button></div>
-    </div>`).join(''):'<div class="empty-state">Chưa có tin nhắn chat trực tiếp.</div>';
-  host.innerHTML=`<div class="admin-feedback-section"><h4>Trao đổi theo bài tập</h4>${assignmentHtml}</div><div class="admin-feedback-section"><h4>Chat trực tiếp</h4>${chatHtml}</div>`;
+  const items=[
+    ...comments.map(c=>({...c,kind:'assignment',sortTime:new Date(c.createdAt||0).getTime()})),
+    ...chatMessages.map(c=>({...c,kind:'chat',sortTime:new Date(c.createdAt||0).getTime()}))
+  ].sort((a,b)=>b.sortTime-a.sortTime);
+  if(!items.length){host.innerHTML='<div class="empty-state">Chưa có trao đổi học thuật.</div>';return;}
+  host.innerHTML=items.map(c=>{
+    if(c.kind==='assignment'){
+      return `<div class="feedback-item"><div class="feedback-item-head"><strong>${esc(c.name)} · ${esc(c.role)}</strong><small>${new Date(c.createdAt).toLocaleString('vi-VN')}</small></div><p><b>${c.assignmentNumber?`Bài ${c.assignmentNumber} · `:''}${esc(c.assignmentTitle||'Bài tập')}</b>${c.assignmentDate?`<br>Ngày học: ${esc(formatAssignmentDate(c.assignmentDate))}`:''}${c.assignmentSubject?` · ${esc(c.assignmentSubject)}`:''}<br>${esc(c.text)}</p><div class="admin-row-actions"><small class="muted">Trao đổi theo bài tập</small><button class="danger-btn" data-delete-comment="${esc(c.id)}">Xóa</button></div></div>`;
+    }
+    return `<div class="feedback-item"><div class="feedback-item-head"><strong>${esc(c.name)} · ${esc(c.role)}</strong><small>${new Date(c.createdAt).toLocaleString('vi-VN')}</small></div><p>${esc(c.text)}</p><div class="admin-row-actions"><small class="muted">Chat trực tiếp</small><button class="danger-btn" data-delete-chat="${esc(c.id)}">Xóa</button></div></div>`;
+  }).join('');
 }
 function renderMessages(){ $('#messageList').innerHTML=messages.length?messages.map(m=>`<div class="message-item"><div class="message-item-head"><strong>${esc(m.name)} · ${esc(m.topic||'Liên hệ')}</strong><small>${new Date(m.createdAt).toLocaleString('vi-VN')}</small></div><p>${esc(m.email)}<br>${esc(m.message)}</p><button class="danger-btn" data-delete-message="${esc(m.id)}">Xóa lời nhắn</button></div>`).join(''):'<div class="empty-state">Chưa có lời nhắn.</div>'; }
 function renderAll(){ renderMetrics();renderDashboard();renderAssignments();renderProjects();renderFeedback();renderMessages();renderSubjects();populateAssignmentSubjectSelect(); }
