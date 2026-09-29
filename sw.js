@@ -1,13 +1,22 @@
 'use strict';
 
-const CACHE_NAME='ptt-static-v4-20260930';
+const CACHE_NAME='ptt-static-v5-20260930';
 const PRECACHE=[
   '/',
   '/index.html',
   '/assignment-viewer.html',
   '/assets/ptt-brand.svg',
   '/assets/ptt-emblem.svg',
-  '/assets/hero-oil-geology-exact.webp',
+  '/assets/hero-oil-geology.webp',
+  '/assets/hero-exact/00.txt',
+  '/assets/hero-exact/01.txt',
+  '/assets/hero-exact/02.txt',
+  '/assets/hero-exact/03.txt',
+  '/assets/hero-exact/04.txt',
+  '/assets/hero-exact/05.txt',
+  '/assets/hero-exact/06.txt',
+  '/assets/hero-exact/07.txt',
+  '/assets/hero-exact/08.txt',
   '/assets/about-fieldwork.svg',
   '/assets/assignments-review.svg',
   '/assets/geo-ai.svg'
@@ -49,7 +58,7 @@ self.addEventListener('fetch',event=>{
     return;
   }
 
-  if(/\.(?:svg|webp|png|jpe?g|gif|ico|css|js)$/i.test(url.pathname)){
+  if(/\.(?:svg|webp|png|jpe?g|gif|ico|css|js|txt)$/i.test(url.pathname)){
     event.respondWith((async()=>{
       const cache=await caches.open(CACHE_NAME);
       const cached=await cache.match(request);
