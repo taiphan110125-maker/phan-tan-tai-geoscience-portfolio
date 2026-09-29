@@ -281,6 +281,11 @@ body.admin-body,.admin-body{background:#f6f8fb!important;color:#183247!important
 @media(max-width:640px){.project-report-editor-head{align-items:flex-start;flex-direction:column}.project-report-picker{width:100%;justify-content:center}}
 
 </style>
+<style id="ptt-admin-chat">
+
+.admin-feedback-section{display:grid;gap:8px;margin-bottom:20px}.admin-feedback-section>h4{margin:0 0 2px;color:#173a55;font-size:12px;border-bottom:1px solid #dfe7ed;padding-bottom:8px}
+
+</style>
 </head>
 <body class="admin-body">
   <header class="admin-topbar">
@@ -491,7 +496,7 @@ window.PTT_CONFIG = {
 const $ = (selector, root = document) => root.querySelector(selector);
 const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
 const sb = window.pttSupabase;
-let projects = [], assignments = [], comments = [], messages = [], subjects = [];
+let projects = [], assignments = [], comments = [], chatMessages = [], messages = [], subjects = [];
 let adminUser = null;
 let pendingProjectImageFile = null;
 let pendingProjectReportFiles = [];
@@ -538,24 +543,26 @@ $('#logoutBtn')?.addEventListener('click',async()=>{ try{ if(sb) await sb.auth.s
 
 async function loadAdminData(){
   const client=requireSupabase();
-  const [pRes,aRes,cRes,mRes,sRes]=await Promise.all([
+  const [pRes,aRes,cRes,chatRes,mRes,sRes]=await Promise.all([
     client.from('projects').select('*').order('sort_order',{ascending:true}).order('created_at',{ascending:false}),
     client.from('assignments').select('*').order('assignment_date',{ascending:true}).order('assignment_number',{ascending:true}).order('created_at',{ascending:true}),
     client.from('comments').select('id,assignment_id,name,role,body,created_at,assignment_title,assignment_date,assignment_number,assignment_subject').order('created_at',{ascending:false}),
+    client.from('academic_chat_messages').select('id,user_id,name,role,body,created_at').order('created_at',{ascending:false}).limit(200),
     client.from('messages').select('*').order('created_at',{ascending:false}),
     client.from('assignment_subjects').select('*').order('sort_order',{ascending:true}).order('name',{ascending:true})
   ]);
-  for(const res of [pRes,aRes,cRes,mRes,sRes]) if(res.error) throw res.error;
+  for(const res of [pRes,aRes,cRes,chatRes,mRes,sRes]) if(res.error) throw res.error;
   const counts={}; for(const c of cRes.data||[]) counts[c.assignment_id]=(counts[c.assignment_id]||0)+1;
   projects=(pRes.data||[]).map(mapProject);
   assignments=(aRes.data||[]).map(r=>mapAssignment(r,counts));
   subjects=(sRes.data||[]).map(r=>({slug:r.slug,name:r.name,sortOrder:Number(r.sort_order||0),active:Boolean(r.active)}));
   comments=(cRes.data||[]).map(r=>({id:r.id,assignmentId:r.assignment_id,assignmentTitle:r.assignment_title||'Bài tập',assignmentDate:r.assignment_date||'',assignmentNumber:Number(r.assignment_number||0),assignmentSubject:r.assignment_subject||'',name:r.name,role:r.role,text:r.body,createdAt:r.created_at}));
+  chatMessages=(chatRes.data||[]).map(r=>({id:r.id,userId:r.user_id,name:r.name,role:r.role,text:r.body,createdAt:r.created_at}));
   messages=(mRes.data||[]).map(r=>({id:r.id,name:r.name,email:r.email,topic:r.topic,message:r.message,createdAt:r.created_at}));
   renderAll();
 }
 
-function renderMetrics(){ const metrics=[['Bài tập',assignments.length,'Tài liệu trên cloud'],['Nhận xét',comments.length,'Phản hồi trong Supabase'],['Lời nhắn',messages.length,'Từ biểu mẫu liên hệ'],['Dự án',projects.length,'Dự án & nghiên cứu']]; $('#metricGrid').innerHTML=metrics.map(i=>`<div class="metric"><span>${i[0]}</span><strong>${i[1]}</strong><small>${i[2]}</small></div>`).join(''); }
+function renderMetrics(){ const metrics=[['Bài tập',assignments.length,'Tài liệu trên cloud'],['Trao đổi',comments.length+chatMessages.length,'Nhận xét + chat trực tiếp'],['Lời nhắn',messages.length,'Từ biểu mẫu liên hệ'],['Dự án',projects.length,'Dự án & nghiên cứu']]; $('#metricGrid').innerHTML=metrics.map(i=>`<div class="metric"><span>${i[0]}</span><strong>${i[1]}</strong><small>${i[2]}</small></div>`).join(''); }
 function renderDashboard(){ const a=assignments.slice(0,4); $('#recentAssignments').innerHTML=a.length?`<div class="mini-list">${a.map(i=>`<div class="mini-list-item"><div><strong>${esc(i.title)}</strong><small>${esc(i.topic)}</small></div><small>${esc(i.date)}</small></div>`).join('')}</div>`:'<div class="empty-state">Chưa có bài tập.</div>'; const c=comments.slice(0,4); $('#recentFeedback').innerHTML=c.length?`<div class="mini-list">${c.map(i=>`<div class="mini-list-item"><div><strong>${esc(i.name)}</strong><small>${esc(i.text)}</small></div><small>${esc(i.role)}</small></div>`).join('')}</div>`:'<div class="empty-state">Chưa có nhận xét mới.</div>'; }
 function renderAssignments(){
   const rows=[...assignments].sort((a,b)=>String(a.assignmentDate).localeCompare(String(b.assignmentDate))||a.assignmentNumber-b.assignmentNumber);
@@ -582,7 +589,22 @@ function renderSubjects(){
     </div>`).join(''):'<div class="empty-state">Chưa có môn học.</div>';
 }
 function renderProjects(){ const q=($('#projectSearch')?.value||'').trim().toLowerCase(); const filtered=projects.filter(p=>`${p.title} ${p.type} ${(p.tags||[]).join(' ')}`.toLowerCase().includes(q)); $('#adminProjectRows').innerHTML=filtered.length?filtered.map(p=>`<tr><td><div class="admin-project-title"><img src="${esc(p.image||'assets/hero-geoscience.svg')}" alt=""><div><strong>${esc(p.title)}</strong><small>${esc((p.summary||'').slice(0,105))}${(p.summary||'').length>105?'…':''} · ${p.reportFiles.length} file báo cáo</small></div></div></td><td>${esc(p.type||'—')}</td><td><div class="admin-tag-list">${(p.tags||[]).slice(0,3).map(t=>`<span>${esc(t)}</span>`).join('')||'<span>Chưa có</span>'}</div></td><td><small>${p.imagePath?'Supabase Storage':esc(p.image||'Mặc định')}</small></td><td><div class="admin-row-actions"><button class="edit-btn" data-edit-project="${esc(p.id)}">Sửa</button><button class="danger-btn" data-delete-project="${esc(p.id)}">Xóa</button></div></td></tr>`).join(''):'<tr><td colspan="5"><div class="empty-state">Không tìm thấy dự án phù hợp.</div></td></tr>'; }
-function renderFeedback(){ $('#feedbackList').innerHTML=comments.length?comments.map(c=>`<div class="feedback-item"><div class="feedback-item-head"><strong>${esc(c.name)} · ${esc(c.role)}</strong><small>${new Date(c.createdAt).toLocaleString('vi-VN')}</small></div><p><b>${c.assignmentNumber?`Bài ${c.assignmentNumber} · `:''}${esc(c.assignmentTitle||'Bài tập')}</b>${c.assignmentDate?`<br>Ngày học: ${esc(formatAssignmentDate(c.assignmentDate))}`:''}${c.assignmentSubject?` · ${esc(c.assignmentSubject)}`:''}<br>${esc(c.text)}</p><div class="admin-row-actions"><small class="muted">Chỉ bị xóa khi Admin chủ động xóa.</small><button class="danger-btn" data-delete-comment="${esc(c.id)}">Xóa trao đổi</button></div></div>`).join(''):'<div class="empty-state">Chưa có trao đổi học thuật.</div>'; }
+function renderFeedback(){
+  const host=$('#feedbackList');
+  const assignmentHtml=comments.length?comments.map(c=>`
+    <div class="feedback-item">
+      <div class="feedback-item-head"><strong>${esc(c.name)} · ${esc(c.role)}</strong><small>${new Date(c.createdAt).toLocaleString('vi-VN')}</small></div>
+      <p><b>${c.assignmentNumber?`Bài ${c.assignmentNumber} · `:''}${esc(c.assignmentTitle||'Bài tập')}</b>${c.assignmentDate?`<br>Ngày học: ${esc(formatAssignmentDate(c.assignmentDate))}`:''}${c.assignmentSubject?` · ${esc(c.assignmentSubject)}`:''}<br>${esc(c.text)}</p>
+      <div class="admin-row-actions"><small class="muted">Trao đổi theo bài tập</small><button class="danger-btn" data-delete-comment="${esc(c.id)}">Xóa trao đổi</button></div>
+    </div>`).join(''):'<div class="empty-state">Chưa có trao đổi theo bài tập.</div>';
+  const chatHtml=chatMessages.length?chatMessages.map(c=>`
+    <div class="feedback-item">
+      <div class="feedback-item-head"><strong>${esc(c.name)} · ${esc(c.role)}</strong><small>${new Date(c.createdAt).toLocaleString('vi-VN')}</small></div>
+      <p><b>Chat trực tiếp</b><br>${esc(c.text)}</p>
+      <div class="admin-row-actions"><small class="muted">Tin nhắn chat trực tiếp</small><button class="danger-btn" data-delete-chat="${esc(c.id)}">Xóa tin chat</button></div>
+    </div>`).join(''):'<div class="empty-state">Chưa có tin nhắn chat trực tiếp.</div>';
+  host.innerHTML=`<div class="admin-feedback-section"><h4>Trao đổi theo bài tập</h4>${assignmentHtml}</div><div class="admin-feedback-section"><h4>Chat trực tiếp</h4>${chatHtml}</div>`;
+}
 function renderMessages(){ $('#messageList').innerHTML=messages.length?messages.map(m=>`<div class="message-item"><div class="message-item-head"><strong>${esc(m.name)} · ${esc(m.topic||'Liên hệ')}</strong><small>${new Date(m.createdAt).toLocaleString('vi-VN')}</small></div><p>${esc(m.email)}<br>${esc(m.message)}</p><button class="danger-btn" data-delete-message="${esc(m.id)}">Xóa lời nhắn</button></div>`).join(''):'<div class="empty-state">Chưa có lời nhắn.</div>'; }
 function renderAll(){ renderMetrics();renderDashboard();renderAssignments();renderProjects();renderFeedback();renderMessages();renderSubjects();populateAssignmentSubjectSelect(); }
 $('#projectSearch')?.addEventListener('input',renderProjects);
@@ -711,6 +733,14 @@ document.addEventListener('click',async event=>{
     const {error}=await sb.from('comments').delete().eq('id',dc.dataset.deleteComment);
     if(error)toast(error.message);
     else{await loadAdminData();notifyPublicContentChanged('comments');toast('Đã xóa trao đổi');}
+    return;
+  }
+  const dchat=event.target.closest('[data-delete-chat]');
+  if(dchat){
+    if(!confirm('Xóa tin nhắn chat trực tiếp này?'))return;
+    const {error}=await sb.from('academic_chat_messages').delete().eq('id',dchat.dataset.deleteChat);
+    if(error)toast(error.message);
+    else{await loadAdminData();notifyPublicContentChanged('academic_chat_messages');toast('Đã xóa tin chat');}
     return;
   }
   const dm=event.target.closest('[data-delete-message]'); if(dm){ if(!confirm('Xóa lời nhắn này?'))return; const {error}=await sb.from('messages').delete().eq('id',dm.dataset.deleteMessage); if(error)toast(error.message); else{await loadAdminData();toast('Đã xóa lời nhắn');} }

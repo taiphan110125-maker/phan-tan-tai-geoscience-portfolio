@@ -553,6 +553,26 @@ body{color:var(--ink-strong)!important}
 .assignment-content-text{white-space:pre-wrap;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
 .assignment-content-text strong{color:#173a55}
 </style>
+<style id="ptt-live-academic-chat">
+
+.live-chat{margin-top:16px;padding-top:14px;border-top:1px solid #dfe8ee}
+.live-chat-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:9px}
+.live-chat-head>div{display:flex;align-items:center;gap:7px}.live-chat-head strong{color:#173a55;font-size:11px}.live-chat-head small{color:#81929f;font-size:8px}
+.live-dot{width:8px;height:8px;border-radius:50%;background:#2b9a68;box-shadow:0 0 0 4px rgba(43,154,104,.11)}
+.academic-chat-list{height:210px;overflow-y:auto;display:grid;align-content:start;gap:7px;padding:8px;background:#f4f8fa;border:1px solid #dce6ed;border-radius:12px;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:#bdcad4 transparent}
+.chat-message{padding:9px 10px;border-radius:10px;background:#fff;border:1px solid #e2e9ee}
+.chat-message-head{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}.chat-message-head>div{display:flex;gap:5px;align-items:center;flex-wrap:wrap}
+.chat-message-head strong{font-size:9px;color:#173a55}.chat-message-head span{font-size:7px;font-weight:800;color:#4c718d;background:#edf4f8;border-radius:999px;padding:2px 5px}.chat-message-head time{font-size:7px;color:#8a9aa6;white-space:nowrap}
+.chat-message p{margin:5px 0 0!important;font-size:9px!important;line-height:1.5!important;color:#405c70!important;white-space:pre-wrap;word-break:break-word}
+.chat-empty{text-align:center;color:#80919d;font-size:9px;padding:22px 10px}
+.academic-chat-form{margin-top:8px}.chat-fields{display:grid;grid-template-columns:minmax(0,1fr) 105px;gap:6px}
+.academic-chat-form input,.academic-chat-form select,.academic-chat-form textarea{width:100%;border:1px solid #d5e0e8;background:#fff;color:#29485f;border-radius:9px;padding:8px 9px;font:inherit;font-size:9px;outline:none}
+.academic-chat-form input:focus,.academic-chat-form select:focus,.academic-chat-form textarea:focus{border-color:#8fb0c8;box-shadow:0 0 0 3px rgba(44,109,164,.08)}
+.chat-send-row{display:grid;grid-template-columns:minmax(0,1fr) 54px;gap:6px;margin-top:6px}.chat-send-row textarea{resize:vertical;min-height:54px;max-height:110px}
+.chat-send-row button{border:0;border-radius:9px;background:#173a55;color:#fff;font-size:9px;font-weight:850;cursor:pointer}.chat-send-row button:disabled{opacity:.55}
+.chat-status{min-height:12px;margin:4px 0 0!important;color:#8a6430!important;font-size:8px!important}
+
+</style>
 </head>
 <body>
   <a class="skip-link" href="#main">Bỏ qua menu</a>
@@ -724,6 +744,31 @@ body{color:var(--ink-strong)!important}
               <div id="academicExchangeHistory" class="academic-exchange-history" aria-live="polite">
                 <div class="exchange-empty">Chưa có trao đổi học thuật.</div>
               </div>
+
+              <section class="live-chat">
+                <div class="live-chat-head">
+                  <div><span class="live-dot"></span><strong>Chat trực tiếp</strong></div>
+                  <small>Tin nhắn được lưu lại</small>
+                </div>
+                <div id="academicChatList" class="academic-chat-list" aria-live="polite">
+                  <div class="chat-empty">Chưa có tin nhắn.</div>
+                </div>
+                <form id="academicChatForm" class="academic-chat-form">
+                  <div class="chat-fields">
+                    <input id="academicChatName" maxlength="100" minlength="2" required placeholder="Tên của bạn">
+                    <select id="academicChatRole" aria-label="Vai trò">
+                      <option value="Sinh viên">Sinh viên</option>
+                      <option value="Giảng viên">Giảng viên</option>
+                      <option value="Người xem">Người xem</option>
+                    </select>
+                  </div>
+                  <div class="chat-send-row">
+                    <textarea id="academicChatMessage" maxlength="1000" rows="2" required placeholder="Nhập tin nhắn trao đổi..."></textarea>
+                    <button type="submit" aria-label="Gửi tin nhắn">Gửi</button>
+                  </div>
+                  <p id="academicChatStatus" class="chat-status" role="status"></p>
+                </form>
+              </section>
             </div>
           </aside>
         </div>
@@ -914,6 +959,7 @@ let projects = [];
 let assignments = [];
 let assignmentSubjects = [];
 let academicExchanges = [];
+let academicChatMessages = [];
 let publicContentLoading = false;
 let publicContentLoadedOnce = false;
 
@@ -972,6 +1018,42 @@ function renderAcademicExchanges(){
       <h4>${escapeHtml(item.assignmentTitle||'Bài tập')}</h4>
       <p>${escapeHtml(item.body)}</p>
     </article>`).join('');
+}
+function renderAcademicChat({stickToBottom=false}={}){
+  const host=$('#academicChatList');
+  if(!host)return;
+  if(!academicChatMessages.length){
+    host.innerHTML='<div class="chat-empty">Chưa có tin nhắn. Bạn có thể bắt đầu cuộc trao đổi.</div>';
+    return;
+  }
+  const nearBottom=host.scrollHeight-host.scrollTop-host.clientHeight<80;
+  host.innerHTML=academicChatMessages.map(item=>`
+    <article class="chat-message">
+      <div class="chat-message-head">
+        <div><strong>${escapeHtml(item.name)}</strong><span>${escapeHtml(item.role||'Người xem')}</span></div>
+        <time>${escapeHtml(formatExchangeTime(item.createdAt))}</time>
+      </div>
+      <p>${escapeHtml(item.body)}</p>
+    </article>`).join('');
+  if(stickToBottom||nearBottom) requestAnimationFrame(()=>{host.scrollTop=host.scrollHeight;});
+}
+async function loadAcademicChat({stickToBottom=false}={}){
+  if(!sb)return;
+  try{
+    const {data,error}=await sb.from('academic_chat_messages')
+      .select('id,user_id,name,role,body,created_at')
+      .order('created_at',{ascending:false})
+      .limit(80);
+    if(error)throw error;
+    academicChatMessages=(data||[]).reverse().map(row=>({
+      id:row.id,userId:row.user_id,name:row.name,role:row.role,body:row.body,createdAt:row.created_at
+    }));
+    renderAcademicChat({stickToBottom});
+  }catch(error){
+    console.warn('Academic chat unavailable:',error);
+    const host=$('#academicChatList');
+    if(host)host.innerHTML='<div class="chat-empty">Chưa tải được chat trực tiếp.</div>';
+  }
 }
 
 // Header + navigation
@@ -1209,6 +1291,34 @@ $('#commentForm')?.addEventListener('submit', async event => {
   finally { submit.disabled = false; }
 });
 
+// Live academic chat
+$('#academicChatForm')?.addEventListener('submit',async event=>{
+  event.preventDefault();
+  const form=event.currentTarget;
+  const name=$('#academicChatName').value.trim();
+  const role=$('#academicChatRole').value||'Người xem';
+  const body=$('#academicChatMessage').value.trim();
+  const status=$('#academicChatStatus');
+  if(name.length<2){status.textContent='Hãy nhập tên của bạn.';return;}
+  if(!body){status.textContent='Hãy nhập nội dung tin nhắn.';return;}
+  const button=form.querySelector('button[type="submit"]');
+  button.disabled=true;status.textContent='Đang gửi…';
+  try{
+    const client=requireSupabase();
+    const {data:authData}=await client.auth.getUser();
+    const {error}=await client.from('academic_chat_messages').insert({
+      user_id:authData?.user?.id||null,
+      name,role,body
+    });
+    if(error)throw error;
+    $('#academicChatMessage').value='';
+    status.textContent='';
+    await loadAcademicChat({stickToBottom:true});
+  }catch(error){
+    status.textContent=error.message||'Không gửi được tin nhắn.';
+  }finally{button.disabled=false;}
+});
+
 // Contact
 $('#contactForm')?.addEventListener('submit', async event => {
   event.preventDefault();
@@ -1325,6 +1435,7 @@ function subscribeRealtime(){
       .on('postgres_changes', {event:'*',schema:'public',table:'assignments'}, () => loadPublicContent({silent:true}))
       .on('postgres_changes', {event:'*',schema:'public',table:'comments'}, () => loadPublicContent({silent:true}))
       .on('postgres_changes', {event:'*',schema:'public',table:'assignment_subjects'}, () => loadPublicContent({silent:true}))
+      .on('postgres_changes', {event:'*',schema:'public',table:'academic_chat_messages'}, () => loadAcademicChat({stickToBottom:true}))
       .subscribe();
   } catch (error){ console.warn('Realtime unavailable:', error); }
 }
@@ -1459,6 +1570,8 @@ function syncUserUI(user){
   accountBtn.setAttribute('aria-expanded', 'false');
   if (loggedIn){
     const name = currentUser.name || currentUser.email || 'Người dùng';
+    const chatName=$('#academicChatName');
+    if(chatName && !chatName.value.trim()) chatName.value=name;
     $('#userAccountName').textContent = name;
     $('#userAvatar').textContent = name.trim().charAt(0).toUpperCase() || 'U';
     $('#userMenuName').textContent = name;
@@ -1540,7 +1653,7 @@ $$('.modal').forEach(modal => modal.addEventListener('click', event => { if (eve
 document.addEventListener('keydown', event => { if (event.key === 'Escape') $$('.modal.open').forEach(closeModal); });
 
 (async function boot(){
-  await Promise.all([loadPublicContent(), loadUserSession()]);
+  await Promise.all([loadPublicContent(), loadUserSession(), loadAcademicChat({stickToBottom:true})]);
   subscribeRealtime();
 })();
 
