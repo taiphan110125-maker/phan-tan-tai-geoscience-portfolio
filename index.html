@@ -1184,8 +1184,7 @@ body{color:var(--ink-strong)!important}
   }
 }
 </style>
-<style id="ptt-hero-exact-final">
-/* Exact requested bright petroleum image — full hero, no dark navy cover */
+<style id="ptt-hero-static-exact-v4">
 #home.hero{
   position:relative!important;
   margin-top:78px!important;
@@ -1195,6 +1194,7 @@ body{color:var(--ink-strong)!important}
   background:#eaf3f7!important;
   color:#17324a!important;
   isolation:isolate;
+  overflow:hidden!important;
 }
 #home .hero-media{
   position:absolute!important;
@@ -1203,7 +1203,7 @@ body{color:var(--ink-strong)!important}
   width:100%!important;
   height:100%!important;
   object-fit:cover!important;
-  object-position:center 50%!important;
+  object-position:center center!important;
   filter:none!important;
   opacity:1!important;
 }
@@ -1213,11 +1213,11 @@ body{color:var(--ink-strong)!important}
   z-index:1!important;
   background:linear-gradient(
     90deg,
-    rgba(255,255,255,.82) 0%,
-    rgba(255,255,255,.68) 26%,
-    rgba(255,255,255,.38) 43%,
-    rgba(255,255,255,.08) 62%,
-    rgba(255,255,255,0) 76%
+    rgba(255,255,255,.78) 0%,
+    rgba(255,255,255,.62) 27%,
+    rgba(255,255,255,.33) 44%,
+    rgba(255,255,255,.08) 61%,
+    rgba(255,255,255,0) 74%
   )!important;
 }
 #home .hero-content{
@@ -1235,44 +1235,25 @@ body{color:var(--ink-strong)!important}
   box-shadow:none!important;
   backdrop-filter:none!important;
 }
-#home .kicker{
-  color:#8a611d!important;
-  text-shadow:0 1px 10px rgba(255,255,255,.8)!important;
-}
-#home h1{
-  color:#12324b!important;
-  text-shadow:0 2px 12px rgba(255,255,255,.72)!important;
-}
-#home h2{
-  color:#284c68!important;
-  text-shadow:0 2px 10px rgba(255,255,255,.72)!important;
-}
+#home .kicker{color:#8a611d!important;text-shadow:0 1px 8px rgba(255,255,255,.9)!important}
+#home h1{color:#12324b!important;text-shadow:0 2px 10px rgba(255,255,255,.78)!important}
+#home h2{color:#284c68!important;text-shadow:0 2px 9px rgba(255,255,255,.78)!important}
 #home h2 span{color:#9b6a19!important}
-#home .hero-lead{
-  color:#36566e!important;
-  text-shadow:0 1px 9px rgba(255,255,255,.88)!important;
-}
+#home .hero-lead{color:#36566e!important;text-shadow:0 1px 8px rgba(255,255,255,.92)!important}
 #home .hero-actions .btn-gold{
-  background:#17324a!important;
-  color:#fff!important;
-  border-color:#17324a!important;
-  box-shadow:0 10px 25px rgba(15,43,64,.18)!important;
+  background:#17324a!important;color:#fff!important;border-color:#17324a!important;
+  box-shadow:0 10px 26px rgba(15,43,64,.18)!important;
 }
 #home .hero-actions .btn-glass{
-  background:rgba(255,255,255,.92)!important;
-  color:#17324a!important;
-  border:1px solid rgba(199,214,224,.95)!important;
-  backdrop-filter:blur(7px)!important;
+  background:rgba(255,255,255,.93)!important;color:#17324a!important;
+  border:1px solid rgba(199,214,224,.96)!important;backdrop-filter:blur(7px)!important;
 }
 #home .hero-tags span{
-  color:#294d68!important;
-  background:rgba(255,255,255,.88)!important;
-  border-color:rgba(199,214,224,.95)!important;
-  backdrop-filter:blur(5px)!important;
+  color:#294d68!important;background:rgba(255,255,255,.90)!important;
+  border-color:rgba(199,214,224,.96)!important;backdrop-filter:blur(5px)!important;
 }
 #home .hero-brief{
-  background:rgba(255,255,255,.90)!important;
-  color:#17324a!important;
+  background:rgba(255,255,255,.91)!important;color:#17324a!important;
   border:1px solid rgba(255,255,255,.92)!important;
   box-shadow:0 18px 48px rgba(16,48,70,.14)!important;
   backdrop-filter:blur(10px)!important;
@@ -1281,34 +1262,20 @@ body{color:var(--ink-strong)!important}
 #home .hero-brief dt{color:#6a8191!important}
 #home .hero-brief dd{color:#17324a!important}
 #home .hero-brief dl>div{border-color:#dbe5eb!important}
+
 @media(max-width:900px){
   #home.hero{height:auto!important;min-height:760px!important}
-  #home .hero-content{
-    grid-template-columns:1fr!important;
-    padding-top:58px!important;
-    padding-bottom:58px!important;
-  }
+  #home .hero-content{grid-template-columns:1fr!important;padding-top:58px!important;padding-bottom:58px!important}
   #home .hero-overlay{
-    background:linear-gradient(
-      90deg,
-      rgba(255,255,255,.86) 0%,
-      rgba(255,255,255,.66) 48%,
-      rgba(255,255,255,.20) 78%,
-      rgba(255,255,255,0) 100%
-    )!important;
+    background:linear-gradient(90deg,rgba(255,255,255,.85),rgba(255,255,255,.64) 50%,rgba(255,255,255,.18) 82%,rgba(255,255,255,0))!important;
   }
   #home .hero-brief{max-width:540px!important;justify-self:start!important}
 }
 @media(max-width:700px){
   #home.hero{margin-top:70px!important;min-height:700px!important}
-  #home .hero-media{object-position:62% center!important}
+  #home .hero-media{object-position:61% center!important}
   #home .hero-overlay{
-    background:linear-gradient(
-      180deg,
-      rgba(255,255,255,.78) 0%,
-      rgba(255,255,255,.64) 54%,
-      rgba(255,255,255,.24) 100%
-    )!important;
+    background:linear-gradient(180deg,rgba(255,255,255,.76),rgba(255,255,255,.62) 56%,rgba(255,255,255,.20))!important;
   }
   #home h1{font-size:54px!important}
   #home h2{font-size:25px!important}
@@ -1316,6 +1283,7 @@ body{color:var(--ink-strong)!important}
   #home .hero-brief{display:none!important}
 }
 </style>
+<link rel="preload" as="image" href="assets/hero-oil-exact-v3.webp" type="image/webp" fetchpriority="high">
 </head>
 <body>
   <a class="skip-link" href="#main">Bỏ qua menu</a>
@@ -1353,7 +1321,7 @@ body{color:var(--ink-strong)!important}
 
   <main id="main">
     <section class="hero" id="home" aria-labelledby="heroTitle">
-      <img class="hero-media" id="heroExactImage" src="assets/hero-oil-geology.webp" alt="Địa tầng ven biển, biển xanh và giàn khoan dầu khí ngoài khơi" fetchpriority="high" decoding="async">
+      <img class="hero-media" src="assets/hero-oil-exact-v3.webp" alt="Địa tầng ven biển, biển xanh và các giàn khoan dầu khí ngoài khơi" fetchpriority="high" decoding="async">
       <div class="hero-overlay"></div>
       <div class="shell hero-content">
         <div class="hero-copy reveal">
@@ -2559,35 +2527,6 @@ if('serviceWorker' in navigator){
     navigator.serviceWorker.register('/sw.js',{scope:'/'}).catch(error=>console.warn('Service worker unavailable:',error));
   },{once:true});
 }
-</script>
-<script id="ptt-hero-exact-loader">
-(()=>{
-  const PARTS=9;
-  const loadExactHero=async()=>{
-    const img=document.getElementById('heroExactImage');
-    if(!img)return;
-    try{
-      const urls=Array.from({length:PARTS},(_,i)=>`assets/hero-exact/${String(i).padStart(2,'0')}.txt`);
-      const chunks=await Promise.all(urls.map(async url=>{
-        const response=await fetch(url,{cache:'force-cache'});
-        if(!response.ok)throw new Error('Không tải được '+url);
-        return response.text();
-      }));
-      const base64=chunks.join('').replace(/\s+/g,'');
-      if(base64.length!==98320)throw new Error('Dữ liệu ảnh không đầy đủ');
-      const binary=atob(base64);
-      const bytes=new Uint8Array(binary.length);
-      for(let i=0;i<binary.length;i++)bytes[i]=binary.charCodeAt(i);
-      const objectUrl=URL.createObjectURL(new Blob([bytes],{type:'image/webp'}));
-      window.__pttHeroObjectUrl=objectUrl;
-      img.src=objectUrl;
-    }catch(error){
-      console.warn('Exact hero image unavailable:',error);
-    }
-  };
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',loadExactHero,{once:true});
-  else loadExactHero();
-})();
 </script>
 </body>
 </html>
