@@ -10,7 +10,7 @@
   <link rel="dns-prefetch" href="//aqkasetqystwvpassidd.supabase.co">
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
   <link rel="dns-prefetch" href="//cdn.jsdelivr.net">
-  <link rel="preload" href="assets/hero-user-hq/hero.b64.txt?v=20260930-hq2" as="fetch">
+  <link rel="preload" href="assets/hero-user-hq/hero.b64.txt?v=20260930-hq2" as="fetch" crossorigin="anonymous">
 <title>Phan Tấn Tài | Geology & Geophysics</title>
   <style>
 :root{
@@ -2545,7 +2545,7 @@ document.addEventListener('visibilitychange',()=>{
   if(document.visibilityState==='visible'&&Date.now()-lastPublicSync>120000)schedulePublicRefresh(0);
 });
 
-// Geo AI
+// Trợ lý ảo
 const aiPanel = $('#aiPanel');
 const aiHistory = [];
 function setAi(open){
@@ -2641,7 +2641,7 @@ async function askGeoAI(message){
     }
     return String(data.answer)+sourceText;
   }catch(error){
-    console.warn('Geo AI server unavailable, using local fallback:',error);
+    console.warn('Virtual assistant backend unavailable, using local fallback:',error);
     if(status) status.textContent='Trợ lý ảo · chế độ dự phòng cục bộ';
     await new Promise(resolve=>setTimeout(resolve,120));
     return localSmartAnswer(message);
@@ -2804,7 +2804,7 @@ if('serviceWorker' in navigator){
     try{
       let b64='';
       try{
-        const response=await fetch('assets/hero-user-hq/hero.b64.txt?v=20260930-hq2',{cache:'force-cache'});
+        const response=await fetch('assets/hero-user-hq/hero.b64.txt?v=20260930-hq2',{cache:'force-cache',credentials:'omit'});
         if(!response.ok)throw new Error('Không tải được ảnh bìa tối ưu.');
         b64=await response.text();
       }catch(primaryError){
