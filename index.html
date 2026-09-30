@@ -2441,9 +2441,39 @@ function localSmartAnswer(query){
   return 'Mình chưa có câu trả lời đủ chắc cho câu hỏi này trong chế độ miễn phí hiện tại. Bạn có thể hỏi cụ thể hơn về petrophysics, well logging, seismic, facies, địa nhiệt, khảo sát thực địa, dự án hoặc bài tập trên website.';
 }
 async function askGeoAI(message){
-  $('#aiStatus').textContent = 'Geo AI Free · 0₫ · dữ liệu website';
-  await new Promise(function(resolve){setTimeout(resolve,180);});
-  return localSmartAnswer(message);
+  const status=$('#aiStatus');
+  if(status) status.textContent='Geo AI · đang phân tích ngữ cảnh…';
+  try{
+    const client=requireSupabase();
+    const history=aiHistory.slice(0,-1).slice(-10).map(item=>({
+      role:item.role,
+      content:String(item.content||'').slice(0,1200)
+    }));
+    const {data,error}=await client.functions.invoke(
+      (window.PTT_CONFIG&&window.PTT_CONFIG.GEO_AI_FUNCTION)||'geo-ai',
+      {body:{message,history}}
+    );
+    if(error) throw error;
+    if(!data?.answer) throw new Error('Geo AI chưa trả về nội dung.');
+    const sourceList=Array.isArray(data.sources)?data.sources.filter(Boolean):[];
+    const sourceText=sourceList.length?'\n\nNguồn tham khảo: '+sourceList.join(' · '):'';
+    if(status){
+      const modeLabels={
+        llm:'AI + dữ liệu website',
+        site:'dữ liệu website',
+        knowledge:'kiến thức chuyên ngành',
+        encyclopedia:'kiến thức bách khoa',
+        fallback:'chế độ hỗ trợ'
+      };
+      status.textContent='Geo AI · '+(modeLabels[data.mode]||'học thuật + dữ liệu website');
+    }
+    return String(data.answer)+sourceText;
+  }catch(error){
+    console.warn('Geo AI server unavailable, using local fallback:',error);
+    if(status) status.textContent='Geo AI · chế độ dự phòng cục bộ';
+    await new Promise(resolve=>setTimeout(resolve,120));
+    return localSmartAnswer(message);
+  }
 }
 $('#aiQuick')?.addEventListener('click', event => {
   const btn=event.target.closest('[data-ai-q]');
