@@ -1714,8 +1714,8 @@ body{color:var(--ink-strong)!important}
 </style>
 
 
-<style id="ptt-academic-exchange-layout-lock-v1">
-/* Giữ cố định bố cục Trao đổi học thuật như thiết kế hiện tại */
+<style id="ptt-academic-exchange-layout-lock-v2">
+/* Khóa tuyệt đối bố cục Trao đổi học thuật: số lượng tin nhắn không làm đổi kích thước */
 #assignments .workspace-grid{
   display:grid!important;
   grid-template-columns:minmax(0,1.58fr) minmax(340px,.92fr)!important;
@@ -1726,8 +1726,9 @@ body{color:var(--ink-strong)!important}
   display:block!important;
   width:100%!important;
   min-width:0!important;
-  height:auto!important;
-  min-height:0!important;
+  height:508px!important;
+  min-height:508px!important;
+  max-height:508px!important;
   align-self:start!important;
   overflow:hidden!important;
   background:#fff!important;
@@ -1736,16 +1737,18 @@ body{color:var(--ink-strong)!important}
   box-shadow:0 12px 34px rgba(22,50,74,.065)!important;
 }
 #assignments .feedback-body{
-  display:flex!important;
-  flex-direction:column!important;
+  display:grid!important;
+  grid-template-rows:auto 262px auto 12px!important;
   gap:10px!important;
   width:100%!important;
+  height:100%!important;
   min-width:0!important;
+  min-height:0!important;
   padding:18px!important;
   overflow:hidden!important;
 }
 #assignments .exchange-title-row{
-  flex:0 0 auto!important;
+  min-height:42px!important;
   display:flex!important;
   align-items:center!important;
   justify-content:space-between!important;
@@ -1764,20 +1767,21 @@ body{color:var(--ink-strong)!important}
   white-space:nowrap!important;
 }
 #assignments .unified-exchange-stream{
-  flex:0 1 auto!important;
   width:100%!important;
-  min-width:0!important;
-  min-height:210px!important;
-  max-height:320px!important;
+  height:262px!important;
+  min-height:262px!important;
+  max-height:262px!important;
   overflow-y:auto!important;
   overflow-x:hidden!important;
   overscroll-behavior:contain!important;
+  scrollbar-gutter:stable!important;
+  align-content:start!important;
 }
 #assignments .unified-chat-form{
-  flex:0 0 auto!important;
   width:100%!important;
   min-width:0!important;
-  margin-top:0!important;
+  min-height:0!important;
+  margin:0!important;
 }
 #assignments .chat-fields{
   display:grid!important;
@@ -1791,9 +1795,22 @@ body{color:var(--ink-strong)!important}
   margin-top:6px!important;
 }
 #assignments .chat-send-row textarea{
+  height:54px!important;
   min-height:54px!important;
-  max-height:110px!important;
-  resize:vertical!important;
+  max-height:54px!important;
+  resize:none!important;
+}
+#assignments .chat-send-row button{
+  height:54px!important;
+}
+#assignments .chat-status{
+  display:block!important;
+  height:12px!important;
+  min-height:12px!important;
+  max-height:12px!important;
+  line-height:12px!important;
+  margin:0!important;
+  overflow:hidden!important;
 }
 @media(max-width:1050px){
   #assignments .workspace-grid{
@@ -1806,18 +1823,29 @@ body{color:var(--ink-strong)!important}
     grid-template-columns:1fr!important;
   }
   #assignments .feedback-card{
-    width:100%!important;
+    height:500px!important;
+    min-height:500px!important;
+    max-height:500px!important;
+  }
+  #assignments .feedback-body{
+    grid-template-rows:auto 255px auto 12px!important;
   }
   #assignments .unified-exchange-stream{
-    max-height:300px!important;
+    height:255px!important;
+    min-height:255px!important;
+    max-height:255px!important;
   }
 }
 @media(max-width:600px){
   #assignments .feedback-card{
+    height:470px!important;
+    min-height:470px!important;
+    max-height:470px!important;
     border-radius:14px!important;
   }
   #assignments .feedback-body{
     padding:12px!important;
+    grid-template-rows:auto 238px auto 12px!important;
   }
   #assignments .exchange-title-row h3{
     font-size:20px!important;
@@ -1826,7 +1854,9 @@ body{color:var(--ink-strong)!important}
     grid-template-columns:minmax(0,1fr) 96px!important;
   }
   #assignments .unified-exchange-stream{
-    max-height:280px!important;
+    height:238px!important;
+    min-height:238px!important;
+    max-height:238px!important;
   }
 }
 </style>
