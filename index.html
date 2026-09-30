@@ -2903,12 +2903,14 @@ async function loadPublicContent({silent = false} = {}){
       client.from('assignment_subjects').select('slug,name,sort_order').eq('active', true).order('sort_order', {ascending:true}).order('name', {ascending:true})
     ]);
     for (const res of [pRes,aRes,cRes,sRes]) if (res.error) throw res.error;
+    const activeAssignmentIds=new Set((aRes.data||[]).map(row=>row.id));
+    const publicComments=(cRes.data||[]).filter(row=>row.assignment_id&&activeAssignmentIds.has(row.assignment_id));
     const counts = {};
-    for (const c of cRes.data || []) if(c.assignment_id) counts[c.assignment_id] = (counts[c.assignment_id] || 0) + 1;
+    for (const c of publicComments) counts[c.assignment_id] = (counts[c.assignment_id] || 0) + 1;
     projects = (pRes.data || []).map(mapProject);
     assignments = (aRes.data || []).map(row => mapAssignment(row, counts));
     assignmentSubjects = (sRes.data || []).map(row => ({slug:row.slug,name:row.name,sortOrder:Number(row.sort_order||0)}));
-    academicExchanges=(cRes.data||[]).map(row=>({
+    academicExchanges=publicComments.map(row=>({
       id:row.id,
       assignmentId:row.assignment_id,
       assignmentTitle:row.assignment_title||'Bài tập',
