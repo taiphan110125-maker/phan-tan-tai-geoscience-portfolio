@@ -1535,6 +1535,135 @@ body{color:var(--ink-strong)!important}
 }
 </style>
 
+
+<style id="ptt-project-user-grid-v1">
+#projects .project-showcase{
+  display:grid!important;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:20px!important;
+  align-items:stretch!important;
+  max-height:none;
+  overflow:visible;
+  padding:0;
+}
+#projects .project-showcase.single-project{
+  grid-template-columns:minmax(0,760px)!important;
+  justify-content:center!important;
+}
+#projects .project-showcase.project-scroll-active{
+  max-height:760px!important;
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+  padding-right:10px!important;
+  overscroll-behavior:contain;
+  scrollbar-width:thin;
+  scrollbar-color:#9eb1bf transparent;
+}
+#projects .project-showcase.project-scroll-active::-webkit-scrollbar{
+  width:8px;
+}
+#projects .project-showcase.project-scroll-active::-webkit-scrollbar-track{
+  background:transparent;
+}
+#projects .project-showcase.project-scroll-active::-webkit-scrollbar-thumb{
+  background:#9eb1bf;
+  border-radius:999px;
+}
+#projects .project-user-card{
+  min-width:0;
+  min-height:355px;
+  display:grid;
+  grid-template-rows:235px minmax(120px,auto);
+  background:#fff;
+  border:1px solid #dbe4ec;
+  border-radius:20px;
+  overflow:hidden;
+  box-shadow:0 14px 38px rgba(17,49,75,.08);
+}
+#projects .project-user-image{
+  width:100%;
+  height:235px;
+  overflow:hidden;
+  background:#eaf0f4;
+}
+#projects .project-user-image img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  object-position:center;
+  transition:transform .35s ease;
+}
+#projects .project-user-card:hover .project-user-image img{
+  transform:scale(1.025);
+}
+#projects .project-user-body{
+  min-width:0;
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  padding:20px 22px 22px;
+}
+#projects .project-user-body .pill{
+  flex:0 0 auto;
+  margin:0 0 11px;
+}
+#projects .project-user-body h3{
+  width:100%;
+  margin:0 0 18px!important;
+  color:#14324b!important;
+  font-family:"Segoe UI",Arial,Helvetica,sans-serif!important;
+  font-size:24px!important;
+  font-weight:750!important;
+  line-height:1.22!important;
+  letter-spacing:-.02em!important;
+  display:-webkit-box;
+  -webkit-box-orient:vertical;
+  -webkit-line-clamp:2;
+  overflow:hidden;
+}
+#projects .project-user-body .project-open{
+  margin-top:auto;
+}
+#projects .project-empty{
+  grid-column:1/-1;
+}
+@media(max-width:900px){
+  #projects .project-showcase{
+    grid-template-columns:1fr!important;
+  }
+  #projects .project-showcase.single-project{
+    grid-template-columns:1fr!important;
+  }
+  #projects .project-showcase.project-scroll-active{
+    max-height:720px!important;
+  }
+}
+@media(max-width:600px){
+  #projects .project-showcase{
+    gap:14px!important;
+  }
+  #projects .project-user-card{
+    min-height:320px;
+    grid-template-rows:205px minmax(115px,auto);
+    border-radius:16px;
+  }
+  #projects .project-user-image{
+    height:205px;
+  }
+  #projects .project-user-body{
+    padding:17px 18px 19px;
+  }
+  #projects .project-user-body h3{
+    font-size:21px!important;
+    margin-bottom:15px!important;
+  }
+  #projects .project-showcase.project-scroll-active{
+    max-height:670px!important;
+    padding-right:5px!important;
+  }
+}
+</style>
+
 </head>
 <body>
   <a class="skip-link" href="#main">Bỏ qua menu</a>
@@ -2174,37 +2303,29 @@ observeReveal();
 function renderProjects(){
   const host = $('#projectShowcase');
   if (!host) return;
+
+  host.classList.remove('single-project','project-scroll-active');
+
   if (!projects.length){
-    host.classList.remove('single-project');
     host.innerHTML = `<div class="project-empty"><strong>Chưa có dự án được công bố.</strong></div>`;
     return;
   }
+
   host.classList.toggle('single-project',projects.length===1);
-  const featured = projects[0];
-  const side = projects.slice(1);
-  host.innerHTML = `
-    <article class="project-feature reveal visible" data-project-id="${escapeHtml(featured.id)}">
-      <img src="${escapeHtml(featured.image || 'assets/hero-geoscience.svg')}" alt="Minh họa ${escapeHtml(featured.title)}" loading="lazy" decoding="async">
-      <div class="project-feature-overlay"></div>
-      <div class="project-feature-content">
-        <span class="pill">${escapeHtml(featured.type || 'PROJECT')}</span>
-        <h3>${escapeHtml(featured.title)}</h3>
-        <p>${escapeHtml(featured.summary || '')}</p>
-        <button type="button" class="btn btn-gold project-open" data-project-id="${escapeHtml(featured.id)}">Xem chi tiết →</button>
+  host.classList.toggle('project-scroll-active',projects.length>4);
+
+  host.innerHTML = projects.map(project => `
+    <article class="project-user-card reveal visible" data-project-id="${escapeHtml(project.id)}">
+      <div class="project-user-image">
+        <img src="${escapeHtml(project.image || 'assets/hero-geoscience.svg')}" alt="Minh họa ${escapeHtml(project.title)}" loading="lazy" decoding="async">
+      </div>
+      <div class="project-user-body">
+        <span class="pill soft">${escapeHtml(project.type || 'PROJECT')}</span>
+        <h3>${escapeHtml(project.title)}</h3>
+        <button type="button" class="btn btn-gold project-open" data-project-id="${escapeHtml(project.id)}">Xem chi tiết →</button>
       </div>
     </article>
-    ${side.length ? `<div class="project-side ${side.length > 2 ? 'project-side-scroll' : ''}">
-      ${side.map(project => `
-        <article class="project-mini reveal visible" data-project-id="${escapeHtml(project.id)}">
-          <img src="${escapeHtml(project.image || 'assets/hero-geoscience.svg')}" alt="Minh họa ${escapeHtml(project.title)}" loading="lazy" decoding="async">
-          <div>
-            <span class="pill soft">${escapeHtml(project.type || 'PROJECT')}</span>
-            <h3>${escapeHtml(project.title)}</h3>
-            <p>${escapeHtml(project.summary || '')}</p>
-            <button type="button" class="text-btn project-open" data-project-id="${escapeHtml(project.id)}">Chi tiết →</button>
-          </div>
-        </article>`).join('')}
-    </div>` : ''}`;
+  `).join('');
 }
 
 const projectModal = $('#projectModal');
