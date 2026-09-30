@@ -1713,6 +1713,124 @@ body{color:var(--ink-strong)!important}
 }
 </style>
 
+
+<style id="ptt-academic-exchange-layout-lock-v1">
+/* Giữ cố định bố cục Trao đổi học thuật như thiết kế hiện tại */
+#assignments .workspace-grid{
+  display:grid!important;
+  grid-template-columns:minmax(0,1.58fr) minmax(340px,.92fr)!important;
+  gap:22px!important;
+  align-items:start!important;
+}
+#assignments .feedback-card{
+  display:block!important;
+  width:100%!important;
+  min-width:0!important;
+  height:auto!important;
+  min-height:0!important;
+  align-self:start!important;
+  overflow:hidden!important;
+  background:#fff!important;
+  border:1px solid #dce5ec!important;
+  border-radius:18px!important;
+  box-shadow:0 12px 34px rgba(22,50,74,.065)!important;
+}
+#assignments .feedback-body{
+  display:flex!important;
+  flex-direction:column!important;
+  gap:10px!important;
+  width:100%!important;
+  min-width:0!important;
+  padding:18px!important;
+  overflow:hidden!important;
+}
+#assignments .exchange-title-row{
+  flex:0 0 auto!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:space-between!important;
+  gap:12px!important;
+  padding-bottom:10px!important;
+  border-bottom:1px solid #e2e9ef!important;
+}
+#assignments .exchange-title-row h3{
+  margin:0!important;
+  font-size:27px!important;
+  line-height:1.05!important;
+  white-space:nowrap!important;
+}
+#assignments .exchange-live-status{
+  flex:0 0 auto!important;
+  white-space:nowrap!important;
+}
+#assignments .unified-exchange-stream{
+  flex:0 1 auto!important;
+  width:100%!important;
+  min-width:0!important;
+  min-height:210px!important;
+  max-height:320px!important;
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+  overscroll-behavior:contain!important;
+}
+#assignments .unified-chat-form{
+  flex:0 0 auto!important;
+  width:100%!important;
+  min-width:0!important;
+  margin-top:0!important;
+}
+#assignments .chat-fields{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) 105px!important;
+  gap:6px!important;
+}
+#assignments .chat-send-row{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) 54px!important;
+  gap:6px!important;
+  margin-top:6px!important;
+}
+#assignments .chat-send-row textarea{
+  min-height:54px!important;
+  max-height:110px!important;
+  resize:vertical!important;
+}
+@media(max-width:1050px){
+  #assignments .workspace-grid{
+    grid-template-columns:minmax(0,1.4fr) minmax(315px,.9fr)!important;
+    gap:16px!important;
+  }
+}
+@media(max-width:860px){
+  #assignments .workspace-grid{
+    grid-template-columns:1fr!important;
+  }
+  #assignments .feedback-card{
+    width:100%!important;
+  }
+  #assignments .unified-exchange-stream{
+    max-height:300px!important;
+  }
+}
+@media(max-width:600px){
+  #assignments .feedback-card{
+    border-radius:14px!important;
+  }
+  #assignments .feedback-body{
+    padding:12px!important;
+  }
+  #assignments .exchange-title-row h3{
+    font-size:20px!important;
+  }
+  #assignments .chat-fields{
+    grid-template-columns:minmax(0,1fr) 96px!important;
+  }
+  #assignments .unified-exchange-stream{
+    max-height:280px!important;
+  }
+}
+</style>
+
 </head>
 <body>
   <a class="skip-link" href="#main">Bỏ qua menu</a>
