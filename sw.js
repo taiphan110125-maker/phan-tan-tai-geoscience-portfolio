@@ -1,6 +1,6 @@
 'use strict';
 
-const CACHE_NAME='ptt-static-v10-20260930';
+const CACHE_NAME='ptt-static-v11-20260930';
 const PRECACHE=[
   '/',
   '/index.html',
@@ -50,6 +50,10 @@ self.addEventListener('fetch',event=>{
         if(response&&response.ok)await cache.put(request,response.clone());
         return response;
       }catch{
+        if(url.pathname==='/assignment-viewer.html'){
+          return (await cache.match('/assignment-viewer.html'))
+            || Response.error();
+        }
         return (await cache.match(request))
           || (await cache.match('/index.html'))
           || Response.error();
