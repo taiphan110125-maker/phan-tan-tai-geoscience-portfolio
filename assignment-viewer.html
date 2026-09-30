@@ -113,8 +113,26 @@
     SUPABASE_URL:'https://aqkasetqystwvpassidd.supabase.co',
     SUPABASE_ANON_KEY:'sb_publishable_f2yw7xfbADdzj9iCfcnxqA_yHG5AqVo'
   };
-  const sb=window.supabase.createClient(cfg.SUPABASE_URL,cfg.SUPABASE_ANON_KEY,{auth:{persistSession:false}});
+  const sb=window.supabase?.createClient
+    ? window.supabase.createClient(cfg.SUPABASE_URL,cfg.SUPABASE_ANON_KEY,{auth:{persistSession:false}})
+    : null;
   const $=s=>document.querySelector(s);
+  async function restRows(table,query=''){
+    const response=await fetch(`${cfg.SUPABASE_URL}/rest/v1/${table}${query?'?'+query:''}`,{
+      headers:{
+        'apikey':cfg.SUPABASE_ANON_KEY,
+        'Authorization':'Bearer '+cfg.SUPABASE_ANON_KEY,
+        'Accept':'application/json'
+      },
+      cache:'no-store'
+    });
+    if(!response.ok)throw new Error(`REST ${table} failed (${response.status})`);
+    return await response.json();
+  }
+  function publicAssignmentUrl(path=''){
+    const encoded=String(path).split('/').map(encodeURIComponent).join('/');
+    return encoded?`${cfg.SUPABASE_URL}/storage/v1/object/public/assignments/${encoded}`:'';
+  }
   function sanitizeRichHtml(html=''){
     const doc=new DOMParser().parseFromString('<div>'+String(html)+'</div>','text/html');
     const root=doc.body.firstElementChild;
@@ -194,13 +212,27 @@
   async function load(){
     if(!assignmentId){showState('Thiếu mã bài tập','Đường dẫn xem trước không hợp lệ.',true);return;}
     try{
-      const {data:a,error}=await sb.from('assignments').select('id,title,topic,assignment_date,assignment_number,subject,content_text,external_url,file_path,file_url,file_name,type').eq('id',assignmentId).eq('published',true).is('deleted_at',null).single();
-      if(error||!a) throw error||new Error('Không tìm thấy bài tập.');
+      let a=null;
+      if(sb){
+        const {data,error}=await sb.from('assignments').select('id,title,topic,assignment_date,assignment_number,subject,content_text,external_url,file_path,file_url,file_name,type').eq('id',assignmentId).eq('published',true).is('deleted_at',null).single();
+        if(error)throw error;
+        a=data;
+      }else{
+        const select=encodeURIComponent('id,title,topic,assignment_date,assignment_number,subject,content_text,external_url,file_path,file_url,file_name,type');
+        const rows=await restRows('assignments',`select=${select}&id=eq.${encodeURIComponent(assignmentId)}&published=eq.true&deleted_at=is.null&limit=1`);
+        a=rows?.[0]||null;
+      }
+      if(!a)throw new Error('Không tìm thấy bài tập.');
 
       let subjectName=a.subject||'Khác';
       if(a.subject){
-        const {data:s}=await sb.from('assignment_subjects').select('name').eq('slug',a.subject).maybeSingle();
-        if(s?.name) subjectName=s.name;
+        if(sb){
+          const {data:subjectRow}=await sb.from('assignment_subjects').select('name').eq('slug',a.subject).maybeSingle();
+          if(subjectRow?.name)subjectName=subjectRow.name;
+        }else{
+          const rows=await restRows('assignment_subjects',`select=name&slug=eq.${encodeURIComponent(a.subject)}&active=eq.true&limit=1`);
+          if(rows?.[0]?.name)subjectName=rows[0].name;
+        }
       }
 
       $('#title').textContent=a.title||'Bài tập';
@@ -233,7 +265,7 @@
 
       let previewUrl=a.file_url||'';
       let downloadUrl=a.file_url||'';
-      if(a.file_path){
+      if(a.file_path && sb){
         const [previewRes,downloadRes]=await Promise.all([
           sb.storage.from('assignments').createSignedUrl(a.file_path,3600),
           sb.storage.from('assignments').createSignedUrl(a.file_path,3600,{download:a.file_name||true})
@@ -241,6 +273,9 @@
         if(previewRes.error||!previewRes.data?.signedUrl) throw previewRes.error||new Error('Không tạo được đường dẫn xem trước.');
         previewUrl=previewRes.data.signedUrl;
         downloadUrl=downloadRes.data?.signedUrl||previewUrl;
+      }else if(a.file_path && !previewUrl){
+        previewUrl=publicAssignmentUrl(a.file_path);
+        downloadUrl=previewUrl;
       }
 
       const download=$('#downloadBtn');
