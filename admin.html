@@ -878,13 +878,18 @@ function populateAssignmentSubjectSelect(currentValue=''){
 }
 
 function go(view){
-  const target=$('.admin-view').find(panel=>panel.dataset.panel===view);
+  const panels=Array.from(document.querySelectorAll('.admin-view'));
+  const links=Array.from(document.querySelectorAll('.side-link[data-view]'));
+  const target=panels.find(panel=>panel.dataset.panel===view);
+
   if(!target){
     console.warn('Admin panel not found:',view);
     return;
   }
-  $('.admin-view').forEach(panel=>panel.classList.toggle('active',panel===target));
-  $('.side-link').forEach(button=>button.classList.toggle('active',button.dataset.view===view));
+
+  panels.forEach(panel=>panel.classList.toggle('active',panel===target));
+  links.forEach(link=>link.classList.toggle('active',link.dataset.view===view));
+
   if(view==='accounts'&&!accountUsersLoaded){
     loadUserAccounts().catch(error=>console.warn('Không tải được mục Tài khoản:',error));
   }
