@@ -123,6 +123,7 @@
       [...node.childNodes].forEach(child=>{
         if(child.nodeType===Node.ELEMENT_NODE){
           if(!allowed.has(child.tagName)){
+            walk(child);
             const frag=doc.createDocumentFragment();
             while(child.firstChild) frag.appendChild(child.firstChild);
             child.replaceWith(frag);
