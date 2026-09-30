@@ -193,7 +193,7 @@
   async function load(){
     if(!assignmentId){showState('Thiếu mã bài tập','Đường dẫn xem trước không hợp lệ.',true);return;}
     try{
-      const {data:a,error}=await sb.from('assignments').select('id,title,topic,assignment_date,assignment_number,subject,content_text,external_url,file_path,file_url,file_name,type').eq('id',assignmentId).eq('published',true).single();
+      const {data:a,error}=await sb.from('assignments').select('id,title,topic,assignment_date,assignment_number,subject,content_text,external_url,file_path,file_url,file_name,type').eq('id',assignmentId).eq('published',true).is('deleted_at',null).single();
       if(error||!a) throw error||new Error('Không tìm thấy bài tập.');
 
       let subjectName=a.subject||'Khác';
