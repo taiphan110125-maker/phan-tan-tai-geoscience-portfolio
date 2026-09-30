@@ -1184,15 +1184,16 @@ body{color:var(--ink-strong)!important}
   }
 }
 </style>
-<style id="ptt-hero-static-exact-v4">
+<style id="ptt-hero-static-exact-v5">
+/* Hero cover: exact petroleum/geology image with a restrained dark overlay for readable text. */
 #home.hero{
   position:relative!important;
   margin-top:78px!important;
   min-height:680px!important;
   height:calc(100vh - 78px)!important;
   max-height:820px!important;
-  background:#eaf3f7!important;
-  color:#17324a!important;
+  background:#071a24!important;
+  color:#fff!important;
   isolation:isolate;
   overflow:hidden!important;
 }
@@ -1211,14 +1212,19 @@ body{color:var(--ink-strong)!important}
   position:absolute!important;
   inset:0!important;
   z-index:1!important;
-  background:linear-gradient(
-    90deg,
-    rgba(255,255,255,.78) 0%,
-    rgba(255,255,255,.62) 27%,
-    rgba(255,255,255,.33) 44%,
-    rgba(255,255,255,.08) 61%,
-    rgba(255,255,255,0) 74%
-  )!important;
+  background:
+    linear-gradient(90deg,
+      rgba(2,15,24,.84) 0%,
+      rgba(3,17,25,.68) 34%,
+      rgba(4,20,28,.38) 58%,
+      rgba(4,20,28,.14) 76%,
+      rgba(4,20,28,.06) 100%
+    ),
+    linear-gradient(180deg,
+      rgba(3,16,24,.18) 0%,
+      rgba(3,17,25,.10) 52%,
+      rgba(3,17,25,.76) 100%
+    )!important;
 }
 #home .hero-content{
   position:relative!important;
@@ -1235,47 +1241,56 @@ body{color:var(--ink-strong)!important}
   box-shadow:none!important;
   backdrop-filter:none!important;
 }
-#home .kicker{color:#8a611d!important;text-shadow:0 1px 8px rgba(255,255,255,.9)!important}
-#home h1{color:#12324b!important;text-shadow:0 2px 10px rgba(255,255,255,.78)!important}
-#home h2{color:#284c68!important;text-shadow:0 2px 9px rgba(255,255,255,.78)!important}
-#home h2 span{color:#9b6a19!important}
-#home .hero-lead{color:#36566e!important;text-shadow:0 1px 8px rgba(255,255,255,.92)!important}
+#home .kicker{color:#f0c980!important;text-shadow:0 2px 14px rgba(0,0,0,.32)!important}
+#home h1{color:#fff8ea!important;text-shadow:0 3px 20px rgba(0,0,0,.38)!important}
+#home h2{color:#fff!important;text-shadow:0 2px 16px rgba(0,0,0,.34)!important}
+#home h2 span{color:#f0c980!important}
+#home .hero-lead{color:#e1eaed!important;text-shadow:0 2px 12px rgba(0,0,0,.34)!important}
 #home .hero-actions .btn-gold{
-  background:#17324a!important;color:#fff!important;border-color:#17324a!important;
-  box-shadow:0 10px 26px rgba(15,43,64,.18)!important;
+  background:linear-gradient(135deg,#f0ca82,#c99443)!important;
+  color:#0d1b20!important;
+  border-color:transparent!important;
+  box-shadow:0 12px 28px rgba(0,0,0,.22)!important;
 }
 #home .hero-actions .btn-glass{
-  background:rgba(255,255,255,.93)!important;color:#17324a!important;
-  border:1px solid rgba(199,214,224,.96)!important;backdrop-filter:blur(7px)!important;
+  background:rgba(7,28,38,.48)!important;
+  color:#fff!important;
+  border:1px solid rgba(255,255,255,.32)!important;
+  backdrop-filter:blur(8px)!important;
 }
 #home .hero-tags span{
-  color:#294d68!important;background:rgba(255,255,255,.90)!important;
-  border-color:rgba(199,214,224,.96)!important;backdrop-filter:blur(5px)!important;
+  color:#edf4f6!important;
+  background:rgba(8,28,38,.54)!important;
+  border-color:rgba(255,255,255,.20)!important;
+  backdrop-filter:blur(6px)!important;
 }
 #home .hero-brief{
-  background:rgba(255,255,255,.91)!important;color:#17324a!important;
-  border:1px solid rgba(255,255,255,.92)!important;
-  box-shadow:0 18px 48px rgba(16,48,70,.14)!important;
-  backdrop-filter:blur(10px)!important;
+  background:rgba(4,21,30,.66)!important;
+  color:#fff!important;
+  border:1px solid rgba(255,255,255,.16)!important;
+  box-shadow:0 18px 48px rgba(0,0,0,.20)!important;
+  backdrop-filter:blur(13px)!important;
 }
-#home .hero-brief>p{color:#8a611d!important}
-#home .hero-brief dt{color:#6a8191!important}
-#home .hero-brief dd{color:#17324a!important}
-#home .hero-brief dl>div{border-color:#dbe5eb!important}
+#home .hero-brief>p{color:#f0c980!important}
+#home .hero-brief dt{color:#a8bbc2!important}
+#home .hero-brief dd{color:#fff!important}
+#home .hero-brief dl>div{border-color:rgba(255,255,255,.12)!important}
 
 @media(max-width:900px){
   #home.hero{height:auto!important;min-height:760px!important}
   #home .hero-content{grid-template-columns:1fr!important;padding-top:58px!important;padding-bottom:58px!important}
   #home .hero-overlay{
-    background:linear-gradient(90deg,rgba(255,255,255,.85),rgba(255,255,255,.64) 50%,rgba(255,255,255,.18) 82%,rgba(255,255,255,0))!important;
+    background:
+      linear-gradient(90deg,rgba(2,15,24,.86),rgba(3,17,25,.62) 58%,rgba(3,17,25,.24) 100%),
+      linear-gradient(180deg,rgba(3,16,24,.12),rgba(3,17,25,.72))!important;
   }
   #home .hero-brief{max-width:540px!important;justify-self:start!important}
 }
 @media(max-width:700px){
   #home.hero{margin-top:70px!important;min-height:700px!important}
-  #home .hero-media{object-position:61% center!important}
+  #home .hero-media{object-position:58% center!important}
   #home .hero-overlay{
-    background:linear-gradient(180deg,rgba(255,255,255,.76),rgba(255,255,255,.62) 56%,rgba(255,255,255,.20))!important;
+    background:linear-gradient(180deg,rgba(2,15,24,.72),rgba(3,17,25,.62) 52%,rgba(3,17,25,.82))!important;
   }
   #home h1{font-size:54px!important}
   #home h2{font-size:25px!important}
