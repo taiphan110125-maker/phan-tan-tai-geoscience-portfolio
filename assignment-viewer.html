@@ -6,6 +6,10 @@
   <meta name="theme-color" content="#ffffff">
   <title>Nội dung bài tập · Phan Tấn Tài</title>
   <link rel="icon" href="assets/ptt-emblem.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://aqkasetqystwvpassidd.supabase.co" crossorigin>
+  <link rel="dns-prefetch" href="//aqkasetqystwvpassidd.supabase.co">
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="dns-prefetch" href="//cdn.jsdelivr.net">
   <style>
     :root{--navy:#17324a;--blue:#2c6da4;--gold:#9a7127;--text:#29485f;--muted:#6f8291;--line:#dce5ec;--soft:#f5f8fb;--white:#fff;--shadow:0 18px 55px rgba(22,50,74,.09)}
     *{box-sizing:border-box}html,body{margin:0;min-height:100%;font-family:"Segoe UI",Arial,Helvetica,sans-serif;color:var(--text);background:var(--soft)}
@@ -46,6 +50,17 @@
 .rich-content-view p,.rich-content-view div{margin:0 0 12px}.rich-content-view h2{font-size:26px;color:#17324a;margin:16px 0 10px}.rich-content-view h3{font-size:20px;color:#17324a;margin:14px 0 8px}.rich-content-view ul,.rich-content-view ol{padding-left:26px;margin:10px 0}.rich-content-view li{margin:5px 0}
 
 </style>
+
+<style id="ptt-viewer-reduced-motion-v1">
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{
+    animation-duration:.01ms!important;
+    animation-iteration-count:1!important;
+    transition-duration:.01ms!important;
+  }
+}
+</style>
+
 </head>
 <body>
   <header class="topbar">
@@ -245,7 +260,7 @@
       console.error(error);
       $('#title').textContent='Không mở được tài liệu';
       $('#subtitle').textContent='Có lỗi khi tải thông tin bài tập.';
-      showState('Không thể mở nội dung',error?.message||'File hiện không khả dụng. Vui lòng thử lại sau.',true);
+      showState('Không thể mở nội dung','Nội dung hiện chưa khả dụng. Vui lòng thử lại sau.',true);
     }
   }
   load();
