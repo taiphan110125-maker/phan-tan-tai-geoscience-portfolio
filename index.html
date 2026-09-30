@@ -1664,6 +1664,42 @@ body{color:var(--ink-strong)!important}
 }
 </style>
 
+
+<style id="ptt-project-auto-image-fit-v1">
+#projects .project-user-image,
+.project-modal-visual{
+  background:#edf2f5!important;
+}
+#projects .project-user-image img,
+.project-modal-visual img{
+  width:100%!important;
+  height:100%!important;
+  display:block!important;
+  object-position:center center!important;
+}
+#projects .project-user-image img.project-image-cover,
+.project-modal-visual img.project-image-cover{
+  object-fit:cover!important;
+}
+#projects .project-user-image img.project-image-contain,
+.project-modal-visual img.project-image-contain{
+  object-fit:contain!important;
+  padding:8px!important;
+}
+#projects .project-user-image img{
+  aspect-ratio:auto!important;
+}
+.project-modal-visual{
+  overflow:hidden!important;
+}
+@media(max-width:600px){
+  #projects .project-user-image img.project-image-contain,
+  .project-modal-visual img.project-image-contain{
+    padding:5px!important;
+  }
+}
+</style>
+
 </head>
 <body>
   <a class="skip-link" href="#main">Bỏ qua menu</a>
@@ -2300,6 +2336,19 @@ function observeReveal(root = document){ $$('.reveal', root).forEach(el => obser
 observeReveal();
 
 // Projects
+function autoFitProjectImage(img){
+  if(!img || !img.naturalWidth || !img.naturalHeight) return;
+  const ratio=img.naturalWidth/img.naturalHeight;
+  img.classList.toggle('project-image-contain',ratio<0.72||ratio>2.15);
+  img.classList.toggle('project-image-cover',ratio>=0.72&&ratio<=2.15);
+}
+function bindProjectImageFit(root=document){
+  root.querySelectorAll?.('.project-user-image img,.project-modal-visual img').forEach(img=>{
+    const apply=()=>autoFitProjectImage(img);
+    if(img.complete) apply();
+    else img.addEventListener('load',apply,{once:true});
+  });
+}
 function renderProjects(){
   const host = $('#projectShowcase');
   if (!host) return;
@@ -2326,6 +2375,7 @@ function renderProjects(){
       </div>
     </article>
   `).join('');
+  bindProjectImageFit(host);
 }
 
 const projectModal = $('#projectModal');
@@ -2362,6 +2412,7 @@ function openProject(projectId){
             </button>`).join('')}
         </div>` : '<p class="project-report-empty">Dự án này chưa có file báo cáo đính kèm.</p>'}
     </section>`;
+  bindProjectImageFit($('#projectModalContent'));
   openModal(projectModal);
 }
 async function openProjectReport(projectId,index){
