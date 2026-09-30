@@ -5,6 +5,17 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="description" content="Portfolio học thuật của Phan Tấn Tài - sinh viên Địa chất và Địa vật lý.">
   <meta name="theme-color" content="#ffffff">
+  <meta name="robots" content="index,follow,max-image-preview:large">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <link rel="canonical" href="https://phan-tan-tai-geoscience-portfolio.onrender.com/">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="vi_VN">
+  <meta property="og:title" content="Phan Tấn Tài | Geology & Geophysics">
+  <meta property="og:description" content="Portfolio học thuật của Phan Tấn Tài - sinh viên Địa chất và Địa vật lý.">
+  <meta property="og:url" content="https://phan-tan-tai-geoscience-portfolio.onrender.com/">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Phan Tấn Tài | Geology & Geophysics">
+  <meta name="twitter:description" content="Portfolio học thuật về Địa chất và Địa vật lý của Phan Tấn Tài.">
   <link rel="icon" href="assets/ptt-emblem.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://aqkasetqystwvpassidd.supabase.co" crossorigin>
   <link rel="dns-prefetch" href="//aqkasetqystwvpassidd.supabase.co">
@@ -1868,7 +1879,7 @@ body{color:var(--ink-strong)!important}
   <header class="site-header" id="siteHeader">
     <div class="shell nav-row">
       <a class="brand brand-header" href="#home" aria-label="Phan Tấn Tài - Trang chủ">
-        <img class="brand-lockup" src="assets/ptt-brand.svg" alt="Phan Tấn Tài — Geology & Geophysics" decoding="async">
+        <img class="brand-lockup" src="assets/ptt-brand.svg" alt="Phan Tấn Tài — Geology & Geophysics" width="720" height="170" decoding="async">
       </a>
 
       <button class="nav-toggle" id="navToggle" aria-label="Mở menu" aria-expanded="false">☰</button>
@@ -1935,7 +1946,7 @@ body{color:var(--ink-strong)!important}
 
         <div class="feature-grid">
           <article class="visual-card reveal">
-            <img src="assets/about-fieldwork.svg" alt="Sinh viên khảo sát địa chất thực địa" loading="lazy" decoding="async">
+            <img src="assets/about-fieldwork.svg" alt="Sinh viên khảo sát địa chất thực địa" width="1200" height="900" loading="lazy" decoding="async">
             <div class="visual-card-overlay"></div>
             <div class="visual-card-body">
               <span class="icon-box">⌁</span>
@@ -1945,7 +1956,7 @@ body{color:var(--ink-strong)!important}
             </div>
           </article>
           <article class="visual-card reveal delay-1">
-            <img src="assets/assignments-review.svg" alt="Không gian học tập với tài liệu địa chất và hệ thống nhận xét" loading="lazy" decoding="async">
+            <img src="assets/assignments-review.svg" alt="Không gian học tập với tài liệu địa chất và hệ thống nhận xét" width="1200" height="900" loading="lazy" decoding="async">
             <div class="visual-card-overlay"></div>
             <div class="visual-card-body">
               <span class="icon-box">▤</span>
@@ -1955,7 +1966,7 @@ body{color:var(--ink-strong)!important}
             </div>
           </article>
           <article class="visual-card reveal delay-2">
-            <img src="assets/geo-ai.svg" alt="Giao diện trợ lý ảo" loading="lazy" decoding="async">
+            <img src="assets/geo-ai.svg" alt="Giao diện trợ lý ảo" width="1200" height="900" loading="lazy" decoding="async">
             <div class="visual-card-overlay"></div>
             <div class="visual-card-body">
               <span class="icon-box">AI</span>
@@ -1972,7 +1983,7 @@ body{color:var(--ink-strong)!important}
       <div class="shell about-layout">
         <div class="about-media reveal">
           <div class="about-photo-card" id="aboutPhotoCard">
-            <img id="aboutProfileImage" src="assets/about-fieldwork.svg" alt="Ảnh chân dung Phan Tấn Tài" loading="lazy" decoding="async" fetchpriority="low">
+            <img id="aboutProfileImage" src="assets/about-fieldwork.svg" alt="Ảnh chân dung Phan Tấn Tài" width="1200" height="1600" loading="lazy" decoding="async" fetchpriority="low">
           </div>
         </div>
         <div class="about-copy reveal delay-1">
@@ -2034,7 +2045,7 @@ body{color:var(--ink-strong)!important}
               </div>
               <form id="academicChatForm" class="academic-chat-form unified-chat-form">
                 <div class="chat-fields">
-                  <input id="academicChatName" maxlength="100" minlength="2" required placeholder="Tên của bạn">
+                  <input id="academicChatName" maxlength="100" minlength="2" required autocomplete="name" aria-label="Tên của bạn" placeholder="Tên của bạn">
                   <select id="academicChatRole" aria-label="Vai trò">
                     <option value="Sinh viên">Sinh viên</option>
                     <option value="Giảng viên">Giảng viên</option>
@@ -2042,7 +2053,7 @@ body{color:var(--ink-strong)!important}
                   </select>
                 </div>
                 <div class="chat-send-row">
-                  <textarea id="academicChatMessage" maxlength="1000" rows="2" required placeholder="Nhập nội dung trao đổi..."></textarea>
+                  <textarea id="academicChatMessage" maxlength="1000" rows="2" required aria-label="Nội dung trao đổi" placeholder="Nhập nội dung trao đổi..."></textarea>
                   <button type="submit" aria-label="Gửi tin nhắn">Gửi</button>
                 </div>
                 <p id="academicChatStatus" class="chat-status" role="status"></p>
@@ -2081,7 +2092,7 @@ body{color:var(--ink-strong)!important}
           <button class="btn btn-gold" id="aiOpenFromSection">Mở trợ lý ảo →</button>
         </div>
         <div class="ai-media reveal delay-1">
-          <img src="assets/geo-ai.svg" alt="Hình minh họa trợ lý ảo" loading="lazy" decoding="async">
+          <img src="assets/geo-ai.svg" alt="Hình minh họa trợ lý ảo" width="1200" height="900" loading="lazy" decoding="async">
           <div class="ai-badge"><span class="pulse"></span> SẴN SÀNG HỖ TRỢ</div>
         </div>
       </div>
@@ -2094,7 +2105,7 @@ body{color:var(--ink-strong)!important}
       <div class="footer-main">
         <div class="footer-left">
           <div class="brand footer-brand">
-            <img class="footer-emblem" src="assets/ptt-emblem.svg" alt="" loading="lazy" decoding="async">
+            <img class="footer-emblem" src="assets/ptt-emblem.svg" alt="" width="180" height="180" loading="lazy" decoding="async">
             <span class="brand-copy">
               <strong>PHAN TẤN TÀI</strong>
               <small>GEOLOGY · GEOPHYSICS</small>
@@ -2180,7 +2191,7 @@ body{color:var(--ink-strong)!important}
   <div class="modal" id="userLoginModal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="userLoginTitle">
     <div class="modal-card login-card">
       <button class="modal-close" id="userLoginClose" aria-label="Đóng">×</button>
-      <div class="login-brand"><img class="modal-emblem" src="assets/ptt-emblem.svg" alt="Logo Phan Tấn Tài" loading="lazy" decoding="async"></div>
+      <div class="login-brand"><img class="modal-emblem" src="assets/ptt-emblem.svg" alt="Logo Phan Tấn Tài" width="180" height="180" loading="lazy" decoding="async"></div>
       <p class="eyebrow">USER ACCOUNT</p>
       <h3 id="userLoginTitle">Đăng nhập người dùng</h3>
       <p class="muted">Đăng nhập là tùy chọn. Bạn vẫn có thể xem toàn bộ dự án và bài tập công khai mà không cần tài khoản.</p>
@@ -2215,7 +2226,7 @@ body{color:var(--ink-strong)!important}
   </div>
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2"></script>
   <script>
 // CẤU HÌNH PUBLIC CHO SUPABASE
 // Publishable key được phép dùng ở frontend; không đặt service_role key ở đây.
@@ -3271,7 +3282,7 @@ document.addEventListener('keydown', event => { if (event.key === 'Escape') $$('
 <script>
 if('serviceWorker' in navigator){
   window.addEventListener('load',()=>{
-    navigator.serviceWorker.register('/sw.js',{scope:'/'}).catch(error=>console.warn('Service worker unavailable:',error));
+    navigator.serviceWorker.register('/sw.js',{scope:'/',updateViaCache:'none'}).catch(error=>console.warn('Service worker unavailable:',error));
   },{once:true});
 }
 </script>
