@@ -3173,7 +3173,17 @@ $('#userLoginForm')?.addEventListener('submit', async event => {
     $('#userLoginStatus').textContent = 'Đăng nhập thành công.';
     showToast(`Xin chào ${user.name}`);
     setTimeout(() => closeModal(userLoginModal), 350);
-  } catch (error){ $('#userLoginStatus').textContent = error.message || 'Đăng nhập thất bại.'; }
+  } catch (error){
+    console.warn('Đăng nhập thất bại:',error);
+    const raw=String(error?.message||'').toLowerCase();
+    if(raw.includes('invalid login credentials')){
+      $('#userLoginStatus').textContent='Email hoặc mật khẩu không đúng. Nếu đây là tài khoản được tạo trước lần nâng cấp đăng ký, tài khoản cũ có thể chưa được xác nhận.';
+    }else if(raw.includes('email not confirmed')){
+      $('#userLoginStatus').textContent='Tài khoản này được tạo theo cơ chế cũ và chưa được xác nhận email.';
+    }else{
+      $('#userLoginStatus').textContent='Đăng nhập thất bại. Vui lòng thử lại.';
+    }
+  }
   finally { button.disabled = false; }
 });
 $('#userRegisterForm')?.addEventListener('submit', async event => {
@@ -3217,7 +3227,12 @@ $('#userRegisterForm')?.addEventListener('submit', async event => {
     setTimeout(()=>closeModal(userRegisterModal),350);
   } catch (error){
     console.warn('Không tạo được tài khoản:',error);
-    status.textContent=error?.message||'Không tạo được tài khoản. Vui lòng thử lại.';
+    const raw=String(error?.message||'');
+    if(/đã được đăng ký|already|registered|exists/i.test(raw)){
+      status.textContent='Email này đã có tài khoản. Nếu tài khoản được tạo trước lần nâng cấp đăng ký, hãy dùng tài khoản khác hoặc xử lý tài khoản cũ trong Supabase Auth.';
+    }else{
+      status.textContent=raw||'Không tạo được tài khoản. Vui lòng thử lại.';
+    }
   } finally {
     button.disabled=false;
   }
