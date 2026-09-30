@@ -1700,6 +1700,19 @@ body{color:var(--ink-strong)!important}
 }
 </style>
 
+
+<style id="ptt-reduced-motion-v1">
+@media (prefers-reduced-motion: reduce){
+  html{scroll-behavior:auto!important}
+  *,*::before,*::after{
+    animation-duration:.01ms!important;
+    animation-iteration-count:1!important;
+    transition-duration:.01ms!important;
+    scroll-behavior:auto!important;
+  }
+}
+</style>
+
 </head>
 <body>
   <a class="skip-link" href="#main">Bỏ qua menu</a>
@@ -2116,6 +2129,10 @@ const DEFAULT_ABOUT_IMAGE='assets/about-fieldwork.svg';
 async function loadAboutImage(){
   const img=$('#aboutProfileImage');
   if(!img)return;
+  img.onerror=()=>{
+    img.onerror=null;
+    img.src=DEFAULT_ABOUT_IMAGE;
+  };
   if(!sb){img.src=DEFAULT_ABOUT_IMAGE;return;}
   try{
     const {data,error}=await sb.from('site_settings')
@@ -2215,7 +2232,7 @@ function showToast(message){
   showToast.timer = setTimeout(() => toast.classList.remove('show'), 2400);
 }
 function configurationError(){
-  return new Error('Website chưa được kết nối Supabase. Hãy cấu hình supabase-config.js theo hướng dẫn trong README.');
+  return new Error('Dịch vụ dữ liệu hiện chưa khả dụng.');
 }
 function requireSupabase(){ if (!sb) throw configurationError(); return sb; }
 function formatDate(value){
@@ -2345,7 +2362,13 @@ function autoFitProjectImage(img){
 function bindProjectImageFit(root=document){
   root.querySelectorAll?.('.project-user-image img,.project-modal-visual img').forEach(img=>{
     const apply=()=>autoFitProjectImage(img);
-    if(img.complete) apply();
+    const fallback=()=>{
+      if(img.dataset.fallbackApplied)return;
+      img.dataset.fallbackApplied='1';
+      img.src='assets/hero-geoscience.svg';
+    };
+    img.addEventListener('error',fallback,{once:true});
+    if(img.complete&&img.naturalWidth) apply();
     else img.addEventListener('load',apply,{once:true});
   });
 }
@@ -2385,7 +2408,7 @@ function openProject(projectId){
   const tags = Array.isArray(project.tags) ? project.tags : [];
   $('#projectModalContent').innerHTML = `
     <div class="project-modal-visual">
-      <img src="${escapeHtml(project.image || 'assets/hero-geoscience.svg')}" alt="Minh họa ${escapeHtml(project.title)}" loading="lazy" decoding="async">
+      <img src="${escapeHtml(project.image || 'assets/hero-geoscience.svg')}" alt="Minh họa ${escapeHtml(project.title)}" loading="eager" decoding="async" fetchpriority="high">
       <span class="project-modal-badge">${escapeHtml(project.type || 'Project')}</span>
     </div>
     <h3 id="projectModalTitle">${escapeHtml(project.title)}</h3>
@@ -2431,7 +2454,7 @@ async function openProjectReport(projectId,index){
     if(!opened) location.href=target;
   }catch(error){
     console.warn('Project report unavailable:',error);
-    showToast('File báo cáo này hiện không mở được. Quản trị viên cần tải lại file.');
+    showToast('File báo cáo này hiện không mở được. Vui lòng thử lại sau.');
   }
 }
 
@@ -2557,7 +2580,7 @@ $('#commentForm')?.addEventListener('submit', async event => {
     await loadPublicContent({silent:true});
     showToast('Đã gửi nhận xét');
     setTimeout(() => closeModal(commentModal), 650);
-  } catch (error){ $('#commentStatus').textContent = error.message || 'Không gửi được nhận xét.'; }
+  } catch (error){ console.warn('Không gửi được nhận xét:',error); $('#commentStatus').textContent = 'Không gửi được nhận xét. Vui lòng thử lại.'; }
   finally { submit.disabled = false; }
 });
 
@@ -2585,7 +2608,7 @@ $('#academicChatForm')?.addEventListener('submit',async event=>{
     status.textContent='';
     await loadAcademicChat({stickToBottom:true});
   }catch(error){
-    status.textContent=error.message||'Không gửi được tin nhắn.';
+    console.warn('Không gửi được tin nhắn:',error); status.textContent='Không gửi được tin nhắn. Vui lòng thử lại.';
   }finally{button.disabled=false;}
 });
 
@@ -2620,7 +2643,7 @@ $('#contactForm')?.addEventListener('submit', async event => {
     localStorage.setItem('ptt-contact-last',String(Date.now()));
     $('#contactStatus').textContent = 'Đã gửi lời nhắn thành công.';
     showToast('Đã ghi nhận lời nhắn');
-  } catch (error){ $('#contactStatus').textContent = error.message || 'Không gửi được lời nhắn.'; }
+  } catch (error){ console.warn('Không gửi được lời nhắn:',error); $('#contactStatus').textContent = 'Không gửi được lời nhắn. Vui lòng thử lại.'; }
   finally { submit.disabled = false; }
 });
 
@@ -2696,9 +2719,9 @@ async function loadPublicContent({silent = false} = {}){
   } catch (error){
     console.error(error);
     if (!silent || !publicContentLoadedOnce){
-      $('#projectShowcase').innerHTML = `<div class="project-empty"><strong>Chưa kết nối được dữ liệu cloud.</strong><span>${escapeHtml(error.message || 'Kiểm tra cấu hình Supabase.')}</span></div>`;
+      $('#projectShowcase').innerHTML = '<div class="project-empty"><strong>Dữ liệu dự án tạm thời chưa khả dụng.</strong></div>';
       const assignmentHost=$('#assignmentGroups');
-      if(assignmentHost) assignmentHost.innerHTML='<div class="assignment-empty">Chưa kết nối được kho bài tập cloud.</div>';
+      if(assignmentHost) assignmentHost.innerHTML='<div class="assignment-empty">Dữ liệu bài tập tạm thời chưa khả dụng.</div>';
     }
   } finally {
     publicContentLoading=false;
@@ -3032,6 +3055,7 @@ if('serviceWorker' in navigator){
       img.src=objectUrl;
     }catch(error){
       console.error('Không tải được ảnh bìa:',error);
+      img.src='assets/hero-geoscience.svg';
     }
   };
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',loadHero,{once:true});
