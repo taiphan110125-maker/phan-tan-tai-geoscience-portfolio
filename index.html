@@ -3315,19 +3315,29 @@ function mapAssignment(row, countMap){
     commentCount:countMap[row.id] || 0
   };
 }
+function waitTimeout(ms,label='Request timeout'){
+  return new Promise((_,reject)=>setTimeout(()=>reject(new Error(label)),ms));
+}
 async function publicRest(table,query=''){
   const cfg=window.PTT_CONFIG||{};
   if(!cfg.SUPABASE_URL||!cfg.SUPABASE_ANON_KEY)throw configurationError();
-  const response=await fetch(`${cfg.SUPABASE_URL}/rest/v1/${table}${query?'?'+query:''}`,{
-    headers:{
-      'apikey':cfg.SUPABASE_ANON_KEY,
-      'Authorization':'Bearer '+cfg.SUPABASE_ANON_KEY,
-      'Accept':'application/json'
-    },
-    cache:'no-store'
-  });
-  if(!response.ok)throw new Error(`REST ${table} failed (${response.status})`);
-  return await response.json();
+  const controller=new AbortController();
+  const timer=setTimeout(()=>controller.abort(),5000);
+  try{
+    const response=await fetch(`${cfg.SUPABASE_URL}/rest/v1/${table}${query?'?'+query:''}`,{
+      headers:{
+        'apikey':cfg.SUPABASE_ANON_KEY,
+        'Authorization':'Bearer '+cfg.SUPABASE_ANON_KEY,
+        'Accept':'application/json'
+      },
+      cache:'no-store',
+      signal:controller.signal
+    });
+    if(!response.ok)throw new Error(`REST ${table} failed (${response.status})`);
+    return await response.json();
+  }finally{
+    clearTimeout(timer);
+  }
 }
 async function loadPublicContentViaRest(){
   const projectSelect=encodeURIComponent('id,title,type,image_url,image_path,summary,tags,objective,data_text,method,output,report_files,sort_order,created_at');
@@ -3401,11 +3411,14 @@ async function loadPublicContent({silent = false} = {}){
     let pRes,aRes,cRes,sRes;
     if(sb){
       try{
-        const results=await Promise.all([
-          sb.from('projects').select('id,title,type,image_url,image_path,summary,tags,objective,data_text,method,output,report_files,sort_order,created_at').eq('published', true).is('deleted_at', null).order('sort_order', {ascending:true}).order('created_at', {ascending:false}),
-          sb.from('assignments').select('id,type,title,topic,content_text,external_url,subject,assignment_date,assignment_number,date_text,created_at,file_name,file_url,file_path').eq('published', true).is('deleted_at', null).order('assignment_date', {ascending:true}).order('assignment_number', {ascending:true}).order('created_at', {ascending:true}),
-          sb.from('comments').select('id,assignment_id,name,role,body,created_at,assignment_title,assignment_date,assignment_number,assignment_subject').order('created_at', {ascending:false}),
-          sb.from('assignment_subjects').select('slug,name,sort_order').eq('active', true).order('sort_order', {ascending:true}).order('name', {ascending:true})
+        const results=await Promise.race([
+          Promise.all([
+            sb.from('projects').select('id,title,type,image_url,image_path,summary,tags,objective,data_text,method,output,report_files,sort_order,created_at').eq('published', true).is('deleted_at', null).order('sort_order', {ascending:true}).order('created_at', {ascending:false}),
+            sb.from('assignments').select('id,type,title,topic,content_text,external_url,subject,assignment_date,assignment_number,date_text,created_at,file_name,file_url,file_path').eq('published', true).is('deleted_at', null).order('assignment_date', {ascending:true}).order('assignment_number', {ascending:true}).order('created_at', {ascending:true}),
+            sb.from('comments').select('id,assignment_id,name,role,body,created_at,assignment_title,assignment_date,assignment_number,assignment_subject').order('created_at', {ascending:false}),
+            sb.from('assignment_subjects').select('slug,name,sort_order').eq('active', true).order('sort_order', {ascending:true}).order('name', {ascending:true})
+          ]),
+          waitTimeout(6500,'Supabase public sync timeout')
         ]);
         [pRes,aRes,cRes,sRes]=results;
         for(const res of results)if(res.error)throw res.error;
@@ -3477,6 +3490,14 @@ function subscribeRealtime(){
       })
       .subscribe();
   }catch(error){console.warn('Realtime unavailable:',error);}
+}
+function startRealtimeWhenIdle(){
+  if(!sb)return;
+  const connection=navigator.connection||navigator.mozConnection||navigator.webkitConnection;
+  if(connection?.saveData||/2g/i.test(connection?.effectiveType||''))return;
+  const start=()=>subscribeRealtime();
+  if('requestIdleCallback' in window)requestIdleCallback(start,{timeout:2500});
+  else setTimeout(start,1200);
 }
 function initLazyAcademicChat(){
   const target=$('#assignments');
@@ -3776,7 +3797,7 @@ document.addEventListener('keydown', event => { if (event.key === 'Escape') $$('
 (async function boot(){
   const restored=restorePublicCache();
   if(!restored)await primePublicContentSnapshot();
-  subscribeRealtime();
+  startRealtimeWhenIdle();
   initLazyAcademicChat();
   await Promise.allSettled([
     loadPublicContent({silent:true}),
