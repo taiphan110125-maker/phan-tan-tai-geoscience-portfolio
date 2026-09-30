@@ -2390,9 +2390,9 @@ body{color:var(--ink-strong)!important}
       <p id="commentTarget" class="muted"></p>
       <form id="commentForm" class="stack-form">
         <input type="hidden" id="commentAssignmentId">
-        <label>Họ tên<input id="commentName" required minlength="2" placeholder="Tên người nhận xét"></label>
+        <label>Họ tên<input id="commentName" required minlength="2" maxlength="100" autocomplete="name" placeholder="Tên người nhận xét"></label>
         <label>Vai trò<select id="commentRole"><option>Giảng viên</option><option>Sinh viên</option><option>Khách</option></select></label>
-        <label>Nhận xét<textarea id="commentText" rows="5" required minlength="5" placeholder="Nhận xét về bài làm..."></textarea></label>
+        <label>Nhận xét<textarea id="commentText" rows="5" required minlength="5" maxlength="2000" placeholder="Nhận xét về bài làm..."></textarea></label>
         <button class="btn btn-dark" type="submit">Lưu nhận xét</button>
         <p class="form-status" id="commentStatus" role="status"></p>
       </form>
@@ -2496,7 +2496,8 @@ let lastOwnCommentId = '';
 let lastOwnChatId = '';
 let pendingOwnCommentKey = '';
 let pendingOwnChatKey = '';
-const PUBLIC_CACHE_KEY = 'ptt-public-cache-v1';
+const PUBLIC_CACHE_KEY = 'ptt-public-cache-v2';
+const LEGACY_PUBLIC_CACHE_KEYS = ['ptt-public-cache-v1'];
 const PUBLIC_CACHE_TTL = 10 * 60 * 1000;
 
 const DEFAULT_ABOUT_IMAGE='assets/about-fieldwork.svg';
@@ -2581,6 +2582,7 @@ function savePublicCache(){
 }
 function restorePublicCache(){
   try{
+    LEGACY_PUBLIC_CACHE_KEYS.forEach(key=>localStorage.removeItem(key));
     const raw=localStorage.getItem(PUBLIC_CACHE_KEY);
     if(!raw)return false;
     const cached=JSON.parse(raw);
@@ -3115,7 +3117,11 @@ $('#commentForm')?.addEventListener('submit', async event => {
   const role = $('#commentRole').value;
   const text = $('#commentText').value.trim();
   const assignmentId = $('#commentAssignmentId').value;
-  if (name.length < 2 || text.length < 5){ $('#commentStatus').textContent = 'Vui lòng nhập đầy đủ họ tên và nhận xét.'; return; }
+  if (!form.checkValidity() || name.length < 2 || text.length < 5){
+    $('#commentStatus').textContent = 'Vui lòng nhập đầy đủ họ tên và nhận xét.';
+    form.reportValidity();
+    return;
+  }
   const submit = form.querySelector('button[type="submit"]');
   submit.disabled = true;
   $('#commentStatus').textContent = 'Đang gửi…';
