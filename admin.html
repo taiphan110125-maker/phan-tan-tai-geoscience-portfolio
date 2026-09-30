@@ -846,8 +846,8 @@ function populateAssignmentSubjectSelect(currentValue=''){
 }
 
 function go(view){
-  $('.admin-view').forEach(panel=>panel.classList.toggle('active',panel.dataset.panel===view));
-  $('.side-link').forEach(button=>button.classList.toggle('active',button.dataset.view===view));
+  $$('.admin-view').forEach(panel=>panel.classList.toggle('active',panel.dataset.panel===view));
+  $$('.side-link').forEach(button=>button.classList.toggle('active',button.dataset.view===view));
   renderAll();
   if(view==='accounts'&&!accountUsersLoaded) loadUserAccounts();
 }
