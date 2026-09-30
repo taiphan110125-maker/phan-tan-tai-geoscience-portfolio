@@ -1968,6 +1968,12 @@ body{color:var(--ink-strong)!important}
   gap:7px;
   padding-right:4px;
 }
+.global-search-results.is-idle{
+  min-height:0;
+  max-height:0;
+  overflow:hidden;
+  padding:0;
+}
 .global-search-result{
   width:100%;
   display:grid;
@@ -2810,14 +2816,12 @@ function renderGlobalSearch(query=''){
 
   if(q.length<2){
     globalSearchMeta.textContent='Nhập ít nhất 2 ký tự để tìm kiếm.';
-    globalSearchResults.innerHTML=`
-      <div class="global-search-empty">
-        <strong>Tìm nhanh nội dung học thuật</strong>
-        <span>Bạn có thể tìm theo tên dự án, môn học, tiêu đề bài tập hoặc từ khóa trong nội dung.</span>
-      </div>`;
+    globalSearchResults.innerHTML='';
+    globalSearchResults.classList.add('is-idle');
     return;
   }
 
+  globalSearchResults.classList.remove('is-idle');
   const results=websiteSearchItems()
     .map(item=>({...item,score:searchScore(item,q)}))
     .filter(item=>item.score>=0)
