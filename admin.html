@@ -799,7 +799,8 @@ let projects = [], assignments = [], comments = [], chatMessages = [], messages 
 let accountUsers = [];
 let accountUsersLoaded = false;
 let adminUser = null;
-let notificationSeen = {feedbackSeenAt:'',messagesSeenAt:''};
+const notificationBootTime=new Date().toISOString();
+let notificationSeen = {feedbackSeenAt:notificationBootTime,messagesSeenAt:notificationBootTime};
 let adminNotificationChannel = null;
 let pendingProjectImageFile = null;
 let pendingProjectPreviewUrl = '';
