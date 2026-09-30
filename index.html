@@ -2715,7 +2715,7 @@ $('#navToggle')?.addEventListener('click', () => {
   const open = nav.classList.toggle('open');
   $('#navToggle').setAttribute('aria-expanded', String(open));
 });
-$('#primaryNav a').forEach(link => link.addEventListener('click', () => {
+document.querySelectorAll('#primaryNav a').forEach(link => link.addEventListener('click', () => {
   $('#primaryNav')?.classList.remove('open');
   $('#navToggle')?.setAttribute('aria-expanded','false');
 }));
