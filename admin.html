@@ -398,7 +398,7 @@ body.admin-body,.admin-body{background:#f6f8fb!important;color:#183247!important
       <button class="side-link" data-view="feedback">◌ <span>Nhận xét</span></button>
       <button class="side-link" data-view="messages">✉ <span>Lời nhắn</span></button>
       <button class="side-link" data-view="security">⌾ <span>Bảo mật</span></button>
-      <div class="sidebar-note"><strong>MVP local</strong><span>Dữ liệu hiện được lưu trong trình duyệt. Production sẽ chuyển sang database và storage riêng.</span></div>
+      <div class="sidebar-note"><strong>Cloud workspace</strong><span>Dữ liệu được đồng bộ qua Supabase Database, Auth và Storage.</span></div>
     </aside>
 
     <main class="admin-main">
@@ -456,14 +456,14 @@ body.admin-body,.admin-body{background:#f6f8fb!important;color:#183247!important
           <div class="site-image-admin-grid">
             <div class="site-image-admin-preview">
               <div class="site-image-card">
-                <img id="siteAboutImagePreview" src="assets/about-fieldwork.svg" alt="Xem trước ảnh giới thiệu">
+                <img id="siteAboutImagePreview" src="assets/about-fieldwork.svg" alt="Xem trước ảnh giới thiệu" loading="lazy" decoding="async">
               </div>
               <small>Khung xem trước theo tỷ lệ ảnh thẻ 3:4.</small>
             </div>
             <div class="site-image-admin-form">
               <div>
                 <h2>Thay ảnh thẻ</h2>
-                <p>Chọn ảnh JPG, PNG hoặc WebP. Dung lượng tối đa 8 MB.</p>
+                <p>Chọn ảnh JPG, PNG hoặc WebP. Hệ thống sẽ tự tối ưu ảnh trước khi tải lên. Tối đa 8 MB.</p>
               </div>
               <label class="site-image-file-picker">
                 <span>Chọn ảnh từ máy</span>
@@ -490,7 +490,7 @@ body.admin-body,.admin-body{background:#f6f8fb!important;color:#183247!important
       <section class="admin-view" data-panel="security">
         <div class="admin-heading"><div><p class="eyebrow">SECURITY</p><h1>Bảo mật</h1></div></div>
         <div class="security-grid">
-          <div class="admin-panel"><h2>Trạng thái bản MVP</h2><ul class="status-list"><li><span class="status warn"></span><div><strong>Admin authentication</strong><small>Khu quản trị bắt buộc đăng nhập bằng Supabase Auth và kiểm tra vai trò admin bằng Row Level Security.</small></div></li><li><span class="status good"></span><div><strong>Không lưu API key trong frontend</strong><small>Thiết kế giữ khóa bí mật ra khỏi mã nguồn public.</small></div></li><li><span class="status good"></span><div><strong>Escape nội dung hiển thị</strong><small>Giảm rủi ro chèn HTML từ dữ liệu người dùng trong MVP.</small></div></li></ul></div>
+          <div class="admin-panel"><h2>Trạng thái hệ thống</h2><ul class="status-list"><li><span class="status warn"></span><div><strong>Admin authentication</strong><small>Khu quản trị bắt buộc đăng nhập bằng Supabase Auth và kiểm tra vai trò admin bằng Row Level Security.</small></div></li><li><span class="status good"></span><div><strong>Không lưu API key trong frontend</strong><small>Thiết kế giữ khóa bí mật ra khỏi mã nguồn public.</small></div></li><li><span class="status good"></span><div><strong>Escape nội dung hiển thị</strong><small>Giảm rủi ro chèn HTML từ dữ liệu người dùng khi hiển thị trong khu quản trị.</small></div></li></ul></div>
           <div class="admin-panel"><h2>Production checklist</h2><ul class="check-list admin-check"><li>Supabase Auth + email verification</li><li>Row Level Security cho database và Storage</li><li>2FA cho tài khoản chủ website</li><li>Rate limit + CAPTCHA cho form public</li><li>Audit log + backup + rollback</li></ul></div>
         </div>
       </section>
@@ -523,9 +523,9 @@ body.admin-body,.admin-body{background:#f6f8fb!important;color:#183247!important
           <div>
             <label>Đường dẫn ảnh<input id="projectImage" placeholder="assets/petrophysics-workstation.svg"></label>
             <label>Hoặc chọn ảnh từ máy<input id="projectImageFile" type="file" accept="image/png,image/jpeg,image/webp"></label>
-            <small class="muted">Ảnh tải từ máy sẽ được lưu vào Supabase Storage để mọi thiết bị cùng nhìn thấy.</small>
+            <small class="muted">Ảnh tải từ máy sẽ được tối ưu và lưu vào Supabase Storage để mọi thiết bị cùng nhìn thấy.</small>
           </div>
-          <div class="project-image-preview"><img id="projectImagePreview" src="assets/hero-geoscience.svg" alt="Xem trước ảnh dự án"></div>
+          <div class="project-image-preview"><img id="projectImagePreview" src="assets/hero-geoscience.svg" alt="Xem trước ảnh dự án" loading="lazy" decoding="async"></div>
         </div>
         <div class="project-report-editor">
           <div class="project-report-editor-head">
@@ -648,6 +648,7 @@ const sb = window.pttSupabase;
 let projects = [], assignments = [], comments = [], chatMessages = [], messages = [], subjects = [];
 let adminUser = null;
 let pendingProjectImageFile = null;
+let pendingProjectPreviewUrl = '';
 let pendingProjectReportFiles = [];
 let removedProjectReportPaths = new Set();
 let currentSiteAboutImagePath = '';
@@ -700,6 +701,44 @@ function resetAssignmentRichEditor(){
 function toast(message){ const el=$('#toast'); if(!el)return; el.textContent=message; el.classList.add('show'); clearTimeout(toast.timer); toast.timer=setTimeout(()=>el.classList.remove('show'),2200); }
 function requireSupabase(){ if(!sb) throw new Error('Chưa cấu hình Supabase.'); return sb; }
 function safeName(name='file'){ return name.normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^A-Za-z0-9._-]+/g,'-').replace(/^-+|-+$/g,'').slice(-100) || 'file'; }
+async function optimizeImageFile(file,{maxWidth=1600,maxHeight=1600,quality=.86}={}){
+  if(!file||!/^image\/(jpeg|png|webp)$/.test(file.type))return file;
+  let bitmap=null,img=null,objectUrl='';
+  try{
+    let width=0,height=0,drawSource=null;
+    if('createImageBitmap' in window){
+      bitmap=await createImageBitmap(file);
+      width=bitmap.width;height=bitmap.height;drawSource=bitmap;
+    }else{
+      objectUrl=URL.createObjectURL(file);
+      img=new Image();
+      await new Promise((resolve,reject)=>{img.onload=resolve;img.onerror=reject;img.src=objectUrl;});
+      width=img.naturalWidth;height=img.naturalHeight;drawSource=img;
+    }
+    if(!width||!height)return file;
+    const scale=Math.min(1,maxWidth/width,maxHeight/height);
+    const targetW=Math.max(1,Math.round(width*scale));
+    const targetH=Math.max(1,Math.round(height*scale));
+    if(scale===1&&file.type==='image/webp'&&file.size<=900*1024)return file;
+
+    const canvas=document.createElement('canvas');
+    canvas.width=targetW;canvas.height=targetH;
+    const ctx=canvas.getContext('2d',{alpha:false});
+    if(!ctx)return file;
+    ctx.drawImage(drawSource,0,0,targetW,targetH);
+    const blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/webp',quality));
+    if(!blob)return file;
+    if(scale===1&&blob.size>=file.size*.98)return file;
+    const base=safeName(file.name.replace(/\.[^.]+$/,'')||'image');
+    return new File([blob],base+'.webp',{type:'image/webp',lastModified:Date.now()});
+  }catch(error){
+    console.warn('Không thể tối ưu ảnh, dùng file gốc:',error);
+    return file;
+  }finally{
+    try{bitmap?.close?.();}catch{}
+    if(objectUrl)URL.revokeObjectURL(objectUrl);
+  }
+}
 function notifyPublicContentChanged(kind){ try { new BroadcastChannel('ptt-content-sync').postMessage({kind,at:Date.now()}); } catch {} }
 function mapProject(r){ return {id:r.id,title:r.title,type:r.type,image:r.image_url||'',imagePath:r.image_path||'',summary:r.summary||'',tags:r.tags||[],objective:r.objective||'',data:r.data_text||'',method:r.method||'',output:r.output||'',reportFiles:Array.isArray(r.report_files)?r.report_files:[],sortOrder:r.sort_order||0}; }
 function formatAssignmentDate(value=''){ const p=String(value||'').split('-'); return p.length===3?`${p[2]}/${p[1]}/${p[0]}`:String(value||''); }
@@ -747,9 +786,7 @@ async function loadSiteAboutImageAdmin(){
     if(error)throw error;
     const map=Object.fromEntries((data||[]).map(row=>[row.key,row.value||'']));
     currentSiteAboutImagePath=map.about_image_path||'';
-    preview.src=map.about_image_url
-      ? map.about_image_url+(map.about_image_url.includes('?')?'&':'?')+'v='+Date.now()
-      : 'assets/about-fieldwork.svg';
+    preview.src=map.about_image_url || 'assets/about-fieldwork.svg';
     $('#siteAboutImageSelected').textContent='Chưa chọn ảnh mới.';
     $('#siteAboutImageStatus').textContent='';
     pendingSiteAboutImageFile=null;
@@ -785,7 +822,7 @@ async function saveSiteAboutImage(){
     const client=requireSupabase();
     newPath='about/'+Date.now()+'-'+safeName(file.name);
     const {error:uploadError}=await client.storage.from('site-images').upload(newPath,file,{
-      cacheControl:'3600',
+      cacheControl:'31536000',
       upsert:false,
       contentType:file.type
     });
@@ -1277,12 +1314,26 @@ function renderProjectReportPreview(project=null){
     ...pending.map((f,i)=>`<div class="project-report-admin-item pending"><span class="report-type">${esc(reportType(f.name))}</span><div><strong>${esc(f.name)}</strong><small>Chờ tải lên khi bấm Lưu dự án</small></div><button type="button" class="danger-btn" data-remove-pending-report="${i}">Bỏ</button></div>`)
   ].join('');
 }
-function resetProjectForm(){ $('#projectForm').reset();$('#projectId').value='';$('#projectStatus').textContent='';$('#projectFormEyebrow').textContent='NEW PROJECT';$('#projectFormHeading').textContent='Thêm dự án & nghiên cứu';$('#projectSaveBtn').textContent='Lưu dự án';$('#projectImage').value='assets/hero-geoscience.svg';pendingProjectImageFile=null;pendingProjectReportFiles=[];removedProjectReportPaths=new Set();setProjectPreview('assets/hero-geoscience.svg');renderProjectReportPreview(); }
+function resetProjectForm(){ if(pendingProjectPreviewUrl){URL.revokeObjectURL(pendingProjectPreviewUrl);pendingProjectPreviewUrl='';} $('#projectForm').reset();$('#projectId').value='';$('#projectStatus').textContent='';$('#projectFormEyebrow').textContent='NEW PROJECT';$('#projectFormHeading').textContent='Thêm dự án & nghiên cứu';$('#projectSaveBtn').textContent='Lưu dự án';$('#projectImage').value='assets/hero-geoscience.svg';pendingProjectImageFile=null;pendingProjectReportFiles=[];removedProjectReportPaths=new Set();setProjectPreview('assets/hero-geoscience.svg');renderProjectReportPreview(); }
 function openProjectEditor(project=null){ resetProjectForm(); if(project){$('#projectId').value=project.id;$('#projectTitle').value=project.title||'';$('#projectType').value=project.type||'';$('#projectSummary').value=project.summary||'';$('#projectTags').value=(project.tags||[]).join(', ');$('#projectObjective').value=project.objective||'';$('#projectData').value=project.data||'';$('#projectMethod').value=project.method||'';$('#projectOutput').value=project.output||'';$('#projectImage').value=project.imagePath?'':(project.image||'');setProjectPreview(project.image);$('#projectFormEyebrow').textContent='EDIT PROJECT';$('#projectFormHeading').textContent='Chỉnh sửa dự án';$('#projectSaveBtn').textContent='Lưu thay đổi';renderProjectReportPreview(project);} projectModal.classList.add('open');projectModal.setAttribute('aria-hidden','false');document.body.classList.add('modal-open');setTimeout(()=>$('#projectTitle').focus(),80); }
 function closeProjectEditor(){ projectModal.classList.remove('open');projectModal.setAttribute('aria-hidden','true');if(!$('.modal.open'))document.body.classList.remove('modal-open'); }
 $('#addProjectBtn')?.addEventListener('click',()=>openProjectEditor());$('#projectAdminModalClose')?.addEventListener('click',closeProjectEditor);$('#projectCancelBtn')?.addEventListener('click',closeProjectEditor);projectModal?.addEventListener('click',e=>{if(e.target===projectModal)closeProjectEditor();});
-$('#projectImage')?.addEventListener('input',e=>{const v=e.target.value.trim();if(v){pendingProjectImageFile=null;setProjectPreview(v);}});
-$('#projectImageFile')?.addEventListener('change',event=>{const file=event.target.files[0];if(!file)return;if(!file.type.startsWith('image/')){$('#projectStatus').textContent='Tệp đã chọn không phải ảnh.';return;}if(file.size>6*1024*1024){$('#projectStatus').textContent='Ảnh vượt quá 6 MB.';return;}pendingProjectImageFile=file;$('#projectImage').value='';setProjectPreview(URL.createObjectURL(file));$('#projectStatus').textContent=`Đã chọn ảnh: ${file.name}`;});
+$('#projectImage')?.addEventListener('input',e=>{const v=e.target.value.trim();if(v){pendingProjectImageFile=null;if(pendingProjectPreviewUrl){URL.revokeObjectURL(pendingProjectPreviewUrl);pendingProjectPreviewUrl='';}setProjectPreview(v);}});
+$('#projectImageFile')?.addEventListener('change',async event=>{
+  const file=event.target.files?.[0];
+  if(!file)return;
+  if(!/^image\/(jpeg|png|webp)$/.test(file.type)){$('#projectStatus').textContent='Chỉ hỗ trợ ảnh JPG, PNG hoặc WebP.';event.target.value='';return;}
+  if(file.size>8*1024*1024){$('#projectStatus').textContent='Ảnh vượt quá 8 MB.';event.target.value='';return;}
+  $('#projectStatus').textContent='Đang tối ưu ảnh…';
+  const optimized=await optimizeImageFile(file,{maxWidth:1800,maxHeight:1400,quality:.84});
+  pendingProjectImageFile=optimized;
+  $('#projectImage').value='';
+  if(pendingProjectPreviewUrl)URL.revokeObjectURL(pendingProjectPreviewUrl);
+  pendingProjectPreviewUrl=URL.createObjectURL(optimized);
+  setProjectPreview(pendingProjectPreviewUrl);
+  const before=(file.size/1024/1024).toFixed(2),after=(optimized.size/1024/1024).toFixed(2);
+  $('#projectStatus').textContent=`Đã chọn ảnh: ${optimized.name} · ${after} MB${optimized!==file?` (tối ưu từ ${before} MB)`:''}`;
+});
 $('#projectReportFiles')?.addEventListener('change',event=>{
   const selected=[...(event.target.files||[])];
   const invalid=selected.find(file=>file.size>50*1024*1024);
@@ -1316,7 +1367,7 @@ $('#projectForm')?.addEventListener('submit',async event=>{
     let imagePath=oldProject?.imagePath||'';
     if(pendingProjectImageFile){
       newImagePath=`${id}/${Date.now()}-${safeName(pendingProjectImageFile.name)}`;
-      const up=await sb.storage.from('project-images').upload(newImagePath,pendingProjectImageFile,{upsert:false,contentType:pendingProjectImageFile.type});
+      const up=await sb.storage.from('project-images').upload(newImagePath,pendingProjectImageFile,{upsert:false,cacheControl:'31536000',contentType:pendingProjectImageFile.type});
       if(up.error)throw up.error;
       imageUrl=sb.storage.from('project-images').getPublicUrl(newImagePath).data.publicUrl;
       imagePath=newImagePath;
@@ -1366,23 +1417,40 @@ $('#projectForm')?.addEventListener('submit',async event=>{
   }
 });
 
-$('#siteAboutImageFile')?.addEventListener('change',event=>{
+$('#siteAboutImageFile')?.addEventListener('change',async event=>{
   const file=event.target.files?.[0]||null;
-  pendingSiteAboutImageFile=file;
   const selected=$('#siteAboutImageSelected');
   const preview=$('#siteAboutImagePreview');
+  const status=$('#siteAboutImageStatus');
   if(pendingSiteAboutPreviewUrl){
     URL.revokeObjectURL(pendingSiteAboutPreviewUrl);
     pendingSiteAboutPreviewUrl='';
   }
+  pendingSiteAboutImageFile=null;
   if(!file){
     selected.textContent='Chưa chọn ảnh mới.';
     return;
   }
-  selected.textContent=file.name+' · '+(file.size/1024/1024).toFixed(2)+' MB';
-  pendingSiteAboutPreviewUrl=URL.createObjectURL(file);
+  if(!/^image\/(jpeg|png|webp)$/.test(file.type)){
+    selected.textContent='Chưa chọn ảnh mới.';
+    status.textContent='Chỉ hỗ trợ ảnh JPG, PNG hoặc WebP.';
+    event.target.value='';
+    return;
+  }
+  if(file.size>8*1024*1024){
+    selected.textContent='Chưa chọn ảnh mới.';
+    status.textContent='Ảnh vượt quá giới hạn 8 MB.';
+    event.target.value='';
+    return;
+  }
+  status.textContent='Đang tối ưu ảnh…';
+  const optimized=await optimizeImageFile(file,{maxWidth:1200,maxHeight:1600,quality:.86});
+  pendingSiteAboutImageFile=optimized;
+  pendingSiteAboutPreviewUrl=URL.createObjectURL(optimized);
   preview.src=pendingSiteAboutPreviewUrl;
-  $('#siteAboutImageStatus').textContent='';
+  const before=(file.size/1024/1024).toFixed(2),after=(optimized.size/1024/1024).toFixed(2);
+  selected.textContent=optimized.name+' · '+after+' MB'+(optimized!==file?' · đã tối ưu từ '+before+' MB':'');
+  status.textContent='';
 });
 $('#saveSiteAboutImageBtn')?.addEventListener('click',saveSiteAboutImage);
 
