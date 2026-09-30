@@ -1365,6 +1365,127 @@ body{color:var(--ink-strong)!important}
 }
 </style>
 
+
+<style id="ptt-about-photo-card-v2">
+#about .about-media{
+  position:relative!important;
+  overflow:visible!important;
+  border-radius:0!important;
+  box-shadow:none!important;
+  background:transparent!important;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+}
+#about .about-photo-card{
+  --about-scale:1.08;
+  --about-pos-x:50%;
+  --about-pos-y:28%;
+  position:relative;
+  width:min(100%,430px);
+  aspect-ratio:3 / 4;
+  overflow:hidden;
+  border-radius:22px;
+  background:#e7eef3;
+  border:1px solid #d7e1e8;
+  box-shadow:0 22px 55px rgba(20,50,72,.12);
+}
+#about .about-photo-card #aboutProfileImage{
+  position:absolute!important;
+  inset:0!important;
+  width:100%!important;
+  height:100%!important;
+  max-width:none!important;
+  object-fit:cover!important;
+  object-position:var(--about-pos-x) var(--about-pos-y)!important;
+  transform:scale(var(--about-scale))!important;
+  transform-origin:center center!important;
+  filter:none!important;
+  transition:transform .18s ease,object-position .18s ease;
+}
+#about .about-card-caption{
+  left:14px!important;
+  right:14px!important;
+  bottom:14px!important;
+  z-index:4;
+  border-color:rgba(255,255,255,.45)!important;
+  background:rgba(4,20,29,.67)!important;
+}
+#about .about-admin-tools{
+  top:14px;
+  right:14px;
+}
+#about .about-image-controls{
+  width:min(100%,430px);
+  margin-top:14px;
+  padding:16px 17px;
+  border:1px solid #d8e2e8;
+  border-radius:16px;
+  background:#fff;
+  box-shadow:0 12px 34px rgba(20,50,72,.08);
+  display:grid;
+  gap:14px;
+}
+#about .about-image-controls[hidden]{display:none!important}
+#about .about-control-head{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:14px;
+  padding-bottom:4px;
+}
+#about .about-control-head div{display:grid;gap:2px}
+#about .about-control-head strong{font-size:13px;color:#173a55}
+#about .about-control-head small{font-size:10px;color:#7a8b97}
+#about .about-control-head button{
+  flex:0 0 auto;
+  border:1px solid #d5e0e7;
+  background:#f7fafb;
+  color:#24485f;
+  border-radius:9px;
+  padding:7px 9px;
+  font-size:10px;
+  font-weight:700;
+  cursor:pointer;
+}
+#about .about-control-row{
+  display:grid;
+  gap:7px;
+}
+#about .about-control-row > span{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  font-size:11px;
+  font-weight:700;
+  color:#36586e;
+}
+#about .about-control-row output{
+  color:#966818;
+  font-variant-numeric:tabular-nums;
+}
+#about .about-control-row input[type="range"]{
+  width:100%;
+  accent-color:#173a55;
+  cursor:pointer;
+}
+#about .about-control-note{
+  margin:0;
+  color:#7b8d98;
+  font-size:10px;
+  line-height:1.55;
+}
+@media(max-width:980px){
+  #about .about-photo-card,
+  #about .about-image-controls{width:min(100%,390px)}
+}
+@media(max-width:700px){
+  #about .about-photo-card,
+  #about .about-image-controls{width:min(100%,350px)}
+}
+</style>
+
 </head>
 <body>
   <a class="skip-link" href="#main">Bỏ qua menu</a>
@@ -1475,13 +1596,39 @@ body{color:var(--ink-strong)!important}
     <section class="section about-section" id="about">
       <div class="shell about-layout">
         <div class="about-media reveal">
-          <img id="aboutProfileImage" src="assets/about-fieldwork.svg" alt="Khảo sát địa chất ngoài thực địa">
-          <div class="about-admin-tools" id="aboutAdminTools" hidden>
-            <button class="about-image-edit-btn" id="aboutImageEditBtn" type="button">✎ Thay ảnh</button>
-            <input id="aboutImageInput" type="file" accept="image/jpeg,image/png,image/webp" hidden>
-            <span class="about-image-edit-status" id="aboutImageEditStatus"></span>
+          <div class="about-photo-card" id="aboutPhotoCard">
+            <img id="aboutProfileImage" src="assets/about-fieldwork.svg" alt="Ảnh chân dung Phan Tấn Tài">
+            <div class="about-admin-tools" id="aboutAdminTools" hidden>
+              <button class="about-image-edit-btn" id="aboutImageEditBtn" type="button">✎ Thay ảnh</button>
+              <input id="aboutImageInput" type="file" accept="image/jpeg,image/png,image/webp" hidden>
+              <span class="about-image-edit-status" id="aboutImageEditStatus"></span>
+            </div>
+            <div class="media-caption about-card-caption"><span>PROFILE PHOTO</span><strong>Phan Tấn Tài</strong></div>
           </div>
-          <div class="media-caption"><span>FIELD NOTE 01</span><strong>Observe · Measure · Interpret</strong></div>
+
+          <div class="about-image-controls" id="aboutImageControls" hidden>
+            <div class="about-control-head">
+              <div><strong>Tinh chỉnh ảnh thẻ</strong><small>Kéo thanh để xem thay đổi trực tiếp.</small></div>
+              <button type="button" id="aboutImageResetBtn">Đặt lại</button>
+            </div>
+
+            <label class="about-control-row">
+              <span>Kích thước ảnh <output id="aboutScaleValue">108%</output></span>
+              <input id="aboutScaleRange" type="range" min="1" max="2.2" step="0.01" value="1.08">
+            </label>
+
+            <label class="about-control-row">
+              <span>Vị trí ngang <output id="aboutPosXValue">50%</output></span>
+              <input id="aboutPosXRange" type="range" min="0" max="100" step="1" value="50">
+            </label>
+
+            <label class="about-control-row">
+              <span>Vị trí dọc <output id="aboutPosYValue">28%</output></span>
+              <input id="aboutPosYRange" type="range" min="0" max="100" step="1" value="28">
+            </label>
+
+            <p class="about-control-note">Các thay đổi được lưu tự động sau khi bạn thả thanh điều chỉnh.</p>
+          </div>
         </div>
         <div class="about-copy reveal delay-1">
           <p class="eyebrow">01 · GIỚI THIỆU</p>
@@ -1788,41 +1935,104 @@ const PUBLIC_CACHE_KEY = 'ptt-public-cache-v1';
 const PUBLIC_CACHE_TTL = 10 * 60 * 1000;
 
 const DEFAULT_ABOUT_IMAGE='assets/about-fieldwork.svg';
+const DEFAULT_ABOUT_STYLE={scale:1.08,posX:50,posY:28};
 let currentAboutImagePath='';
+let currentAboutStyle={...DEFAULT_ABOUT_STYLE};
+let aboutStyleSaveTimer=null;
 
 function cleanUploadName(name='image'){
   return String(name).normalize('NFD').replace(/[\u0300-\u036f]/g,'')
     .replace(/[^A-Za-z0-9._-]+/g,'-').replace(/^-+|-+$/g,'').slice(-90) || 'image';
 }
+function clampNumber(value,min,max,fallback){
+  const n=Number(value);
+  return Number.isFinite(n)?Math.min(max,Math.max(min,n)):fallback;
+}
+function applyAboutImageStyle(style=currentAboutStyle,{syncInputs=true}={}){
+  currentAboutStyle={
+    scale:clampNumber(style.scale,1,2.2,DEFAULT_ABOUT_STYLE.scale),
+    posX:clampNumber(style.posX,0,100,DEFAULT_ABOUT_STYLE.posX),
+    posY:clampNumber(style.posY,0,100,DEFAULT_ABOUT_STYLE.posY)
+  };
+  const card=$('#aboutPhotoCard');
+  if(card){
+    card.style.setProperty('--about-scale',String(currentAboutStyle.scale));
+    card.style.setProperty('--about-pos-x',currentAboutStyle.posX+'%');
+    card.style.setProperty('--about-pos-y',currentAboutStyle.posY+'%');
+  }
+  if(syncInputs){
+    const scale=$('#aboutScaleRange'),x=$('#aboutPosXRange'),y=$('#aboutPosYRange');
+    if(scale)scale.value=String(currentAboutStyle.scale);
+    if(x)x.value=String(currentAboutStyle.posX);
+    if(y)y.value=String(currentAboutStyle.posY);
+  }
+  const scaleOut=$('#aboutScaleValue'),xOut=$('#aboutPosXValue'),yOut=$('#aboutPosYValue');
+  if(scaleOut)scaleOut.value=Math.round(currentAboutStyle.scale*100)+'%';
+  if(xOut)xOut.value=Math.round(currentAboutStyle.posX)+'%';
+  if(yOut)yOut.value=Math.round(currentAboutStyle.posY)+'%';
+}
+async function saveAboutImageStyle(){
+  if(!sb)return;
+  const now=new Date().toISOString();
+  const rows=[
+    {key:'about_image_scale',value:String(currentAboutStyle.scale),updated_at:now},
+    {key:'about_image_pos_x',value:String(currentAboutStyle.posX),updated_at:now},
+    {key:'about_image_pos_y',value:String(currentAboutStyle.posY),updated_at:now}
+  ];
+  const {error}=await sb.from('site_settings').upsert(rows,{onConflict:'key'});
+  if(error)throw error;
+}
+function queueAboutStyleSave(){
+  clearTimeout(aboutStyleSaveTimer);
+  aboutStyleSaveTimer=setTimeout(async()=>{
+    const status=$('#aboutImageEditStatus');
+    try{
+      await saveAboutImageStyle();
+      if(status)status.textContent='Đã lưu vị trí ảnh.';
+      setTimeout(()=>{if(status?.textContent==='Đã lưu vị trí ảnh.')status.textContent='';},1500);
+    }catch(error){
+      if(status)status.textContent=error.message||'Không lưu được vị trí ảnh.';
+    }
+  },180);
+}
 async function loadAboutImage(){
   const img=$('#aboutProfileImage');
   if(!img)return;
+  applyAboutImageStyle(DEFAULT_ABOUT_STYLE);
   if(!sb){img.src=DEFAULT_ABOUT_IMAGE;return;}
   try{
     const {data,error}=await sb.from('site_settings')
       .select('key,value')
-      .in('key',['about_image_url','about_image_path']);
+      .in('key',['about_image_url','about_image_path','about_image_scale','about_image_pos_x','about_image_pos_y']);
     if(error)throw error;
     const map=Object.fromEntries((data||[]).map(row=>[row.key,row.value||'']));
     currentAboutImagePath=map.about_image_path||'';
+    applyAboutImageStyle({
+      scale:map.about_image_scale||DEFAULT_ABOUT_STYLE.scale,
+      posX:map.about_image_pos_x||DEFAULT_ABOUT_STYLE.posX,
+      posY:map.about_image_pos_y||DEFAULT_ABOUT_STYLE.posY
+    });
     if(map.about_image_url){
       img.src=map.about_image_url+(map.about_image_url.includes('?')?'&':'?')+'v='+Date.now();
-    }else if(!img.getAttribute('src')){
+    }else{
       img.src=DEFAULT_ABOUT_IMAGE;
     }
   }catch(error){
     console.warn('Không tải được ảnh Giới thiệu tùy chỉnh:',error);
-    if(!img.getAttribute('src'))img.src=DEFAULT_ABOUT_IMAGE;
+    img.src=img.getAttribute('src')||DEFAULT_ABOUT_IMAGE;
   }
 }
 async function syncAboutAdminTools(authUser){
   const tools=$('#aboutAdminTools');
-  if(!tools)return;
-  tools.hidden=true;
+  const controls=$('#aboutImageControls');
+  if(tools)tools.hidden=true;
+  if(controls)controls.hidden=true;
   if(!sb||!authUser)return;
   try{
     const {data,error}=await sb.from('profiles').select('role').eq('id',authUser.id).maybeSingle();
-    if(!error&&data?.role==='admin')tools.hidden=false;
+    const isAdmin=!error&&data?.role==='admin';
+    if(tools)tools.hidden=!isAdmin;
+    if(controls)controls.hidden=!isAdmin;
   }catch{}
 }
 async function uploadAboutImage(file){
@@ -1874,7 +2084,6 @@ async function uploadAboutImage(file){
     button.disabled=false;
   }
 }
-
 
 function escapeHtml(value = ''){
   return String(value).replace(/[&<>'"]/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[char]));
@@ -2578,11 +2787,35 @@ const accountBtn = $('#userAccountBtn');
 const accountMenu = $('#userAccountMenu');
 
 const aboutImageInput=$('#aboutImageInput');
+const aboutScaleRange=$('#aboutScaleRange');
+const aboutPosXRange=$('#aboutPosXRange');
+const aboutPosYRange=$('#aboutPosYRange');
+
 $('#aboutImageEditBtn')?.addEventListener('click',()=>aboutImageInput?.click());
 aboutImageInput?.addEventListener('change',async event=>{
   const file=event.target.files?.[0];
   event.target.value='';
   if(file)await uploadAboutImage(file);
+});
+
+function previewAboutControls(){
+  applyAboutImageStyle({
+    scale:aboutScaleRange?.value??currentAboutStyle.scale,
+    posX:aboutPosXRange?.value??currentAboutStyle.posX,
+    posY:aboutPosYRange?.value??currentAboutStyle.posY
+  },{syncInputs:false});
+}
+[aboutScaleRange,aboutPosXRange,aboutPosYRange].forEach(input=>{
+  input?.addEventListener('input',previewAboutControls);
+  input?.addEventListener('change',()=>{
+    previewAboutControls();
+    queueAboutStyleSave();
+  });
+});
+$('#aboutImageResetBtn')?.addEventListener('click',()=>{
+  applyAboutImageStyle(DEFAULT_ABOUT_STYLE);
+  queueAboutStyleSave();
+  showToast('Đã đặt lại khung ảnh thẻ');
 });
 
 function userView(user){
