@@ -1,0 +1,130 @@
+{
+  "generated_at": "2026-09-30T18:16:35.037051+00:00",
+  "projects": [
+    {
+      "id": "p_1790772660562",
+      "title": "Đồ án 1",
+      "type": "Minh giải địa vật lý",
+      "image_url": "assets/hero-geoscience.svg",
+      "image_path": "p_1790772660562/1790772660562-cac-duong-cong-dia-vat-ly-gieng-khoan-20230312215136.webp",
+      "summary": "Mỏ X thuộc Lô Y nằm trong bể trầm tích Cửu Long trên thềm lục địa phía Nam Việt Nam. Các thành tạo Oligoxen dưới (Hệ tầng Trà Cú) phủ trực tiếp lên đá móng nứt nẻ và là một đối tượng chứa dầu khí quan trọng của mỏ. Đồ án nhằm minh giải và đánh giá các thông số vỉa chứa gồm hàm lượng sét (Vcl), độ rỗng hiệu dụng (PHIE) và độ bão hòa nước (Sw) của các thành tạo này dựa trên tài liệu địa vật lý giếng khoan của hai giếng X-1C và X-2C. Trên cơ sở đó, đồ án xác định các khoảng vỉa có triển vọng chứa hydrocarbon (Net Pay) và kiểm chứng độ tin cậy của kết quả thông qua đối sánh với số liệu của đơn vị sản xuất, tài liệu Masterlog và tài liệu thử vỉa.",
+      "tags": [
+        "Well logging"
+      ],
+      "objective": "Đánh giá thông số chứa các thành tạo Oligoxen dưới Mỏ X, Lô Y, Bể Z theo tài liệu địa vật lý giếng khoan",
+      "data_text": "Tài liệu địa vật lý giếng khoan",
+      "method": "Đồ án áp dụng phương pháp minh giải tài liệu ĐVLGK trên phần mềm Interactive Petrophysics (IP) với tổ hợp các đường cong Gamma Ray (GR), điện trở suất (LLS, LLD), neutron (NPHI) và siêu âm (DT).",
+      "output": "Bộ thông số chứa các thành tạo Oligoxen dưới Mỏ X, Lô Y, Bể Cửu Long theo",
+      "report_files": [],
+      "sort_order": 0,
+      "created_at": "2026-09-30T12:51:07.162516+00:00",
+      "remote_image_url": "https://aqkasetqystwvpassidd.supabase.co/storage/v1/object/public/project-images/p_1790772660562/1790772660562-cac-duong-cong-dia-vat-ly-gieng-khoan-20230312215136.webp"
+    },
+    {
+      "id": "p_1790773129500",
+      "title": "Báo cáo thực địa",
+      "type": "Thực Địa",
+      "image_url": "assets/hero-geoscience.svg",
+      "image_path": "p_1790773129500/1790773129500-cfd557cf-2e4d-4ac4-b792-a644e2fd0b50.webp",
+      "summary": "Khảo sát các thành tạo địa chất tại Ninh Thuận, Bình Thuận, Khánh Hòa (Nha Trang) và TP. Hồ Chí Minh (bao gồm khu vực Vũng Tàu).",
+      "tags": [
+        "Thực tế",
+        "trãi nghiệm"
+      ],
+      "objective": "Nắm được kiến thức thực tế về địa chất",
+      "data_text": "Tự thu thập",
+      "method": "Tìm hiểu và quan sát thực tế",
+      "output": "Các mẫu tự thu thập và báo cáo về chuyến thực địa",
+      "report_files": [],
+      "sort_order": 1,
+      "created_at": "2026-09-30T12:58:55.718772+00:00",
+      "remote_image_url": "https://aqkasetqystwvpassidd.supabase.co/storage/v1/object/public/project-images/p_1790773129500/1790773129500-cfd557cf-2e4d-4ac4-b792-a644e2fd0b50.webp"
+    }
+  ],
+  "assignments": [
+    {
+      "id": "a_1790700810370_0_4ams3",
+      "type": "PPTX",
+      "title": "Assignment 01",
+      "topic": "Given the course outline of Applied Geophysics you are asked to make a ppt presentation file either by yourself or using an AI platform that you see fit (ChatGPT, Gemini, etc.). You are encouraged to add pcitures/figures for better illustration of the course outline.",
+      "content_text": "",
+      "external_url": "",
+      "subject": "ia-vat-ly-ung-dung",
+      "assignment_date": "2026-09-10",
+      "assignment_number": 1,
+      "date_text": "10/09/2026",
+      "created_at": "2026-09-29T16:54:03.956533+00:00",
+      "file_name": "phan tấn tài 2026.pptx",
+      "file_url": "https://aqkasetqystwvpassidd.supabase.co/storage/v1/object/public/assignments/date-2026-09-10/a_1790700810370_0_4ams3/1790700810370-phan-tan-tai-2026.pptx",
+      "file_path": "date-2026-09-10/a_1790700810370_0_4ams3/1790700810370-phan-tan-tai-2026.pptx"
+    },
+    {
+      "id": "a_1790701478280_0_9t2uc",
+      "type": "PDF",
+      "title": "Assignment 02",
+      "topic": "This is a group work. Given the presentation file of General Seismic you are asked: 1) to use an AI model to make it into a new slide. 2) Solve the chpater problems given in the Textbook 3) Your group is asked to come down to the PVU laboratory to look at the seismic equipment and describe it as in details as possible. In the report please indicate clearly contribution from each team member.",
+      "content_text": "",
+      "external_url": "",
+      "subject": "ia-vat-ly-ung-dung",
+      "assignment_date": "2026-09-25",
+      "assignment_number": 1,
+      "date_text": "25/09/2026",
+      "created_at": "2026-09-29T17:07:13.878865+00:00",
+      "file_name": "Assignment 2-thuyết trình thiết bị đo địa chấn.pdf",
+      "file_url": "https://aqkasetqystwvpassidd.supabase.co/storage/v1/object/public/assignments/date-2026-09-25/a_1790701478280_0_9t2uc/1790701478280-Assignment-2-thuyet-trinh-thiet-bi-o-ia-chan.pdf",
+      "file_path": "date-2026-09-25/a_1790701478280_0_9t2uc/1790701478280-Assignment-2-thuyet-trinh-thiet-bi-o-ia-chan.pdf"
+    },
+    {
+      "id": "a_1790703251154_0_61zh5",
+      "type": "BÀI",
+      "title": "Assignment 03",
+      "topic": "You are asked to create an AI-asisted website showing your profile and to update your assignment solutions and research project. You may neeed to do the followings but not limited to: 1) Learn from the internet sources on how to make an website 2) Select the tool of use 3) Explain your medthodology 4) Design of your website layout (say, introduction on yourself, posting your assignment answers, etc.) 5) Implementation",
+      "content_text": "Website được xây dựng theo hướng portfolio cá nhân chuyên ngành Địa chất – Địa vật lý – Dầu khí, có cả trang công khai cho người xem và trang Admin để quản lý nội dung. Quá trình làm bắt đầu từ việc thiết kế giao diện sáng, hiện đại, tối giản, sau đó bổ sung dần các chức năng thực tế như quản lý dự án, bài tập, file báo cáo, trao đổi học thuật, đăng nhập và xem trước tài liệu.<div>Các công cụ chính đã dùng gồm:</div><div>- HTML, CSS, JavaScript: tạo toàn bộ giao diện và chức năng frontend của website.</div><div>- GitHub: lưu mã nguồn website, quản lý các phiên bản và cập nhật code.</div><div>- Render: triển khai website lên Internet và tự chạy từ mã nguồn GitHub.</div><div>- Supabase Database: lưu dữ liệu dự án, bài tập, môn học, nhận xét, tin nhắn và thông tin người dùng.</div><div>- Supabase Storage: lưu file bài tập, file báo cáo dự án và hình ảnh.</div><div>- Supabase Authentication: quản lý đăng ký, đăng nhập người dùng và tài khoản Admin.</div><div>- Supabase RLS: phân quyền giữa người xem công khai và Admin.</div><div>- AI Image Generation: tạo hình ảnh chuyên về địa chất, địa tầng, dầu khí, giàn khoan và địa vật lý để dùng trên website.</div><div>- Geo AI: tích hợp trợ lý học tập chuyên về Địa chất – Địa vật lý ngay trong website.</div><div>Quá trình phát triển chính có thể tóm tắt như sau:</div><div>1. Xây dựng giao diện trang chủ, giới thiệu, dự án, bài tập, Geo AI và liên hệ.</div><div>2. Tạo giao diện Admin riêng để quản lý dữ liệu.</div><div>3. Kết nối website với Supabase để dữ liệu không còn nằm cố định trong HTML.</div><div>4. Thêm chức năng đăng nhập và phân quyền Admin.</div><div>5. Xây dựng phần Dự án, cho phép thêm hình ảnh, thông tin chi tiết và nhiều file báo cáo.</div><div>6. Xây dựng phần Bài tập, chia theo ngày/tháng/năm và tự đánh số Bài 1, Bài 2, Bài 3...</div><div>7. Cho phép Admin quản lý môn học.</div><div>8. Cho phép tải nhiều file bài tập cùng lúc hoặc tạo bài không cần file.</div><div>9. Thêm trường Nội dung bài tập, không bắt buộc.</div><div>10. Tạo trang Xem trước tài liệu riêng trước khi tải file.</div><div>11. Hỗ trợ PDF, Word, PowerPoint và Excel.</div><div>12. Tăng giới hạn file bài tập và báo cáo lên 50 MB/file theo giới hạn phù hợp của Supabase Free.</div><div>13. Xây dựng phần Trao đổi học thuật, hiển thị người nhận xét, bài tập liên quan, ngày học, thời gian trao đổi và lưu lịch sử.</div><div>14. Giữ lịch sử trao đổi ngay cả khi bài tập bị xóa; Admin vẫn có quyền chủ động xóa từng trao đổi.</div><div>15. Tối ưu giao diện, màu chữ và hình ảnh theo chủ đề Địa chất – Dầu khí, đồng thời loại bỏ các hình ảnh có người theo yêu cầu của bạn.</div><div>16. Đưa website lên Render và cập nhật trực tiếp mỗi khi có thay đổi.</div><div>Có thể mô tả kiến trúc website rất ngắn như sau:</div><div>Người dùng → Website trên Render → JavaScript → Supabase Database / Storage / Auth</div><div>Trong đó GitHub là nơi lưu mã nguồn, Render là nơi chạy website, còn Supabase đóng vai trò gần giống backend của hệ thống.</div>",
+      "external_url": "https://phan-tan-tai-geoscience-portfolio.onrender.com",
+      "subject": "ia-vat-ly-ung-dung",
+      "assignment_date": "2026-10-01",
+      "assignment_number": 1,
+      "date_text": "01/10/2026",
+      "created_at": "2026-09-29T17:34:12.045894+00:00",
+      "file_name": "",
+      "file_url": "",
+      "file_path": ""
+    }
+  ],
+  "subjects": [
+    {
+      "slug": "petrophysics",
+      "name": "Petrophysics",
+      "sort_order": 10
+    },
+    {
+      "slug": "seismic",
+      "name": "Seismic",
+      "sort_order": 20
+    },
+    {
+      "slug": "geology",
+      "name": "Geology",
+      "sort_order": 30
+    },
+    {
+      "slug": "ia-vat-ly-ung-dung",
+      "name": "Địa vật lý ứng dụng",
+      "sort_order": 40
+    }
+  ],
+  "comments": [
+    {
+      "id": "59fff00b-6fcd-4c10-8eb3-e6953f4a5ffa",
+      "assignment_id": "a_1790701478280_0_9t2uc",
+      "name": "Phan Tấn Tài",
+      "role": "Sinh viên",
+      "body": "hi tài",
+      "created_at": "2026-09-30T14:48:56.004767+00:00",
+      "assignment_title": "Assignment 02",
+      "assignment_date": "2026-09-25",
+      "assignment_number": 1,
+      "assignment_subject": "Địa vật lý ứng dụng"
+    }
+  ]
+}
