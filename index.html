@@ -3022,7 +3022,7 @@ async function openProjectReport(projectId,index){
   if(!file){ showToast('Không tìm thấy file báo cáo.'); return; }
   try{
     let target=file.url || '';
-    if(file.path){
+    if(file.path && sb){
       const {data,error}=await sb.storage.from('project-reports').createSignedUrl(file.path,120);
       if(error || !data?.signedUrl) throw error || new Error('File báo cáo không còn trong Storage.');
       target=data.signedUrl;
@@ -3315,18 +3315,61 @@ function mapAssignment(row, countMap){
     commentCount:countMap[row.id] || 0
   };
 }
+async function publicRest(table,query=''){
+  const cfg=window.PTT_CONFIG||{};
+  if(!cfg.SUPABASE_URL||!cfg.SUPABASE_ANON_KEY)throw configurationError();
+  const response=await fetch(`${cfg.SUPABASE_URL}/rest/v1/${table}${query?'?'+query:''}`,{
+    headers:{
+      'apikey':cfg.SUPABASE_ANON_KEY,
+      'Authorization':'Bearer '+cfg.SUPABASE_ANON_KEY,
+      'Accept':'application/json'
+    },
+    cache:'no-store'
+  });
+  if(!response.ok)throw new Error(`REST ${table} failed (${response.status})`);
+  return await response.json();
+}
+async function loadPublicContentViaRest(){
+  const projectSelect=encodeURIComponent('id,title,type,image_url,image_path,summary,tags,objective,data_text,method,output,report_files,sort_order,created_at');
+  const assignmentSelect=encodeURIComponent('id,type,title,topic,content_text,external_url,subject,assignment_date,assignment_number,date_text,created_at,file_name,file_url,file_path');
+  const commentSelect=encodeURIComponent('id,assignment_id,name,role,body,created_at,assignment_title,assignment_date,assignment_number,assignment_subject');
+  const subjectSelect=encodeURIComponent('slug,name,sort_order');
+  const [projectsData,assignmentsData,commentsData,subjectsData]=await Promise.all([
+    publicRest('projects',`select=${projectSelect}&published=eq.true&deleted_at=is.null&order=sort_order.asc,created_at.desc`),
+    publicRest('assignments',`select=${assignmentSelect}&published=eq.true&deleted_at=is.null&order=assignment_date.asc,assignment_number.asc,created_at.asc`),
+    publicRest('comments',`select=${commentSelect}&order=created_at.desc`),
+    publicRest('assignment_subjects',`select=${subjectSelect}&active=eq.true&order=sort_order.asc,name.asc`)
+  ]);
+  return [
+    {data:projectsData,error:null},
+    {data:assignmentsData,error:null},
+    {data:commentsData,error:null},
+    {data:subjectsData,error:null}
+  ];
+}
 async function loadPublicContent({silent = false} = {}){
   if(publicContentLoading){publicRefreshPending=true;return;}
   publicContentLoading=true;
   try {
-    const client = requireSupabase();
-    const [pRes, aRes, cRes, sRes] = await Promise.all([
-      client.from('projects').select('id,title,type,image_url,image_path,summary,tags,objective,data_text,method,output,report_files,sort_order,created_at').eq('published', true).is('deleted_at', null).order('sort_order', {ascending:true}).order('created_at', {ascending:false}),
-      client.from('assignments').select('id,type,title,topic,content_text,external_url,subject,assignment_date,assignment_number,date_text,created_at,file_name,file_url,file_path').eq('published', true).is('deleted_at', null).order('assignment_date', {ascending:true}).order('assignment_number', {ascending:true}).order('created_at', {ascending:true}),
-      client.from('comments').select('id,assignment_id,name,role,body,created_at,assignment_title,assignment_date,assignment_number,assignment_subject').order('created_at', {ascending:false}),
-      client.from('assignment_subjects').select('slug,name,sort_order').eq('active', true).order('sort_order', {ascending:true}).order('name', {ascending:true})
-    ]);
-    for (const res of [pRes,aRes,cRes,sRes]) if (res.error) throw res.error;
+    let pRes,aRes,cRes,sRes;
+    if(sb){
+      try{
+        const results=await Promise.all([
+          sb.from('projects').select('id,title,type,image_url,image_path,summary,tags,objective,data_text,method,output,report_files,sort_order,created_at').eq('published', true).is('deleted_at', null).order('sort_order', {ascending:true}).order('created_at', {ascending:false}),
+          sb.from('assignments').select('id,type,title,topic,content_text,external_url,subject,assignment_date,assignment_number,date_text,created_at,file_name,file_url,file_path').eq('published', true).is('deleted_at', null).order('assignment_date', {ascending:true}).order('assignment_number', {ascending:true}).order('created_at', {ascending:true}),
+          sb.from('comments').select('id,assignment_id,name,role,body,created_at,assignment_title,assignment_date,assignment_number,assignment_subject').order('created_at', {ascending:false}),
+          sb.from('assignment_subjects').select('slug,name,sort_order').eq('active', true).order('sort_order', {ascending:true}).order('name', {ascending:true})
+        ]);
+        [pRes,aRes,cRes,sRes]=results;
+        for(const res of results)if(res.error)throw res.error;
+      }catch(clientError){
+        console.warn('Supabase client failed; using public REST fallback:',clientError);
+        [pRes,aRes,cRes,sRes]=await loadPublicContentViaRest();
+      }
+    }else{
+      console.warn('Supabase JS unavailable; using public REST fallback.');
+      [pRes,aRes,cRes,sRes]=await loadPublicContentViaRest();
+    }
     const activeAssignmentIds=new Set((aRes.data||[]).map(row=>row.id));
     const publicComments=(cRes.data||[]).filter(row=>row.assignment_id&&activeAssignmentIds.has(row.assignment_id));
     const counts = {};
@@ -3708,7 +3751,7 @@ document.addEventListener('keydown', event => { if (event.key === 'Escape') $$('
 <script>
 if('serviceWorker' in navigator){
   window.addEventListener('load',()=>{
-    navigator.serviceWorker.register('/sw.js?v=20261001-mobilefix1',{scope:'/',updateViaCache:'none'})
+    navigator.serviceWorker.register('/sw.js?v=20261001-mobilefix2',{scope:'/',updateViaCache:'none'})
       .then(registration=>registration.update())
       .catch(error=>console.warn('Service worker unavailable:',error));
   },{once:true});
