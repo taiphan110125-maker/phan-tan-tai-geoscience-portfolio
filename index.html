@@ -1510,7 +1510,19 @@ body{color:var(--ink-strong)!important}
   contain-intrinsic-size:850px;
 }
 @media(max-width:700px){
-  #projects,#assignments,#contact,#geo-ai{contain-intrinsic-size:1050px}
+  #projects,#assignments,#contact,#geo-ai{
+    content-visibility:visible;
+    contain-intrinsic-size:auto;
+  }
+  #projects .project-showcase.project-scroll-active{
+    max-height:none!important;
+    overflow:visible!important;
+    padding-right:0!important;
+  }
+  .project-open,.assignment-view,.comment-open{
+    touch-action:manipulation;
+    min-height:44px;
+  }
 }
 </style>
 
