@@ -4,6 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="theme-color" content="#071a24">
+  <meta name="robots" content="noindex,nofollow,noarchive">
+  <meta name="referrer" content="same-origin">
   <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
@@ -468,7 +470,7 @@ body.admin-body,.admin-body{background:#f6f8fb!important;color:#183247!important
 <body class="admin-body">
   <header class="admin-topbar">
     <div class="brand">
-      <img class="admin-brand-emblem" src="assets/ptt-emblem.svg" alt="Logo Phan Tấn Tài">
+      <img class="admin-brand-emblem" src="assets/ptt-emblem.svg" alt="Logo Phan Tấn Tài" width="180" height="180" decoding="async">
       <span class="brand-copy"><strong>PHAN TẤN TÀI</strong><small>ADMIN CONSOLE</small></span>
     </div>
     <div class="admin-top-actions"><a class="btn btn-outline" href="index.html">Xem website công khai</a><button class="btn btn-gold" id="logoutBtn">Đăng xuất</button></div>
@@ -543,7 +545,7 @@ body.admin-body,.admin-body{background:#f6f8fb!important;color:#183247!important
           <div class="site-image-admin-grid">
             <div class="site-image-admin-preview">
               <div class="site-image-card">
-                <img id="siteAboutImagePreview" src="assets/about-fieldwork.svg" alt="Xem trước ảnh giới thiệu" loading="lazy" decoding="async">
+                <img id="siteAboutImagePreview" src="assets/about-fieldwork.svg" alt="Xem trước ảnh giới thiệu" width="1200" height="1600" loading="lazy" decoding="async">
               </div>
               <small>Khung xem trước theo tỷ lệ ảnh thẻ 3:4.</small>
             </div>
@@ -638,7 +640,7 @@ body.admin-body,.admin-body{background:#f6f8fb!important;color:#183247!important
             <label>Hoặc chọn ảnh từ máy<input id="projectImageFile" type="file" accept="image/png,image/jpeg,image/webp"></label>
             <small class="muted">Ảnh tải từ máy sẽ được tối ưu và lưu vào Supabase Storage để mọi thiết bị cùng nhìn thấy.</small>
           </div>
-          <div class="project-image-preview"><img id="projectImagePreview" src="assets/hero-geoscience.svg" alt="Xem trước ảnh dự án" loading="lazy" decoding="async"></div>
+          <div class="project-image-preview"><img id="projectImagePreview" src="assets/hero-geoscience.svg" alt="Xem trước ảnh dự án" width="1600" height="900" loading="lazy" decoding="async"></div>
         </div>
         <div class="project-report-editor">
           <div class="project-report-editor-head">
@@ -707,7 +709,7 @@ body.admin-body,.admin-body{background:#f6f8fb!important;color:#183247!important
       <p class="eyebrow">SUBJECTS</p><h3>Quản lý môn học</h3>
       <p class="muted">Bạn có thể thêm môn mới, đổi tên hoặc ẩn môn khỏi bộ lọc công khai.</p>
       <form id="subjectForm" class="subject-add-form">
-        <input id="subjectName" required minlength="2" maxlength="80" placeholder="Tên môn học mới">
+        <input id="subjectName" required minlength="2" maxlength="80" aria-label="Tên môn học mới" placeholder="Tên môn học mới">
         <button class="btn btn-dark" type="submit">+ Thêm môn</button>
       </form>
       <p class="form-status" id="subjectStatus"></p>
@@ -716,7 +718,7 @@ body.admin-body,.admin-body{background:#f6f8fb!important;color:#183247!important
   </div>
 
   <div class="toast" id="toast" role="status"></div>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2"></script>
   <script>
 // CẤU HÌNH PUBLIC CHO SUPABASE
 // Publishable key được phép dùng ở frontend; không đặt service_role key ở đây.
@@ -1015,7 +1017,7 @@ function renderAssignments(){
   $('#adminAssignmentRows').innerHTML=rows.length?rows.map(i=>`
     <tr>
       <td><strong>${esc(formatAssignmentDate(i.assignmentDate))} · Bài ${i.assignmentNumber}</strong><small>${esc(i.title)} · ${esc(i.type)}${i.fileName?` · ${esc(i.fileName)}`:''}${i.externalUrl?' · Link':''}${i.contentPlain?` · ${esc(i.contentPlain.slice(0,70))}${i.contentPlain.length>70?'…':''}`:''}</small></td>
-      <td><select class="admin-inline-select" data-assignment-subject="${esc(i.id)}">${subjectOptions(i.subject,false)}</select></td>
+      <td><select class="admin-inline-select" data-assignment-subject="${esc(i.id)}" aria-label="Môn học của bài tập">${subjectOptions(i.subject,false)}</select></td>
       <td><label class="inline-day-control"><span>Ngày</span><input type="date" value="${esc(i.assignmentDate)}" data-assignment-date="${esc(i.id)}"></label></td>
       <td>${esc(i.topic||'—')}</td>
       <td>${Number(i.commentCount||0)}</td>
@@ -1034,7 +1036,7 @@ function renderSubjects(){
       </div>
     </div>`).join(''):'<div class="empty-state">Chưa có môn học.</div>';
 }
-function renderProjects(){ const q=($('#projectSearch')?.value||'').trim().toLowerCase(); const filtered=projects.filter(p=>`${p.title} ${p.type} ${(p.tags||[]).join(' ')}`.toLowerCase().includes(q)); $('#adminProjectRows').innerHTML=filtered.length?filtered.map(p=>`<tr><td><div class="admin-project-title"><img src="${esc(p.image||'assets/hero-geoscience.svg')}" alt=""><div><strong>${esc(p.title)}</strong><small>${esc((p.summary||'').slice(0,105))}${(p.summary||'').length>105?'…':''} · ${p.reportFiles.length} file báo cáo</small></div></div></td><td>${esc(p.type||'—')}</td><td><div class="admin-tag-list">${(p.tags||[]).slice(0,3).map(t=>`<span>${esc(t)}</span>`).join('')||'<span>Chưa có</span>'}</div></td><td><small>${p.imagePath?'Supabase Storage':esc(p.image||'Mặc định')}</small></td><td><div class="admin-row-actions"><button class="edit-btn" data-edit-project="${esc(p.id)}">Sửa</button><button class="danger-btn" data-delete-project="${esc(p.id)}">Xóa</button></div></td></tr>`).join(''):'<tr><td colspan="5"><div class="empty-state">Không tìm thấy dự án phù hợp.</div></td></tr>'; }
+function renderProjects(){ const q=($('#projectSearch')?.value||'').trim().toLowerCase(); const filtered=projects.filter(p=>`${p.title} ${p.type} ${(p.tags||[]).join(' ')}`.toLowerCase().includes(q)); $('#adminProjectRows').innerHTML=filtered.length?filtered.map(p=>`<tr><td><div class="admin-project-title"><img src="${esc(p.image||'assets/hero-geoscience.svg')}" alt="" loading="lazy" decoding="async"><div><strong>${esc(p.title)}</strong><small>${esc((p.summary||'').slice(0,105))}${(p.summary||'').length>105?'…':''} · ${p.reportFiles.length} file báo cáo</small></div></div></td><td>${esc(p.type||'—')}</td><td><div class="admin-tag-list">${(p.tags||[]).slice(0,3).map(t=>`<span>${esc(t)}</span>`).join('')||'<span>Chưa có</span>'}</div></td><td><small>${p.imagePath?'Supabase Storage':esc(p.image||'Mặc định')}</small></td><td><div class="admin-row-actions"><button class="edit-btn" data-edit-project="${esc(p.id)}">Sửa</button><button class="danger-btn" data-delete-project="${esc(p.id)}">Xóa</button></div></td></tr>`).join(''):'<tr><td colspan="5"><div class="empty-state">Không tìm thấy dự án phù hợp.</div></td></tr>'; }
 function renderFeedback(){
   const host=$('#feedbackList');
   const items=[
