@@ -1872,6 +1872,190 @@ body{color:var(--ink-strong)!important}
 }
 </style>
 
+<style id="ptt-global-search-v1">
+.global-search-open{
+  height:40px;
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+  padding:0 10px;
+  border:1px solid rgba(19,49,72,.15);
+  border-radius:999px;
+  background:#fff;
+  color:#23445b;
+  font:700 12px/1 "Segoe UI",Arial,sans-serif;
+  cursor:pointer;
+  white-space:nowrap;
+  transition:border-color .2s ease,box-shadow .2s ease,transform .2s ease;
+}
+.global-search-open:hover{
+  border-color:rgba(19,49,72,.28);
+  box-shadow:0 8px 22px rgba(22,50,74,.08);
+  transform:translateY(-1px);
+}
+.global-search-open kbd,
+.global-search-box kbd{
+  border:1px solid #d8e1e7;
+  border-bottom-width:2px;
+  border-radius:6px;
+  background:#f7f9fa;
+  color:#738797;
+  padding:3px 5px;
+  font:700 9px/1 "Segoe UI",Arial,sans-serif;
+}
+.global-search-card{
+  width:min(760px,calc(100vw - 28px))!important;
+  max-height:min(760px,calc(100vh - 40px));
+  padding:24px!important;
+  overflow:hidden!important;
+  display:flex;
+  flex-direction:column;
+}
+.global-search-heading{
+  padding-right:42px;
+}
+.global-search-heading h3{
+  margin:3px 0 6px;
+  color:#17324a;
+  font-size:28px;
+}
+.global-search-heading p{
+  margin:0 0 18px;
+  color:#6f8392;
+  font-size:13px;
+}
+.global-search-box{
+  display:grid;
+  grid-template-columns:auto minmax(0,1fr) auto;
+  align-items:center;
+  gap:10px;
+  min-height:54px;
+  padding:0 14px;
+  border:1px solid #d7e1e8;
+  border-radius:14px;
+  background:#f9fbfc;
+}
+.global-search-box>span{
+  font-size:20px;
+  color:#557287;
+}
+.global-search-box input{
+  width:100%;
+  min-width:0;
+  border:0!important;
+  outline:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+  color:#17324a;
+  font:500 15px/1.4 "Segoe UI",Arial,sans-serif;
+}
+.global-search-box input::-webkit-search-cancel-button{cursor:pointer}
+.global-search-meta{
+  min-height:36px;
+  display:flex;
+  align-items:center;
+  padding:0 2px;
+  color:#7b8d9a;
+  font-size:11px;
+}
+.global-search-results{
+  min-height:180px;
+  max-height:min(470px,55vh);
+  overflow-y:auto;
+  overscroll-behavior:contain;
+  scrollbar-gutter:stable;
+  display:grid;
+  gap:7px;
+  padding-right:4px;
+}
+.global-search-result{
+  width:100%;
+  display:grid;
+  grid-template-columns:74px minmax(0,1fr) 26px;
+  align-items:center;
+  gap:12px;
+  padding:13px 14px;
+  border:1px solid #e1e8ed;
+  border-radius:13px;
+  background:#fff;
+  text-align:left;
+  cursor:pointer;
+  transition:background .18s ease,border-color .18s ease,transform .18s ease;
+}
+.global-search-result:hover,
+.global-search-result:focus-visible{
+  background:#f8fafb;
+  border-color:#c9d6df;
+  transform:translateY(-1px);
+  outline:none;
+}
+.global-search-type{
+  display:inline-flex;
+  justify-content:center;
+  align-items:center;
+  min-height:25px;
+  padding:4px 7px;
+  border-radius:999px;
+  background:#edf3f6;
+  color:#537083;
+  font-size:9px;
+  font-weight:800;
+  text-transform:uppercase;
+  letter-spacing:.04em;
+}
+.global-search-copy{
+  min-width:0;
+  display:grid;
+  gap:4px;
+}
+.global-search-copy strong{
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  color:#17324a;
+  font-size:14px;
+}
+.global-search-copy small{
+  overflow:hidden;
+  display:-webkit-box;
+  -webkit-box-orient:vertical;
+  -webkit-line-clamp:2;
+  color:#718492;
+  font-size:11px;
+  line-height:1.45;
+}
+.global-search-arrow{
+  color:#9a6d2a;
+  font-size:18px;
+  text-align:center;
+}
+.global-search-empty{
+  min-height:170px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:7px;
+  padding:28px;
+  border:1px dashed #d7e1e8;
+  border-radius:14px;
+  color:#788b99;
+  text-align:center;
+}
+.global-search-empty strong{color:#35536a;font-size:14px}
+.global-search-empty span{max-width:460px;font-size:11px;line-height:1.55}
+@media(max-width:1120px){
+  .global-search-open kbd{display:none}
+  .global-search-label{display:none}
+  .global-search-open{width:40px;justify-content:center;padding:0}
+}
+@media(max-width:700px){
+  .global-search-card{padding:18px!important}
+  .global-search-heading h3{font-size:23px}
+  .global-search-result{grid-template-columns:64px minmax(0,1fr) 20px;padding:11px}
+  .global-search-results{max-height:52vh}
+}
+</style>
 </head>
 <body>
   <a class="skip-link" href="#main">Bỏ qua menu</a>
@@ -1892,6 +2076,9 @@ body{color:var(--ink-strong)!important}
         <a href="#geo-ai">Trợ lý ảo</a>
       </nav>
       <div class="account-actions" id="accountActions">
+        <button class="global-search-open" id="globalSearchOpen" type="button" aria-label="Tìm kiếm toàn website" aria-haspopup="dialog">
+          <span aria-hidden="true">⌕</span><span class="global-search-label">Tìm kiếm</span><kbd>Ctrl K</kbd>
+        </button>
         <button class="btn btn-outline btn-login" id="userLoginOpen">Đăng nhập</button>
         <button class="btn btn-gold btn-register" id="userRegisterOpen">Đăng ký</button>
         <button class="account-chip" id="userAccountBtn" type="button" hidden aria-haspopup="true" aria-expanded="false">
@@ -2163,6 +2350,24 @@ body{color:var(--ink-strong)!important}
       <button type="submit" aria-label="Gửi câu hỏi">↑</button>
     </form>
   </aside>
+
+  <div class="modal global-search-modal" id="globalSearchModal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="globalSearchTitle">
+    <div class="modal-card global-search-card">
+      <button class="modal-close" id="globalSearchClose" type="button" aria-label="Đóng tìm kiếm">×</button>
+      <div class="global-search-heading">
+        <p class="eyebrow">SEARCH</p>
+        <h3 id="globalSearchTitle">Tìm kiếm toàn website</h3>
+        <p>Tìm dự án, bài tập, môn học và các khu vực trên website.</p>
+      </div>
+      <label class="global-search-box" for="globalSearchInput">
+        <span aria-hidden="true">⌕</span>
+        <input id="globalSearchInput" type="search" autocomplete="off" spellcheck="false" placeholder="Nhập từ khóa, ví dụ: địa chấn, i2G, petrophysics...">
+        <kbd>ESC</kbd>
+      </label>
+      <div class="global-search-meta" id="globalSearchMeta">Nhập ít nhất 2 ký tự để tìm kiếm.</div>
+      <div class="global-search-results" id="globalSearchResults" role="listbox" aria-label="Kết quả tìm kiếm"></div>
+    </div>
+  </div>
 
   <div class="modal" id="projectModal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="projectModalTitle">
     <div class="modal-card">
@@ -2515,6 +2720,191 @@ const observer = 'IntersectionObserver' in window ? new IntersectionObserver(ent
 }, {threshold:.12}) : null;
 function observeReveal(root = document){ $$('.reveal', root).forEach(el => observer ? observer.observe(el) : el.classList.add('visible')); }
 observeReveal();
+
+// Global search
+const globalSearchModal=$('#globalSearchModal');
+const globalSearchInput=$('#globalSearchInput');
+const globalSearchResults=$('#globalSearchResults');
+const globalSearchMeta=$('#globalSearchMeta');
+
+function searchNormalize(value=''){
+  return String(value)
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g,'')
+    .replace(/đ/g,'d')
+    .replace(/Đ/g,'D')
+    .toLowerCase()
+    .replace(/\s+/g,' ')
+    .trim();
+}
+function searchSnippet(value='',query='',max=130){
+  const plain=String(value||'').replace(/\s+/g,' ').trim();
+  if(!plain)return '';
+  const q=searchNormalize(query);
+  const normalized=searchNormalize(plain);
+  const at=normalized.indexOf(q);
+  let start=at>45?Math.max(0,at-38):0;
+  let text=plain.slice(start,start+max);
+  if(start>0)text='…'+text;
+  if(start+max<plain.length)text+='…';
+  return text;
+}
+function websiteSearchItems(){
+  const projectItems=projects.map(project=>({
+    key:'project:'+project.id,
+    kind:'project',
+    type:'Dự án',
+    title:project.title,
+    description:[project.type,project.summary,(project.tags||[]).join(' '),project.objective,project.data,project.method,project.output].filter(Boolean).join(' · '),
+    search:[project.title,project.type,project.summary,(project.tags||[]).join(' '),project.objective,project.data,project.method,project.output].join(' '),
+    id:project.id
+  }));
+
+  const assignmentItems=assignments.map(item=>({
+    key:'assignment:'+item.id,
+    kind:'assignment',
+    type:'Bài tập',
+    title:item.title,
+    description:[assignmentSubjectName(item.subject),item.topic,item.contentPlain,item.fileName,formatAssignmentDate(item.assignmentDate),`Bài ${item.assignmentNumber}`].filter(Boolean).join(' · '),
+    search:[item.title,item.topic,item.contentPlain,item.fileName,item.externalUrl,assignmentSubjectName(item.subject),formatAssignmentDate(item.assignmentDate),`Bài ${item.assignmentNumber}`].join(' '),
+    id:item.id
+  }));
+
+  const subjectItems=assignmentSubjects.map(subject=>({
+    key:'subject:'+subject.slug,
+    kind:'subject',
+    type:'Môn học',
+    title:subject.name,
+    description:`Xem các bài tập thuộc môn ${subject.name}`,
+    search:[subject.name,subject.slug].join(' '),
+    id:subject.slug
+  }));
+
+  const sectionItems=[
+    {key:'section:about',kind:'section',type:'Khu vực',title:'Giới thiệu',description:'Thông tin giới thiệu và định hướng học tập.',search:'giới thiệu bản thân hồ sơ profile about',id:'about'},
+    {key:'section:projects',kind:'section',type:'Khu vực',title:'Dự án nghiên cứu',description:'Danh sách dự án và nghiên cứu.',search:'dự án nghiên cứu project research',id:'projects'},
+    {key:'section:assignments',kind:'section',type:'Khu vực',title:'Bài tập & Tài liệu',description:'Kho bài tập và tài liệu học tập.',search:'bài tập tài liệu assignment document',id:'assignments'},
+    {key:'section:contact',kind:'section',type:'Khu vực',title:'Liên hệ',description:'Thông tin và biểu mẫu liên hệ.',search:'liên hệ email điện thoại contact message',id:'contact'},
+    {key:'section:geo-ai',kind:'section',type:'Khu vực',title:'Trợ lý ảo',description:'Trợ lý hỗ trợ thông tin trên website.',search:'trợ lý ảo ai chatbot assistant',id:'geo-ai'}
+  ];
+
+  return [...projectItems,...assignmentItems,...subjectItems,...sectionItems];
+}
+function searchScore(item,query){
+  const q=searchNormalize(query);
+  const title=searchNormalize(item.title);
+  const body=searchNormalize(item.search);
+  if(!q||!body.includes(q))return -1;
+  let score=0;
+  if(title===q)score+=100;
+  else if(title.startsWith(q))score+=70;
+  else if(title.includes(q))score+=50;
+  if(body.startsWith(q))score+=20;
+  score+=Math.max(0,20-Math.min(20,body.indexOf(q)));
+  if(item.kind==='project'||item.kind==='assignment')score+=8;
+  return score;
+}
+function renderGlobalSearch(query=''){
+  if(!globalSearchResults||!globalSearchMeta)return;
+  const q=String(query||'').trim();
+
+  if(q.length<2){
+    globalSearchMeta.textContent='Nhập ít nhất 2 ký tự để tìm kiếm.';
+    globalSearchResults.innerHTML=`
+      <div class="global-search-empty">
+        <strong>Tìm nhanh nội dung học thuật</strong>
+        <span>Bạn có thể tìm theo tên dự án, môn học, tiêu đề bài tập hoặc từ khóa trong nội dung.</span>
+      </div>`;
+    return;
+  }
+
+  const results=websiteSearchItems()
+    .map(item=>({...item,score:searchScore(item,q)}))
+    .filter(item=>item.score>=0)
+    .sort((a,b)=>b.score-a.score||a.title.localeCompare(b.title,'vi'))
+    .slice(0,14);
+
+  globalSearchMeta.textContent=results.length
+    ? `${results.length} kết quả phù hợp`
+    : `Không tìm thấy nội dung phù hợp với “${q}”.`;
+
+  if(!results.length){
+    globalSearchResults.innerHTML='<div class="global-search-empty"><strong>Không có kết quả</strong><span>Thử từ khóa ngắn hơn hoặc tên môn học/dự án khác.</span></div>';
+    return;
+  }
+
+  globalSearchResults.innerHTML=results.map((item,index)=>`
+    <button type="button" class="global-search-result" role="option"
+      data-search-kind="${escapeHtml(item.kind)}"
+      data-search-id="${escapeHtml(item.id)}"
+      data-search-index="${index}">
+      <span class="global-search-type">${escapeHtml(item.type)}</span>
+      <span class="global-search-copy">
+        <strong>${escapeHtml(item.title)}</strong>
+        <small>${escapeHtml(searchSnippet(item.description,q))}</small>
+      </span>
+      <span class="global-search-arrow" aria-hidden="true">→</span>
+    </button>`).join('');
+}
+function openGlobalSearch(){
+  if(!globalSearchModal)return;
+  globalSearchModal.classList.add('open');
+  globalSearchModal.setAttribute('aria-hidden','false');
+  document.body.classList.add('modal-open');
+  renderGlobalSearch(globalSearchInput?.value||'');
+  requestAnimationFrame(()=>globalSearchInput?.focus());
+}
+function closeGlobalSearch(){
+  if(!globalSearchModal)return;
+  globalSearchModal.classList.remove('open');
+  globalSearchModal.setAttribute('aria-hidden','true');
+  if(!$('.modal.open'))document.body.classList.remove('modal-open');
+}
+function activateSearchResult(kind,id){
+  closeGlobalSearch();
+
+  if(kind==='project'){
+    setTimeout(()=>openProject(id),80);
+    return;
+  }
+  if(kind==='assignment'){
+    window.open('assignment-viewer.html?id='+encodeURIComponent(id),'_blank','noopener');
+    return;
+  }
+  if(kind==='subject'){
+    const section=$('#assignments');
+    if(subjectFilter){
+      subjectFilter.value=[...subjectFilter.options].some(option=>option.value===id)?id:'all';
+      renderAssignments();
+    }
+    section?.scrollIntoView({behavior:'smooth',block:'start'});
+    return;
+  }
+  if(kind==='section'){
+    document.getElementById(id)?.scrollIntoView({behavior:'smooth',block:'start'});
+  }
+}
+
+$('#globalSearchOpen')?.addEventListener('click',openGlobalSearch);
+$('#globalSearchClose')?.addEventListener('click',closeGlobalSearch);
+globalSearchModal?.addEventListener('click',event=>{if(event.target===globalSearchModal)closeGlobalSearch();});
+globalSearchInput?.addEventListener('input',event=>renderGlobalSearch(event.target.value));
+globalSearchResults?.addEventListener('click',event=>{
+  const item=event.target.closest('[data-search-kind]');
+  if(!item)return;
+  activateSearchResult(item.dataset.searchKind,item.dataset.searchId);
+});
+document.addEventListener('keydown',event=>{
+  if((event.ctrlKey||event.metaKey)&&event.key.toLowerCase()==='k'){
+    event.preventDefault();
+    openGlobalSearch();
+    return;
+  }
+  if(event.key==='Escape'&&globalSearchModal?.classList.contains('open')){
+    event.preventDefault();
+    closeGlobalSearch();
+  }
+});
 
 // Projects
 function autoFitProjectImage(img){
