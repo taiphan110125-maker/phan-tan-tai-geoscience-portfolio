@@ -2897,8 +2897,8 @@ async function loadPublicContent({silent = false} = {}){
   try {
     const client = requireSupabase();
     const [pRes, aRes, cRes, sRes] = await Promise.all([
-      client.from('projects').select('id,title,type,image_url,image_path,summary,tags,objective,data_text,method,output,report_files,sort_order,created_at').eq('published', true).order('sort_order', {ascending:true}).order('created_at', {ascending:false}),
-      client.from('assignments').select('id,type,title,topic,content_text,external_url,subject,assignment_date,assignment_number,date_text,created_at,file_name,file_url,file_path').eq('published', true).order('assignment_date', {ascending:true}).order('assignment_number', {ascending:true}).order('created_at', {ascending:true}),
+      client.from('projects').select('id,title,type,image_url,image_path,summary,tags,objective,data_text,method,output,report_files,sort_order,created_at').eq('published', true).is('deleted_at', null).order('sort_order', {ascending:true}).order('created_at', {ascending:false}),
+      client.from('assignments').select('id,type,title,topic,content_text,external_url,subject,assignment_date,assignment_number,date_text,created_at,file_name,file_url,file_path').eq('published', true).is('deleted_at', null).order('assignment_date', {ascending:true}).order('assignment_number', {ascending:true}).order('created_at', {ascending:true}),
       client.from('comments').select('id,assignment_id,name,role,body,created_at,assignment_title,assignment_date,assignment_number,assignment_subject').order('created_at', {ascending:false}),
       client.from('assignment_subjects').select('slug,name,sort_order').eq('active', true).order('sort_order', {ascending:true}).order('name', {ascending:true})
     ]);
