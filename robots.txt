@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /admin.html
+Disallow: /admin-login.html
+
+Sitemap: https://phan-tan-tai-geoscience-portfolio.onrender.com/sitemap.xml
