@@ -2438,7 +2438,7 @@ function localSmartAnswer(query){
   if(pHit.length && aiScore(query,pHit[0])>=3) return 'Có vẻ bạn đang hỏi về dự án:\n'+pHit.map(aiProjectLine).join('\n')+'\n\nBạn có thể xem chi tiết trong mục Dự án.';
   const aHit=aiFind(query,assignments,2);
   if(aHit.length && aiScore(query,aHit[0])>=3) return 'Mình tìm thấy tài liệu liên quan:\n'+aHit.map(aiAssignmentLine).join('\n');
-  return 'Mình chưa có câu trả lời đủ chắc cho câu hỏi này trong chế độ miễn phí hiện tại. Bạn có thể hỏi cụ thể hơn về petrophysics, well logging, seismic, facies, địa nhiệt, khảo sát thực địa, dự án hoặc bài tập trên website.';
+  return 'Mình chưa có đủ dữ liệu để trả lời chính xác câu này. Geo AI trên website tập trung vào Địa chất – Địa vật lý, dầu khí, petrophysics, seismic, địa chất công trình/địa kỹ thuật và dữ liệu dự án – bài tập. Bạn hãy nêu rõ thuật ngữ hoặc nội dung chuyên ngành cần hỏi.';
 }
 async function askGeoAI(message){
   const status=$('#aiStatus');
@@ -2459,10 +2459,13 @@ async function askGeoAI(message){
     const sourceText=sourceList.length?'\n\nNguồn tham khảo: '+sourceList.join(' · '):'';
     if(status){
       const modeLabels={
-        llm:'AI + dữ liệu website',
+        llm:'AI chuyên ngành',
         site:'dữ liệu website',
         knowledge:'kiến thức chuyên ngành',
-        encyclopedia:'kiến thức bách khoa',
+        clarify:'cần làm rõ câu hỏi',
+        out_of_scope:'ngoài phạm vi chuyên môn',
+        scope:'trợ lý chuyên ngành',
+        profile:'hồ sơ website',
         fallback:'chế độ hỗ trợ'
       };
       status.textContent='Geo AI · '+(modeLabels[data.mode]||'học thuật + dữ liệu website');
