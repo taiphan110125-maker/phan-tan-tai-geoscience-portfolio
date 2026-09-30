@@ -10,6 +10,7 @@
   <link rel="dns-prefetch" href="//aqkasetqystwvpassidd.supabase.co">
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
   <link rel="dns-prefetch" href="//cdn.jsdelivr.net">
+  <link rel="preload" href="assets/hero-user-hq/hero.b64.txt?v=20260930-hq2" as="fetch">
 <title>Phan Tấn Tài | Geology & Geophysics</title>
   <style>
 :root{
@@ -2109,7 +2110,15 @@ async function loadAcademicChat({stickToBottom=false}={}){
 
 // Header + navigation
 const header = $('#siteHeader');
-window.addEventListener('scroll', () => header?.classList.toggle('scrolled', window.scrollY > 20), {passive:true});
+let headerScrollFrame=0;
+function syncHeaderScroll(){
+  headerScrollFrame=0;
+  header?.classList.toggle('scrolled',window.scrollY>20);
+}
+window.addEventListener('scroll',()=>{
+  if(!headerScrollFrame)headerScrollFrame=requestAnimationFrame(syncHeaderScroll);
+},{passive:true});
+syncHeaderScroll();
 $('#navToggle')?.addEventListener('click', () => {
   const nav = $('#primaryNav');
   const open = nav.classList.toggle('open');
@@ -2119,7 +2128,12 @@ $$('#primaryNav a').forEach(link => link.addEventListener('click', () => $('#pri
 
 // Reveal animations
 const observer = 'IntersectionObserver' in window ? new IntersectionObserver(entries => {
-  entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('visible'); });
+  entries.forEach(entry => {
+    if(entry.isIntersecting){
+      entry.target.classList.add('visible');
+      observer.unobserve(entry.target);
+    }
+  });
 }, {threshold:.12}) : null;
 function observeReveal(root = document){ $$('.reveal', root).forEach(el => observer ? observer.observe(el) : el.classList.add('visible')); }
 observeReveal();
@@ -2788,13 +2802,22 @@ if('serviceWorker' in navigator){
     const img=document.getElementById('heroUserImage');
     if(!img)return;
     try{
-      const parts=await Promise.all(
-        Array.from({length:9},(_,i)=>
-          fetch(`assets/hero-user-hq/${String(i).padStart(2,'0')}.txt?v=20260930-hq1`,{cache:'force-cache'})
-            .then(r=>{if(!r.ok)throw new Error('Không tải được phần ảnh '+i);return r.text();})
-        )
-      );
-      const b64=parts.join('').replace(/\s+/g,'');
+      let b64='';
+      try{
+        const response=await fetch('assets/hero-user-hq/hero.b64.txt?v=20260930-hq2',{cache:'force-cache'});
+        if(!response.ok)throw new Error('Không tải được ảnh bìa tối ưu.');
+        b64=await response.text();
+      }catch(primaryError){
+        console.warn('Hero single payload unavailable, using fallback chunks:',primaryError);
+        const parts=await Promise.all(
+          Array.from({length:9},(_,i)=>
+            fetch(`assets/hero-user-hq/${String(i).padStart(2,'0')}.txt?v=20260930-hq1`,{cache:'force-cache'})
+              .then(r=>{if(!r.ok)throw new Error('Không tải được phần ảnh '+i);return r.text();})
+          )
+        );
+        b64=parts.join('');
+      }
+      b64=b64.replace(/\s+/g,'');
       const binary=atob(b64);
       const bytes=new Uint8Array(binary.length);
       for(let i=0;i<binary.length;i++)bytes[i]=binary.charCodeAt(i);
