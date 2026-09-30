@@ -1214,16 +1214,16 @@ body{color:var(--ink-strong)!important}
   z-index:1!important;
   background:
     linear-gradient(90deg,
-      rgba(2,15,24,.68) 0%,
-      rgba(3,17,25,.50) 34%,
-      rgba(4,20,28,.22) 58%,
-      rgba(4,20,28,.06) 76%,
-      rgba(4,20,28,.01) 100%
+      rgba(2,15,24,.58) 0%,
+      rgba(3,17,25,.42) 34%,
+      rgba(4,20,28,.16) 58%,
+      rgba(4,20,28,.03) 76%,
+      rgba(4,20,28,0) 100%
     ),
     linear-gradient(180deg,
-      rgba(3,16,24,.18) 0%,
-      rgba(3,17,25,.10) 52%,
-      rgba(3,17,25,.42) 100%
+      rgba(3,16,24,.06) 0%,
+      rgba(3,17,25,.04) 52%,
+      rgba(3,17,25,.28) 100%
     )!important;
 }
 #home .hero-content{
@@ -1298,7 +1298,6 @@ body{color:var(--ink-strong)!important}
   #home .hero-brief{display:none!important}
 }
 </style>
-<link rel="preload" as="image" href="assets/hero-oil-exact-v3.webp?v=20260930-hero2" type="image/webp" fetchpriority="high">
 </head>
 <body>
   <a class="skip-link" href="#main">Bỏ qua menu</a>
@@ -1336,7 +1335,7 @@ body{color:var(--ink-strong)!important}
 
   <main id="main">
     <section class="hero" id="home" aria-labelledby="heroTitle">
-      <img class="hero-media" src="assets/hero-oil-exact-v3.webp?v=20260930-hero2" alt="Địa tầng ven biển, biển xanh và các giàn khoan dầu khí ngoài khơi" fetchpriority="high" decoding="async">
+      <img class="hero-media" id="heroUserImage" alt="Địa tầng ven biển, biển xanh và các giàn khoan dầu khí ngoài khơi" fetchpriority="high" decoding="async">
       <div class="hero-overlay"></div>
       <div class="shell hero-content">
         <div class="hero-copy reveal">
@@ -2542,6 +2541,34 @@ if('serviceWorker' in navigator){
     navigator.serviceWorker.register('/sw.js',{scope:'/'}).catch(error=>console.warn('Service worker unavailable:',error));
   },{once:true});
 }
+</script>
+
+<script id="ptt-hero-user-loader">
+(()=>{
+  const loadHero=async()=>{
+    const img=document.getElementById('heroUserImage');
+    if(!img)return;
+    try{
+      const parts=await Promise.all(
+        Array.from({length:6},(_,i)=>
+          fetch(`assets/hero-user-fixed/${String(i).padStart(2,'0')}.txt?v=20260930-final2`,{cache:'no-store'})
+            .then(r=>{if(!r.ok)throw new Error('Không tải được phần ảnh '+i);return r.text();})
+        )
+      );
+      const b64=parts.join('').replace(/\s+/g,'');
+      const binary=atob(b64);
+      const bytes=new Uint8Array(binary.length);
+      for(let i=0;i<binary.length;i++)bytes[i]=binary.charCodeAt(i);
+      const objectUrl=URL.createObjectURL(new Blob([bytes],{type:'image/webp'}));
+      img.onload=()=>URL.revokeObjectURL(objectUrl);
+      img.src=objectUrl;
+    }catch(error){
+      console.error('Không tải được ảnh bìa:',error);
+    }
+  };
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',loadHero,{once:true});
+  else loadHero();
+})();
 </script>
 </body>
 </html>
