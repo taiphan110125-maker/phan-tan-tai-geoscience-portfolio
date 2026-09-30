@@ -1,6 +1,6 @@
 'use strict';
 
-const CACHE_NAME='ptt-static-v11-20260930';
+const CACHE_NAME='ptt-static-v12-20261001';
 const PRECACHE=[
   '/',
   '/index.html',
@@ -46,7 +46,7 @@ self.addEventListener('fetch',event=>{
     event.respondWith((async()=>{
       const cache=await caches.open(CACHE_NAME);
       try{
-        const response=await fetch(request);
+        const response=await fetch(request,{cache:'no-store'});
         if(response&&response.ok)await cache.put(request,response.clone());
         return response;
       }catch{
