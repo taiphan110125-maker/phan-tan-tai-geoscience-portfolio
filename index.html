@@ -2201,7 +2201,7 @@ body{color:var(--ink-strong)!important}
       <div class="login-brand"><span class="brand-mark" aria-hidden="true"><span></span><span></span><span></span></span></div>
       <p class="eyebrow">CREATE ACCOUNT</p>
       <h3 id="userRegisterTitle">Đăng ký tài khoản</h3>
-      <p class="muted">Tài khoản người dùng dùng để nhận diện khi tương tác. Quyền quản trị là một hệ thống riêng.</p>
+      <p class="muted">Tài khoản người dùng dùng để nhận diện khi tương tác. Tạo xong có thể đăng nhập ngay, không cần xác nhận email. Quyền quản trị là một hệ thống riêng.</p>
       <form id="userRegisterForm" class="stack-form">
         <label>Họ và tên<input id="userRegisterName" required minlength="2" maxlength="80" autocomplete="name" placeholder="Nguyễn Văn A"></label>
         <label>Email<input id="userRegisterEmail" type="email" required autocomplete="email" placeholder="ban@example.com"></label>
@@ -2222,7 +2222,8 @@ body{color:var(--ink-strong)!important}
 window.PTT_CONFIG = {
   SUPABASE_URL: 'https://aqkasetqystwvpassidd.supabase.co',
   SUPABASE_ANON_KEY: 'sb_publishable_f2yw7xfbADdzj9iCfcnxqA_yHG5AqVo',
-  GEO_AI_FUNCTION: 'geo-ai'
+  GEO_AI_FUNCTION: 'geo-ai',
+  SIGNUP_FUNCTION: 'signup-no-confirm'
 };
 
 </script>
@@ -3178,27 +3179,48 @@ $('#userLoginForm')?.addEventListener('submit', async event => {
 $('#userRegisterForm')?.addEventListener('submit', async event => {
   event.preventDefault();
   const form = event.currentTarget;
+  if(!form.checkValidity()){form.reportValidity();return;}
   const password = $('#userRegisterPassword').value;
   const password2 = $('#userRegisterPassword2').value;
   if (password !== password2){ $('#userRegisterStatus').textContent = 'Hai mật khẩu chưa khớp.'; return; }
   const name = $('#userRegisterName').value.trim();
-  const email = $('#userRegisterEmail').value.trim();
+  const email = $('#userRegisterEmail').value.trim().toLowerCase();
   const button = form.querySelector('button[type="submit"]');
-  $('#userRegisterStatus').textContent = 'Đang tạo tài khoản…'; button.disabled = true;
+  const status = $('#userRegisterStatus');
+  status.textContent = 'Đang tạo tài khoản…';
+  button.disabled = true;
   try {
     const client = requireSupabase();
-    const {data,error} = await client.auth.signUp({email,password,options:{data:{name}}});
-    if (error) throw error;
+    const cfg=window.PTT_CONFIG||{};
+    const endpoint=`${cfg.SUPABASE_URL}/functions/v1/${cfg.SIGNUP_FUNCTION||'signup-no-confirm'}`;
+    const response=await fetch(endpoint,{
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'apikey':cfg.SUPABASE_ANON_KEY,
+        'Authorization':'Bearer '+cfg.SUPABASE_ANON_KEY
+      },
+      body:JSON.stringify({name,email,password})
+    });
+    const result=await response.json().catch(()=>({}));
+    if(!response.ok||!result?.ok) throw new Error(result?.error||'Không tạo được tài khoản.');
+
+    status.textContent='Đang đăng nhập…';
+    const {data,error}=await client.auth.signInWithPassword({email,password});
+    if(error)throw error;
+
+    const user=userView(data.user);
+    syncUserUI(user);
     form.reset();
-    if (data.session){
-      const user = userView(data.user); syncUserUI(user); showToast(`Chào mừng ${user.name}`);
-      $('#userRegisterStatus').textContent = 'Tạo tài khoản thành công.';
-      setTimeout(() => closeModal(userRegisterModal), 350);
-    } else {
-      $('#userRegisterStatus').textContent = 'Đã tạo tài khoản. Hãy kiểm tra email để xác nhận rồi đăng nhập.';
-    }
-  } catch (error){ $('#userRegisterStatus').textContent = error.message || 'Không tạo được tài khoản.'; }
-  finally { button.disabled = false; }
+    status.textContent='Tạo tài khoản thành công.';
+    showToast(`Chào mừng ${user.name}`);
+    setTimeout(()=>closeModal(userRegisterModal),350);
+  } catch (error){
+    console.warn('Không tạo được tài khoản:',error);
+    status.textContent=error?.message||'Không tạo được tài khoản. Vui lòng thử lại.';
+  } finally {
+    button.disabled=false;
+  }
 });
 accountBtn?.addEventListener('click', event => {
   event.stopPropagation();
