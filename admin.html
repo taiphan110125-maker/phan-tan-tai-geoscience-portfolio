@@ -466,6 +466,40 @@ body.admin-body,.admin-body{background:#f6f8fb!important;color:#183247!important
 }
 </style>
 
+<style id="ptt-admin-notification-badges-v1">
+.admin-sidebar .side-link{
+  display:flex!important;
+  align-items:center!important;
+}
+.admin-sidebar .side-link>span:not(.side-badge){
+  min-width:0;
+}
+.admin-sidebar .side-badge{
+  margin-left:auto;
+  min-width:21px;
+  height:21px;
+  padding:0 6px;
+  border-radius:999px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  background:#d89a3e;
+  color:#fff;
+  font-size:10px;
+  font-weight:800;
+  line-height:1;
+  box-shadow:0 4px 12px rgba(141,91,24,.18);
+}
+.admin-sidebar .side-badge[hidden]{
+  display:none!important;
+}
+.admin-sidebar .side-link.active .side-badge{
+  background:#f2c770;
+  color:#17324a;
+  box-shadow:none;
+}
+</style>
+
 </head>
 <body class="admin-body">
   <header class="admin-topbar">
@@ -483,8 +517,8 @@ body.admin-body,.admin-body{background:#f6f8fb!important;color:#183247!important
       <button type="button" class="side-link" data-view="assignments">▤ <span>Bài tập</span></button>
       <button type="button" class="side-link" data-view="projects">⌁ <span>Dự án</span></button>
       <button type="button" class="side-link" data-view="site-image">▣ <span>Ảnh giới thiệu</span></button>
-      <button type="button" class="side-link" data-view="feedback">◌ <span>Nhận xét</span></button>
-      <button type="button" class="side-link" data-view="messages">✉ <span>Lời nhắn</span></button>
+      <button type="button" class="side-link" data-view="feedback">◌ <span>Nhận xét</span><span class="side-badge" id="feedbackUnreadBadge" hidden aria-label="Nhận xét mới">0</span></button>
+      <button type="button" class="side-link" data-view="messages">✉ <span>Lời nhắn</span><span class="side-badge" id="messagesUnreadBadge" hidden aria-label="Lời nhắn mới">0</span></button>
       <button type="button" class="side-link" data-view="accounts">◎ <span>Tài khoản</span></button>
       <button type="button" class="side-link" data-view="security">⌾ <span>Bảo mật</span></button>
       <div class="sidebar-note"><strong>Cloud workspace</strong><span>Dữ liệu được đồng bộ qua Supabase Database, Auth và Storage.</span></div>
@@ -765,6 +799,8 @@ let projects = [], assignments = [], comments = [], chatMessages = [], messages 
 let accountUsers = [];
 let accountUsersLoaded = false;
 let adminUser = null;
+let notificationSeen = {feedbackSeenAt:'',messagesSeenAt:''};
+let adminNotificationChannel = null;
 let pendingProjectImageFile = null;
 let pendingProjectPreviewUrl = '';
 let pendingProjectReportFiles = [];
@@ -877,6 +913,144 @@ function populateAssignmentSubjectSelect(currentValue=''){
   if(!select.value && subjects.find(s=>s.active)) select.value=subjects.find(s=>s.active).slug;
 }
 
+function timeMs(value){
+  const time=Date.parse(value||'');
+  return Number.isFinite(time)?time:0;
+}
+function activeAdminView(){
+  return document.querySelector('.admin-view.active')?.dataset.panel||'';
+}
+function feedbackUnreadCount(){
+  const seen=timeMs(notificationSeen.feedbackSeenAt);
+  return [...comments,...chatMessages].reduce((count,item)=>count+(timeMs(item.createdAt)>seen?1:0),0);
+}
+function messagesUnreadCount(){
+  const seen=timeMs(notificationSeen.messagesSeenAt);
+  return messages.reduce((count,item)=>count+(timeMs(item.createdAt)>seen?1:0),0);
+}
+function setBadge(id,count){
+  const badge=document.getElementById(id);
+  if(!badge)return;
+  const value=Math.max(0,Number(count||0));
+  badge.textContent=value>99?'99+':String(value);
+  badge.hidden=value===0;
+}
+function renderNotificationBadges(){
+  setBadge('feedbackUnreadBadge',feedbackUnreadCount());
+  setBadge('messagesUnreadBadge',messagesUnreadCount());
+}
+async function loadNotificationState(){
+  if(!adminUser)return;
+  const client=requireSupabase();
+  const {data,error}=await client.from('admin_notification_state')
+    .select('feedback_seen_at,messages_seen_at')
+    .eq('admin_id',adminUser.id)
+    .maybeSingle();
+  if(error)throw error;
+
+  if(data){
+    notificationSeen.feedbackSeenAt=data.feedback_seen_at||'';
+    notificationSeen.messagesSeenAt=data.messages_seen_at||'';
+  }else{
+    const now=new Date().toISOString();
+    const {error:insertError}=await client.from('admin_notification_state').insert({
+      admin_id:adminUser.id,
+      feedback_seen_at:now,
+      messages_seen_at:now,
+      updated_at:now
+    });
+    if(insertError)throw insertError;
+    notificationSeen.feedbackSeenAt=now;
+    notificationSeen.messagesSeenAt=now;
+  }
+  renderNotificationBadges();
+}
+async function markNotificationsSeen(view){
+  if(!adminUser||!['feedback','messages'].includes(view))return;
+  const now=new Date().toISOString();
+  const field=view==='feedback'?'feedback_seen_at':'messages_seen_at';
+  if(view==='feedback')notificationSeen.feedbackSeenAt=now;
+  else notificationSeen.messagesSeenAt=now;
+  renderNotificationBadges();
+
+  const client=requireSupabase();
+  const {error}=await client.from('admin_notification_state')
+    .update({[field]:now,updated_at:now})
+    .eq('admin_id',adminUser.id);
+  if(error)throw error;
+}
+function subscribeAdminNotifications(){
+  if(!sb||adminNotificationChannel)return;
+
+  const onFeedbackInsert=(kind,row)=>{
+    if(!row?.id)return;
+    if(kind==='comment'){
+      if(!comments.some(item=>item.id===row.id)){
+        comments.unshift({
+          id:row.id,
+          assignmentId:row.assignment_id,
+          assignmentTitle:row.assignment_title||'Bài tập',
+          assignmentDate:row.assignment_date||'',
+          assignmentNumber:Number(row.assignment_number||0),
+          assignmentSubject:row.assignment_subject||'',
+          name:row.name,
+          role:row.role,
+          text:row.body,
+          createdAt:row.created_at
+        });
+        const assignment=assignments.find(item=>item.id===row.assignment_id);
+        if(assignment)assignment.commentCount=Number(assignment.commentCount||0)+1;
+      }
+    }else if(!chatMessages.some(item=>item.id===row.id)){
+      chatMessages.unshift({
+        id:row.id,
+        userId:row.user_id,
+        name:row.name,
+        role:row.role,
+        text:row.body,
+        createdAt:row.created_at
+      });
+    }
+
+    renderFeedback();
+    renderMetrics();
+    renderDashboard();
+    renderNotificationBadges();
+
+    if(activeAdminView()==='feedback'){
+      markNotificationsSeen('feedback').catch(error=>console.warn('Không cập nhật trạng thái đã đọc:',error));
+    }else{
+      toast('Có trao đổi học thuật mới');
+    }
+  };
+
+  adminNotificationChannel=sb.channel('admin-notifications-v1')
+    .on('postgres_changes',{event:'INSERT',schema:'public',table:'comments'},payload=>onFeedbackInsert('comment',payload.new))
+    .on('postgres_changes',{event:'INSERT',schema:'public',table:'academic_chat_messages'},payload=>onFeedbackInsert('chat',payload.new))
+    .on('postgres_changes',{event:'INSERT',schema:'public',table:'messages'},payload=>{
+      const row=payload.new;
+      if(row?.id&&!messages.some(item=>item.id===row.id)){
+        messages.unshift({
+          id:row.id,
+          name:row.name,
+          email:row.email,
+          topic:row.topic,
+          message:row.message,
+          createdAt:row.created_at
+        });
+      }
+      renderMessages();
+      renderMetrics();
+      renderNotificationBadges();
+      if(activeAdminView()==='messages'){
+        markNotificationsSeen('messages').catch(error=>console.warn('Không cập nhật trạng thái đã đọc:',error));
+      }else{
+        toast('Có lời nhắn mới');
+      }
+    })
+    .subscribe();
+}
+
 function go(view){
   const panels=Array.from(document.querySelectorAll('.admin-view'));
   const links=Array.from(document.querySelectorAll('.side-link[data-view]'));
@@ -892,6 +1066,9 @@ function go(view){
 
   if(view==='accounts'&&!accountUsersLoaded){
     loadUserAccounts().catch(error=>console.warn('Không tải được mục Tài khoản:',error));
+  }
+  if(view==='feedback'||view==='messages'){
+    markNotificationsSeen(view).catch(error=>console.warn('Không cập nhật trạng thái đã đọc:',error));
   }
 }
 window.pttAdminGo=go;
@@ -1130,7 +1307,7 @@ async function loadUserAccounts(){
     if(refresh)refresh.disabled=false;
   }
 }
-function renderAll(){ renderMetrics();renderDashboard();renderAssignments();renderProjects();renderFeedback();renderMessages();renderSubjects();populateAssignmentSubjectSelect(); }
+function renderAll(){ renderMetrics();renderDashboard();renderAssignments();renderProjects();renderFeedback();renderMessages();renderSubjects();populateAssignmentSubjectSelect();renderNotificationBadges(); }
 $('#projectSearch')?.addEventListener('input',renderProjects);
 $('#accountSearch')?.addEventListener('input',renderAccounts);
 $('#refreshAccountsBtn')?.addEventListener('click',()=>{accountUsersLoaded=false;loadUserAccounts();});
@@ -1718,8 +1895,13 @@ document.addEventListener('keydown',event=>{if(event.key!=='Escape')return;if(pr
 (async function boot(){
   if(await ensureAdminSession()){
     try{
-      await Promise.all([loadAdminData(),loadSiteAboutImageAdmin()]);
-    }catch(e){toast(e.message);}
+      await Promise.all([loadAdminData(),loadSiteAboutImageAdmin(),loadNotificationState()]);
+      renderNotificationBadges();
+      subscribeAdminNotifications();
+    }catch(e){
+      console.warn('Admin boot warning:',e);
+      toast(e.message||'Có phần dữ liệu chưa tải được.');
+    }
   }
 })();
 
