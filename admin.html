@@ -574,7 +574,7 @@ body.admin-body,.admin-body{background:#f6f8fb!important;color:#183247!important
         <div class="admin-heading"><div><p class="eyebrow">SECURITY</p><h1>Bảo mật</h1></div></div>
         <div class="security-grid">
           <div class="admin-panel"><h2>Trạng thái hệ thống</h2><ul class="status-list"><li><span class="status warn"></span><div><strong>Admin authentication</strong><small>Khu quản trị bắt buộc đăng nhập bằng Supabase Auth và kiểm tra vai trò admin bằng Row Level Security.</small></div></li><li><span class="status good"></span><div><strong>Không lưu API key trong frontend</strong><small>Thiết kế giữ khóa bí mật ra khỏi mã nguồn public.</small></div></li><li><span class="status good"></span><div><strong>Escape nội dung hiển thị</strong><small>Giảm rủi ro chèn HTML từ dữ liệu người dùng khi hiển thị trong khu quản trị.</small></div></li></ul></div>
-          <div class="admin-panel"><h2>Production checklist</h2><ul class="check-list admin-check"><li>Supabase Auth + email verification</li><li>Row Level Security cho database và Storage</li><li>2FA cho tài khoản chủ website</li><li>Rate limit + CAPTCHA cho form public</li><li>Audit log + backup + rollback</li></ul></div>
+          <div class="admin-panel"><h2>Production checklist</h2><ul class="check-list admin-check"><li>Supabase Auth + quản lý tài khoản người dùng</li><li>Row Level Security cho database và Storage</li><li>2FA cho tài khoản chủ website</li><li>Rate limit + CAPTCHA cho form public</li><li>Audit log + backup + rollback</li></ul></div>
         </div>
       </section>
     </main>
