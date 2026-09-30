@@ -1502,7 +1502,7 @@ document.addEventListener('click',async event=>{
   const ds=event.target.closest('[data-delete-subject]');
   if(ds){
     const slug=ds.dataset.deleteSubject;
-    if(assignments.some(a=>a.subject===slug)){toast('Môn này đang có bài tập. Hãy đổi môn cho các bài trước khi xóa.');return;}
+    if([...assignments,...trashAssignments].some(a=>a.subject===slug)){toast('Môn này vẫn đang được dùng bởi bài tập, kể cả trong Thùng rác. Hãy xử lý các bài đó trước khi xóa môn.');return;}
     if(!confirm('Xóa môn học này?'))return;
     const {error}=await sb.from('assignment_subjects').delete().eq('slug',slug);
     if(error)toast(error.message);else{await loadAdminData();notifyPublicContentChanged('assignment_subjects');toast('Đã xóa môn học');} return;
@@ -1514,10 +1514,127 @@ document.addEventListener('click',async event=>{
   const ra=event.target.closest('[data-reupload-assignment]');
   if(ra){ const item=assignments.find(a=>a.id===ra.dataset.reuploadAssignment); reuploadAssignmentFile(item); return; }
   const da=event.target.closest('[data-delete-assignment]');
-  if(da){ const id=da.dataset.deleteAssignment; const item=assignments.find(a=>a.id===id); if(!item||!confirm(`Xóa ${formatAssignmentDate(item.assignmentDate)} · Bài ${item.assignmentNumber} “${item.title}”?\n\nFile đính kèm và nhận xét liên quan sẽ bị xóa.`))return; try{ const sourceDate=item.assignmentDate; if(item.filePath) await sb.storage.from('assignments').remove([item.filePath]); const {error}=await sb.from('assignments').delete().eq('id',id); if(error)throw error; assignments=assignments.filter(a=>a.id!==id); await normalizeAssignmentNumbers(sourceDate); await loadAdminData();notifyPublicContentChanged('assignments');toast('Đã xóa bài tập'); }catch(e){toast(e.message);} return; }
+  if(da){
+    const id=da.dataset.deleteAssignment;
+    const item=assignments.find(a=>a.id===id);
+    if(!item||!confirm(`Chuyển ${formatAssignmentDate(item.assignmentDate)} · Bài ${item.assignmentNumber} “${item.title}” vào Thùng rác?\n\nFile và nhận xét vẫn được giữ để có thể khôi phục.`))return;
+    try{
+      const sourceDate=item.assignmentDate;
+      const {error}=await sb.from('assignments').update({
+        deleted_at:new Date().toISOString(),
+        deleted_by:adminUser?.id||null
+      }).eq('id',id);
+      if(error)throw error;
+      assignments=assignments.filter(a=>a.id!==id);
+      await normalizeAssignmentNumbers(sourceDate);
+      await loadAdminData();
+      notifyPublicContentChanged('assignments');
+      toast('Đã chuyển bài tập vào Thùng rác');
+    }catch(e){toast(e.message||'Không thể chuyển bài tập vào Thùng rác.');}
+    return;
+  }
   const ep=event.target.closest('[data-edit-project]'); if(ep){ const p=projects.find(x=>x.id===ep.dataset.editProject); if(p)openProjectEditor(p); return; }
   const dp=event.target.closest('[data-delete-project]');
-  if(dp){ const id=dp.dataset.deleteProject; const p=projects.find(x=>x.id===id); if(!p||!confirm(`Xóa dự án “${p.title}”?\n\nDự án, ảnh và các file báo cáo đính kèm sẽ bị xóa.`))return; try{ if(p.imagePath) await sb.storage.from('project-images').remove([p.imagePath]); const reportPaths=(p.reportFiles||[]).map(f=>f.path).filter(Boolean); if(reportPaths.length) await sb.storage.from('project-reports').remove(reportPaths); const {error}=await sb.from('projects').delete().eq('id',id); if(error)throw error; await loadAdminData();notifyPublicContentChanged('projects');toast('Đã xóa dự án'); }catch(e){toast(e.message);} return; }
+  if(dp){
+    const id=dp.dataset.deleteProject;
+    const p=projects.find(x=>x.id===id);
+    if(!p||!confirm(`Chuyển dự án “${p.title}” vào Thùng rác?\n\nẢnh và file báo cáo vẫn được giữ để có thể khôi phục.`))return;
+    try{
+      const {error}=await sb.from('projects').update({
+        deleted_at:new Date().toISOString(),
+        deleted_by:adminUser?.id||null
+      }).eq('id',id);
+      if(error)throw error;
+      await loadAdminData();
+      notifyPublicContentChanged('projects');
+      toast('Đã chuyển dự án vào Thùng rác');
+    }catch(e){toast(e.message||'Không thể chuyển dự án vào Thùng rác.');}
+    return;
+  }
+  const restoreAssignment=event.target.closest('[data-restore-assignment]');
+  if(restoreAssignment){
+    const id=restoreAssignment.dataset.restoreAssignment;
+    const item=trashAssignments.find(a=>a.id===id);
+    if(!item)return;
+    try{
+      const nextNumber=assignments
+        .filter(a=>a.assignmentDate===item.assignmentDate)
+        .reduce((max,a)=>Math.max(max,Number(a.assignmentNumber||0)),0)+1;
+      const {error}=await sb.from('assignments').update({
+        deleted_at:null,
+        deleted_by:null,
+        assignment_number:nextNumber,
+        date_text:formatAssignmentDate(item.assignmentDate)
+      }).eq('id',id);
+      if(error)throw error;
+      await loadAdminData();
+      notifyPublicContentChanged('assignments');
+      toast('Đã khôi phục bài tập');
+    }catch(e){toast(e.message||'Không thể khôi phục bài tập.');}
+    return;
+  }
+
+  const purgeAssignment=event.target.closest('[data-purge-assignment]');
+  if(purgeAssignment){
+    const id=purgeAssignment.dataset.purgeAssignment;
+    const item=trashAssignments.find(a=>a.id===id);
+    if(!item||!confirm(`Xóa vĩnh viễn bài tập “${item.title}”?\n\nFile đính kèm và nhận xét liên quan sẽ bị xóa và không thể khôi phục.`))return;
+    try{
+      if(item.filePath){
+        const remove=await sb.storage.from('assignments').remove([item.filePath]);
+        if(remove.error)console.warn('Không xóa được file bài tập:',remove.error);
+      }
+      const commentsDelete=await sb.from('comments').delete().eq('assignment_id',id);
+      if(commentsDelete.error)throw commentsDelete.error;
+      const {error}=await sb.from('assignments').delete().eq('id',id);
+      if(error)throw error;
+      await loadAdminData();
+      notifyPublicContentChanged('assignments');
+      notifyPublicContentChanged('comments');
+      toast('Đã xóa vĩnh viễn bài tập');
+    }catch(e){toast(e.message||'Không thể xóa vĩnh viễn bài tập.');}
+    return;
+  }
+
+  const restoreProject=event.target.closest('[data-restore-project]');
+  if(restoreProject){
+    const id=restoreProject.dataset.restoreProject;
+    const item=trashProjects.find(p=>p.id===id);
+    if(!item)return;
+    try{
+      const {error}=await sb.from('projects').update({deleted_at:null,deleted_by:null}).eq('id',id);
+      if(error)throw error;
+      await loadAdminData();
+      notifyPublicContentChanged('projects');
+      toast('Đã khôi phục dự án');
+    }catch(e){toast(e.message||'Không thể khôi phục dự án.');}
+    return;
+  }
+
+  const purgeProject=event.target.closest('[data-purge-project]');
+  if(purgeProject){
+    const id=purgeProject.dataset.purgeProject;
+    const item=trashProjects.find(p=>p.id===id);
+    if(!item||!confirm(`Xóa vĩnh viễn dự án “${item.title}”?\n\nẢnh và file báo cáo sẽ bị xóa và không thể khôi phục.`))return;
+    try{
+      if(item.imagePath){
+        const removeImage=await sb.storage.from('project-images').remove([item.imagePath]);
+        if(removeImage.error)console.warn('Không xóa được ảnh dự án:',removeImage.error);
+      }
+      const reportPaths=(item.reportFiles||[]).map(file=>file.path).filter(Boolean);
+      if(reportPaths.length){
+        const removeReports=await sb.storage.from('project-reports').remove(reportPaths);
+        if(removeReports.error)console.warn('Không xóa được file báo cáo:',removeReports.error);
+      }
+      const {error}=await sb.from('projects').delete().eq('id',id);
+      if(error)throw error;
+      await loadAdminData();
+      notifyPublicContentChanged('projects');
+      toast('Đã xóa vĩnh viễn dự án');
+    }catch(e){toast(e.message||'Không thể xóa vĩnh viễn dự án.');}
+    return;
+  }
+
   const dc=event.target.closest('[data-delete-comment]');
   if(dc){
     if(!confirm('Xóa trao đổi học thuật này? Nội dung sẽ bị xóa vĩnh viễn.'))return;
