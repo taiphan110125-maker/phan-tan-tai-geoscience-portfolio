@@ -397,6 +397,43 @@ body.admin-body,.admin-body{background:#f6f8fb!important;color:#183247!important
 }
 </style>
 
+<style id="ptt-account-admin-v1">
+.account-admin-panel{padding:0!important;overflow:hidden!important}
+.account-admin-toolbar{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:16px 18px;border-bottom:1px solid #e7edf2;
+}
+.account-search{min-width:min(420px,60vw)!important}
+.account-refresh-btn{
+  color:#17324a!important;border-color:#d6e0e7!important;background:#fff!important;
+}
+.account-summary{
+  padding:12px 18px;background:#f8fafc;border-bottom:1px solid #e7edf2;
+  color:#6a7f8f;font-size:11px;
+}
+.account-summary strong{color:#17324a;font-size:12px}
+.account-admin-table{min-width:980px}
+.account-identity{display:grid;gap:3px}
+.account-identity strong{color:#17324a;font-size:12px}
+.account-identity small{color:#738796;font-size:10px}
+.account-role,.account-confirm{
+  display:inline-flex;align-items:center;justify-content:center;
+  border-radius:999px;padding:5px 8px;font-size:8px;font-weight:850;letter-spacing:.04em;
+}
+.account-role.user{background:#eef4f7;color:#4d6d82}
+.account-role.admin{background:#fff0cf;color:#855d12}
+.account-confirm.good{background:#e7f5ed;color:#26714e}
+.account-confirm.pending{background:#fff1e3;color:#9a5d20}
+.account-actions{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.account-confirm-btn{white-space:nowrap}
+.account-protected{font-size:9px;color:#7d8f9c;white-space:nowrap}
+#accountStatus{padding:0 18px 14px;min-height:18px}
+@media(max-width:700px){
+  .account-admin-toolbar{align-items:stretch;flex-direction:column}
+  .account-search{min-width:0!important;width:100%}
+}
+</style>
+
 </head>
 <body class="admin-body">
   <header class="admin-topbar">
@@ -416,6 +453,7 @@ body.admin-body,.admin-body{background:#f6f8fb!important;color:#183247!important
       <button class="side-link" data-view="site-image">▣ <span>Ảnh giới thiệu</span></button>
       <button class="side-link" data-view="feedback">◌ <span>Nhận xét</span></button>
       <button class="side-link" data-view="messages">✉ <span>Lời nhắn</span></button>
+      <button class="side-link" data-view="accounts">◎ <span>Tài khoản</span></button>
       <button class="side-link" data-view="security">⌾ <span>Bảo mật</span></button>
       <div class="sidebar-note"><strong>Cloud workspace</strong><span>Dữ liệu được đồng bộ qua Supabase Database, Auth và Storage.</span></div>
     </aside>
@@ -504,6 +542,32 @@ body.admin-body,.admin-body{background:#f6f8fb!important;color:#183247!important
       <section class="admin-view" data-panel="messages">
         <div class="admin-heading"><div><p class="eyebrow">CONTACT</p><h1>Lời nhắn</h1></div></div>
         <div class="admin-panel"><div id="messageList"></div></div>
+      </section>
+
+      <section class="admin-view" data-panel="accounts">
+        <div class="admin-heading">
+          <div>
+            <p class="eyebrow">USERS</p>
+            <h1>Tài khoản người dùng</h1>
+            <p>Xem và quản lý các tài khoản đăng ký trên website. Tài khoản Admin được bảo vệ khỏi thao tác xóa.</p>
+          </div>
+        </div>
+        <div class="admin-panel account-admin-panel">
+          <div class="account-admin-toolbar">
+            <label class="admin-search account-search"><span>⌕</span><input id="accountSearch" type="search" placeholder="Tìm tên hoặc email..."></label>
+            <button class="btn btn-outline account-refresh-btn" id="refreshAccountsBtn" type="button">Làm mới</button>
+          </div>
+          <div class="account-summary" id="accountSummary">Chưa tải danh sách tài khoản.</div>
+          <div class="table-scroll">
+            <table class="admin-table account-admin-table">
+              <thead>
+                <tr><th>Tài khoản</th><th>Vai trò</th><th>Xác nhận email</th><th>Ngày tạo</th><th>Đăng nhập gần nhất</th><th>Thao tác</th></tr>
+              </thead>
+              <tbody id="accountRows"><tr><td colspan="6"><div class="empty-state">Mở mục Tài khoản để tải dữ liệu.</div></td></tr></tbody>
+            </table>
+          </div>
+          <p class="form-status" id="accountStatus" role="status"></p>
+        </div>
       </section>
 
       <section class="admin-view" data-panel="security">
@@ -629,7 +693,8 @@ body.admin-body,.admin-body{background:#f6f8fb!important;color:#183247!important
 window.PTT_CONFIG = {
   SUPABASE_URL: 'https://aqkasetqystwvpassidd.supabase.co',
   SUPABASE_ANON_KEY: 'sb_publishable_f2yw7xfbADdzj9iCfcnxqA_yHG5AqVo',
-  GEO_AI_FUNCTION: 'geo-ai'
+  GEO_AI_FUNCTION: 'geo-ai',
+  ADMIN_USER_FUNCTION: 'admin-user-management'
 };
 
 </script>
@@ -665,6 +730,8 @@ const $ = (selector, root = document) => root.querySelector(selector);
 const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
 const sb = window.pttSupabase;
 let projects = [], assignments = [], comments = [], chatMessages = [], messages = [], subjects = [];
+let accountUsers = [];
+let accountUsersLoaded = false;
 let adminUser = null;
 let pendingProjectImageFile = null;
 let pendingProjectPreviewUrl = '';
@@ -778,7 +845,12 @@ function populateAssignmentSubjectSelect(currentValue=''){
   if(!select.value && subjects.find(s=>s.active)) select.value=subjects.find(s=>s.active).slug;
 }
 
-function go(view){ $$('.admin-view').forEach(panel=>panel.classList.toggle('active',panel.dataset.panel===view)); $$('.side-link').forEach(button=>button.classList.toggle('active',button.dataset.view===view)); renderAll(); }
+function go(view){
+  $('.admin-view').forEach(panel=>panel.classList.toggle('active',panel.dataset.panel===view));
+  $('.side-link').forEach(button=>button.classList.toggle('active',button.dataset.view===view));
+  renderAll();
+  if(view==='accounts'&&!accountUsersLoaded) loadUserAccounts();
+}
 $$('.side-link').forEach(button=>button.addEventListener('click',()=>go(button.dataset.view)));
 $$('[data-go]').forEach(button=>button.addEventListener('click',()=>go(button.dataset.go)));
 
@@ -934,8 +1006,83 @@ function renderFeedback(){
   }).join('');
 }
 function renderMessages(){ $('#messageList').innerHTML=messages.length?messages.map(m=>`<div class="message-item"><div class="message-item-head"><strong>${esc(m.name)} · ${esc(m.topic||'Liên hệ')}</strong><small>${new Date(m.createdAt).toLocaleString('vi-VN')}</small></div><p>${esc(m.email)}<br>${esc(m.message)}</p><button class="danger-btn" data-delete-message="${esc(m.id)}">Xóa lời nhắn</button></div>`).join(''):'<div class="empty-state">Chưa có lời nhắn.</div>'; }
+
+function formatAccountDate(value){
+  if(!value)return '—';
+  try{return new Date(value).toLocaleString('vi-VN',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});}
+  catch{return '—';}
+}
+function renderAccounts(){
+  const rows=$('#accountRows');
+  const summary=$('#accountSummary');
+  if(!rows||!summary)return;
+  const q=($('#accountSearch')?.value||'').trim().toLowerCase();
+  const filtered=accountUsers.filter(user=>!q||[user.name,user.email,user.role].some(value=>String(value||'').toLowerCase().includes(q)));
+  const confirmed=accountUsers.filter(user=>user.emailConfirmed).length;
+  summary.innerHTML=`<strong>${accountUsers.length}</strong> tài khoản · <strong>${confirmed}</strong> đã xác nhận · <strong>${accountUsers.length-confirmed}</strong> chưa xác nhận`;
+  if(!filtered.length){
+    rows.innerHTML=`<tr><td colspan="6"><div class="empty-state">${accountUsers.length?'Không tìm thấy tài khoản phù hợp.':'Chưa có tài khoản người dùng.'}</div></td></tr>`;
+    return;
+  }
+  rows.innerHTML=filtered.map(user=>{
+    const isAdmin=user.role==='admin';
+    const confirmButton=!user.emailConfirmed
+      ? `<button class="edit-btn account-confirm-btn" data-confirm-account="${esc(user.id)}">Xác nhận email</button>`
+      : '';
+    const deleteButton=!isAdmin&&!user.isCurrentAdmin
+      ? `<button class="danger-btn" data-delete-account="${esc(user.id)}" data-account-email="${esc(user.email)}">Xóa</button>`
+      : '';
+    return `<tr>
+      <td><div class="account-identity"><strong>${esc(user.name||'Chưa đặt tên')}</strong><small>${esc(user.email||'—')}</small></div></td>
+      <td><span class="account-role ${isAdmin?'admin':'user'}">${isAdmin?'Admin':'User'}</span></td>
+      <td><span class="account-confirm ${user.emailConfirmed?'good':'pending'}">${user.emailConfirmed?'Đã xác nhận':'Chưa xác nhận'}</span></td>
+      <td>${esc(formatAccountDate(user.createdAt))}</td>
+      <td>${esc(formatAccountDate(user.lastSignInAt))}</td>
+      <td><div class="account-actions">${confirmButton}${deleteButton}${isAdmin?'<span class="account-protected">Được bảo vệ</span>':''}</div></td>
+    </tr>`;
+  }).join('');
+}
+async function callAccountAdmin(action,payload={}){
+  const client=requireSupabase();
+  const {data:sessionData,error:sessionError}=await client.auth.getSession();
+  if(sessionError||!sessionData?.session?.access_token) throw new Error('Phiên Admin đã hết hạn. Hãy đăng nhập lại.');
+  const cfg=window.PTT_CONFIG||{};
+  const endpoint=`${cfg.SUPABASE_URL}/functions/v1/${cfg.ADMIN_USER_FUNCTION||'admin-user-management'}`;
+  const response=await fetch(endpoint,{
+    method:'POST',
+    headers:{
+      'Content-Type':'application/json',
+      'apikey':cfg.SUPABASE_ANON_KEY,
+      'Authorization':'Bearer '+sessionData.session.access_token
+    },
+    body:JSON.stringify({action,...payload})
+  });
+  const result=await response.json().catch(()=>({}));
+  if(!response.ok) throw new Error(result?.error||'Không thể thực hiện thao tác tài khoản.');
+  return result;
+}
+async function loadUserAccounts(){
+  const status=$('#accountStatus');
+  const refresh=$('#refreshAccountsBtn');
+  if(status)status.textContent='Đang tải danh sách tài khoản…';
+  if(refresh)refresh.disabled=true;
+  try{
+    const result=await callAccountAdmin('list');
+    accountUsers=Array.isArray(result.users)?result.users:[];
+    accountUsersLoaded=true;
+    renderAccounts();
+    if(status)status.textContent='';
+  }catch(error){
+    console.warn('Không tải được danh sách tài khoản:',error);
+    if(status)status.textContent=error.message||'Không tải được danh sách tài khoản.';
+  }finally{
+    if(refresh)refresh.disabled=false;
+  }
+}
 function renderAll(){ renderMetrics();renderDashboard();renderAssignments();renderProjects();renderFeedback();renderMessages();renderSubjects();populateAssignmentSubjectSelect(); }
 $('#projectSearch')?.addEventListener('input',renderProjects);
+$('#accountSearch')?.addEventListener('input',renderAccounts);
+$('#refreshAccountsBtn')?.addEventListener('click',()=>{accountUsersLoaded=false;loadUserAccounts();});
 
 async function openStoredAssignment(item){
   if(!item) return;
@@ -1472,6 +1619,48 @@ $('#siteAboutImageFile')?.addEventListener('change',async event=>{
   status.textContent='';
 });
 $('#saveSiteAboutImageBtn')?.addEventListener('click',saveSiteAboutImage);
+
+document.addEventListener('click',async event=>{
+  const confirmButton=event.target.closest('[data-confirm-account]');
+  if(confirmButton){
+    const id=confirmButton.dataset.confirmAccount;
+    confirmButton.disabled=true;
+    $('#accountStatus').textContent='Đang xác nhận email…';
+    try{
+      await callAccountAdmin('confirm',{userId:id});
+      const user=accountUsers.find(item=>item.id===id);
+      if(user)user.emailConfirmed=true;
+      renderAccounts();
+      $('#accountStatus').textContent='Đã xác nhận email cho tài khoản.';
+      toast('Đã xác nhận email');
+    }catch(error){
+      $('#accountStatus').textContent=error.message||'Không thể xác nhận email.';
+    }finally{
+      confirmButton.disabled=false;
+    }
+    return;
+  }
+
+  const deleteButton=event.target.closest('[data-delete-account]');
+  if(deleteButton){
+    const id=deleteButton.dataset.deleteAccount;
+    const email=deleteButton.dataset.accountEmail||'tài khoản này';
+    if(!confirm(`Xóa tài khoản ${email}? Thao tác này không thể hoàn tác.`))return;
+    deleteButton.disabled=true;
+    $('#accountStatus').textContent='Đang xóa tài khoản…';
+    try{
+      await callAccountAdmin('delete',{userId:id});
+      accountUsers=accountUsers.filter(item=>item.id!==id);
+      renderAccounts();
+      $('#accountStatus').textContent='Đã xóa tài khoản.';
+      toast('Đã xóa tài khoản');
+    }catch(error){
+      $('#accountStatus').textContent=error.message||'Không thể xóa tài khoản.';
+    }finally{
+      deleteButton.disabled=false;
+    }
+  }
+});
 
 document.addEventListener('keydown',event=>{if(event.key!=='Escape')return;if(projectModal?.classList.contains('open'))closeProjectEditor();if(assignmentModal?.classList.contains('open'))closeAssignmentModal();});
 
