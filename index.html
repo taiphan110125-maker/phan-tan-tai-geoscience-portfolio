@@ -2371,7 +2371,7 @@ body{color:var(--ink-strong)!important}
         <kbd>ESC</kbd>
       </label>
       <div class="global-search-meta" id="globalSearchMeta">Nhập ít nhất 2 ký tự để tìm kiếm.</div>
-      <div class="global-search-results" id="globalSearchResults" role="listbox" aria-label="Kết quả tìm kiếm"></div>
+      <div class="global-search-results" id="globalSearchResults" role="list" aria-label="Kết quả tìm kiếm"></div>
     </div>
   </div>
 
@@ -2715,7 +2715,10 @@ $('#navToggle')?.addEventListener('click', () => {
   const open = nav.classList.toggle('open');
   $('#navToggle').setAttribute('aria-expanded', String(open));
 });
-$$('#primaryNav a').forEach(link => link.addEventListener('click', () => $('#primaryNav')?.classList.remove('open')));
+$('#primaryNav a').forEach(link => link.addEventListener('click', () => {
+  $('#primaryNav')?.classList.remove('open');
+  $('#navToggle')?.setAttribute('aria-expanded','false');
+}));
 
 // Reveal animations
 const observer = 'IntersectionObserver' in window ? new IntersectionObserver(entries => {
@@ -2840,7 +2843,7 @@ function renderGlobalSearch(query=''){
   }
 
   globalSearchResults.innerHTML=results.map((item,index)=>`
-    <button type="button" class="global-search-result" role="option"
+    <button type="button" class="global-search-result"
       data-search-kind="${escapeHtml(item.kind)}"
       data-search-id="${escapeHtml(item.id)}"
       data-search-index="${index}">
@@ -2874,7 +2877,9 @@ function activateSearchResult(kind,id){
     return;
   }
   if(kind==='assignment'){
-    window.open('assignment-viewer.html?id='+encodeURIComponent(id),'_blank','noopener');
+    const target='assignment-viewer.html?id='+encodeURIComponent(id);
+    const opened=window.open(target,'_blank','noopener');
+    if(!opened)location.href=target;
     return;
   }
   if(kind==='subject'){
