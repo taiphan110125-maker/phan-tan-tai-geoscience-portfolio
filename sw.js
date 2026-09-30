@@ -1,10 +1,11 @@
 'use strict';
 
-const CACHE_NAME='ptt-static-v13-20261001';
+const CACHE_NAME='ptt-static-v14-20261001';
 const PRECACHE=[
   '/',
   '/index.html',
   '/assignment-viewer.html',
+  '/public-content.json',
   '/assets/ptt-brand.svg',
   '/assets/ptt-emblem.svg',
   '/assets/about-fieldwork.svg',
@@ -62,7 +63,7 @@ self.addEventListener('fetch',event=>{
     return;
   }
 
-  if(/\.(?:svg|webp|png|jpe?g|gif|ico|css|js|txt)$/i.test(url.pathname)){
+  if(/\.(?:svg|webp|png|jpe?g|gif|ico|css|js|json|txt)$/i.test(url.pathname)){
     event.respondWith((async()=>{
       const cache=await caches.open(CACHE_NAME);
       const cached=await cache.match(request);
