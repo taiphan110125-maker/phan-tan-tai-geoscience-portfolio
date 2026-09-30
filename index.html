@@ -3347,6 +3347,17 @@ async function loadPublicContentViaRest(){
     {data:subjectsData,error:null}
   ];
 }
+async function loadPublicContentSnapshot(){
+  const response=await fetch('/public-content.json?v=20261001-mobile-snapshot1',{cache:'no-store'});
+  if(!response.ok)throw new Error(`Snapshot failed (${response.status})`);
+  const snapshot=await response.json();
+  return [
+    {data:Array.isArray(snapshot.projects)?snapshot.projects:[],error:null},
+    {data:Array.isArray(snapshot.assignments)?snapshot.assignments:[],error:null},
+    {data:Array.isArray(snapshot.comments)?snapshot.comments:[],error:null},
+    {data:Array.isArray(snapshot.subjects)?snapshot.subjects:[],error:null}
+  ];
+}
 async function loadPublicContent({silent = false} = {}){
   if(publicContentLoading){publicRefreshPending=true;return;}
   publicContentLoading=true;
@@ -3363,12 +3374,22 @@ async function loadPublicContent({silent = false} = {}){
         [pRes,aRes,cRes,sRes]=results;
         for(const res of results)if(res.error)throw res.error;
       }catch(clientError){
-        console.warn('Supabase client failed; using public REST fallback:',clientError);
-        [pRes,aRes,cRes,sRes]=await loadPublicContentViaRest();
+        console.warn('Supabase client failed; trying public REST fallback:',clientError);
+        try{
+          [pRes,aRes,cRes,sRes]=await loadPublicContentViaRest();
+        }catch(restError){
+          console.warn('Public REST failed; using same-origin snapshot:',restError);
+          [pRes,aRes,cRes,sRes]=await loadPublicContentSnapshot();
+        }
       }
     }else{
-      console.warn('Supabase JS unavailable; using public REST fallback.');
-      [pRes,aRes,cRes,sRes]=await loadPublicContentViaRest();
+      console.warn('Supabase JS unavailable; trying public REST fallback.');
+      try{
+        [pRes,aRes,cRes,sRes]=await loadPublicContentViaRest();
+      }catch(restError){
+        console.warn('Public REST failed; using same-origin snapshot:',restError);
+        [pRes,aRes,cRes,sRes]=await loadPublicContentSnapshot();
+      }
     }
     const activeAssignmentIds=new Set((aRes.data||[]).map(row=>row.id));
     const publicComments=(cRes.data||[]).filter(row=>row.assignment_id&&activeAssignmentIds.has(row.assignment_id));
@@ -3751,7 +3772,7 @@ document.addEventListener('keydown', event => { if (event.key === 'Escape') $$('
 <script>
 if('serviceWorker' in navigator){
   window.addEventListener('load',()=>{
-    navigator.serviceWorker.register('/sw.js?v=20261001-mobilefix2',{scope:'/',updateViaCache:'none'})
+    navigator.serviceWorker.register('/sw.js?v=20261001-mobilefix3',{scope:'/',updateViaCache:'none'})
       .then(registration=>registration.update())
       .catch(error=>console.warn('Service worker unavailable:',error));
   },{once:true});
