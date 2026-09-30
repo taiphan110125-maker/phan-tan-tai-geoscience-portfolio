@@ -21,7 +21,7 @@
   <link rel="dns-prefetch" href="//aqkasetqystwvpassidd.supabase.co">
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
   <link rel="dns-prefetch" href="//cdn.jsdelivr.net">
-  <link rel="preload" href="assets/hero-user-hq/hero.b64.txt?v=20260930-hq2" as="fetch" crossorigin="anonymous">
+  <link rel="preload" href="assets/hero-user.webp?v=20261001-native1" as="image" type="image/webp" fetchpriority="high">
 <title>Phan Tấn Tài | Geology & Geophysics</title>
   <style>
 :root{
@@ -2114,7 +2114,7 @@ body{color:var(--ink-strong)!important}
 
   <main id="main">
     <section class="hero" id="home" aria-labelledby="heroTitle">
-      <img class="hero-media" id="heroUserImage" alt="Địa tầng ven biển, biển xanh và các giàn khoan dầu khí ngoài khơi" fetchpriority="high" decoding="async">
+      <img class="hero-media" id="heroUserImage" src="assets/hero-user.webp?v=20261001-native1" alt="Địa tầng ven biển, biển xanh và các giàn khoan dầu khí ngoài khơi" width="1672" height="941" fetchpriority="high" decoding="async">
       <div class="hero-overlay"></div>
       <div class="shell hero-content">
         <div class="hero-copy reveal">
@@ -3358,6 +3358,42 @@ async function loadPublicContentSnapshot(){
     {data:Array.isArray(snapshot.subjects)?snapshot.subjects:[],error:null}
   ];
 }
+function applyPublicResponses(pRes,aRes,cRes,sRes,{markSynced=false,saveCache=false}={}){
+  const activeAssignmentIds=new Set((aRes.data||[]).map(row=>row.id));
+  const publicComments=(cRes.data||[]).filter(row=>row.assignment_id&&activeAssignmentIds.has(row.assignment_id));
+  const counts={};
+  for(const c of publicComments)counts[c.assignment_id]=(counts[c.assignment_id]||0)+1;
+  projects=(pRes.data||[]).map(mapProject);
+  assignments=(aRes.data||[]).map(row=>mapAssignment(row,counts));
+  assignmentSubjects=(sRes.data||[]).map(row=>({slug:row.slug,name:row.name,sortOrder:Number(row.sort_order||0)}));
+  academicExchanges=publicComments.map(row=>({
+    id:row.id,
+    assignmentId:row.assignment_id,
+    assignmentTitle:row.assignment_title||'Bài tập',
+    assignmentDate:row.assignment_date||'',
+    assignmentNumber:Number(row.assignment_number||0),
+    assignmentSubject:row.assignment_subject||'',
+    name:row.name||'Người xem',
+    role:row.role||'Người xem',
+    body:row.body||'',
+    createdAt:row.created_at
+  }));
+  renderPublicState();
+  publicContentLoadedOnce=true;
+  if(markSynced)lastPublicSync=Date.now();
+  if(saveCache)savePublicCache();
+}
+async function primePublicContentSnapshot(){
+  if(publicContentLoadedOnce)return true;
+  try{
+    const [pRes,aRes,cRes,sRes]=await loadPublicContentSnapshot();
+    applyPublicResponses(pRes,aRes,cRes,sRes);
+    return true;
+  }catch(error){
+    console.warn('Same-origin snapshot unavailable:',error);
+    return false;
+  }
+}
 async function loadPublicContent({silent = false} = {}){
   if(publicContentLoading){publicRefreshPending=true;return;}
   publicContentLoading=true;
@@ -3391,29 +3427,7 @@ async function loadPublicContent({silent = false} = {}){
         [pRes,aRes,cRes,sRes]=await loadPublicContentSnapshot();
       }
     }
-    const activeAssignmentIds=new Set((aRes.data||[]).map(row=>row.id));
-    const publicComments=(cRes.data||[]).filter(row=>row.assignment_id&&activeAssignmentIds.has(row.assignment_id));
-    const counts = {};
-    for (const c of publicComments) counts[c.assignment_id] = (counts[c.assignment_id] || 0) + 1;
-    projects = (pRes.data || []).map(mapProject);
-    assignments = (aRes.data || []).map(row => mapAssignment(row, counts));
-    assignmentSubjects = (sRes.data || []).map(row => ({slug:row.slug,name:row.name,sortOrder:Number(row.sort_order||0)}));
-    academicExchanges=publicComments.map(row=>({
-      id:row.id,
-      assignmentId:row.assignment_id,
-      assignmentTitle:row.assignment_title||'Bài tập',
-      assignmentDate:row.assignment_date||'',
-      assignmentNumber:Number(row.assignment_number||0),
-      assignmentSubject:row.assignment_subject||'',
-      name:row.name||'Người xem',
-      role:row.role||'Người xem',
-      body:row.body||'',
-      createdAt:row.created_at
-    }));
-    renderPublicState();
-    publicContentLoadedOnce=true;
-    lastPublicSync=Date.now();
-    savePublicCache();
+    applyPublicResponses(pRes,aRes,cRes,sRes,{markSynced:true,saveCache:true});
   } catch (error){
     console.error(error);
     if (!silent || !publicContentLoadedOnce){
@@ -3760,10 +3774,15 @@ $$('.modal').forEach(modal => modal.addEventListener('click', event => { if (eve
 document.addEventListener('keydown', event => { if (event.key === 'Escape') $$('.modal.open').forEach(closeModal); });
 
 (async function boot(){
-  restorePublicCache();
+  const restored=restorePublicCache();
+  if(!restored)await primePublicContentSnapshot();
   subscribeRealtime();
   initLazyAcademicChat();
-  await Promise.allSettled([loadPublicContent(),loadUserSession(),loadAboutImage()]);
+  await Promise.allSettled([
+    loadPublicContent({silent:true}),
+    loadUserSession(),
+    loadAboutImage()
+  ]);
 })();
 
 </script>
@@ -3772,49 +3791,13 @@ document.addEventListener('keydown', event => { if (event.key === 'Escape') $$('
 <script>
 if('serviceWorker' in navigator){
   window.addEventListener('load',()=>{
-    navigator.serviceWorker.register('/sw.js?v=20261001-mobilefix3',{scope:'/',updateViaCache:'none'})
+    navigator.serviceWorker.register('/sw.js?v=20261001-performance1',{scope:'/',updateViaCache:'none'})
       .then(registration=>registration.update())
       .catch(error=>console.warn('Service worker unavailable:',error));
   },{once:true});
 }
 </script>
 
-<script id="ptt-hero-user-loader">
-(()=>{
-  const loadHero=async()=>{
-    const img=document.getElementById('heroUserImage');
-    if(!img)return;
-    try{
-      let b64='';
-      try{
-        const response=await fetch('assets/hero-user-hq/hero.b64.txt?v=20260930-hq2',{cache:'force-cache',credentials:'omit'});
-        if(!response.ok)throw new Error('Không tải được ảnh bìa tối ưu.');
-        b64=await response.text();
-      }catch(primaryError){
-        console.warn('Hero single payload unavailable, using fallback chunks:',primaryError);
-        const parts=await Promise.all(
-          Array.from({length:9},(_,i)=>
-            fetch(`assets/hero-user-hq/${String(i).padStart(2,'0')}.txt?v=20260930-hq1`,{cache:'force-cache'})
-              .then(r=>{if(!r.ok)throw new Error('Không tải được phần ảnh '+i);return r.text();})
-          )
-        );
-        b64=parts.join('');
-      }
-      b64=b64.replace(/\s+/g,'');
-      const binary=atob(b64);
-      const bytes=new Uint8Array(binary.length);
-      for(let i=0;i<binary.length;i++)bytes[i]=binary.charCodeAt(i);
-      const objectUrl=URL.createObjectURL(new Blob([bytes],{type:'image/webp'}));
-      img.onload=()=>URL.revokeObjectURL(objectUrl);
-      img.src=objectUrl;
-    }catch(error){
-      console.error('Không tải được ảnh bìa:',error);
-      img.src='assets/hero-geoscience.svg';
-    }
-  };
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',loadHero,{once:true});
-  else loadHero();
-})();
-</script>
+
 </body>
 </html>
