@@ -1096,7 +1096,7 @@ function closeAssignmentModal(){
   assignmentModal.classList.remove('open');assignmentModal.setAttribute('aria-hidden','true');
   if(!$('.modal.open'))document.body.classList.remove('modal-open');
 }
-$('#addAssignmentBtn')?.addEventListener('click',openAssignmentModal);$('#assignmentModalClose')?.addEventListener('click',closeAssignmentModal);assignmentModal?.addEventListener('click',e=>{if(e.target===assignmentModal)closeAssignmentModal();});
+$('#addAssignmentBtn')?.addEventListener('click',()=>openAssignmentModal());$('#assignmentModalClose')?.addEventListener('click',closeAssignmentModal);assignmentModal?.addEventListener('click',e=>{if(e.target===assignmentModal)closeAssignmentModal();});
 $('#assignmentFile')?.addEventListener('change',event=>{
   const files=[...(event.target.files||[])];
   const editing=Boolean($('#assignmentEditId').value);
