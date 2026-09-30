@@ -4,6 +4,9 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="theme-color" content="#071a24">
+  <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
   <link rel="icon" href="assets/ptt-emblem.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://aqkasetqystwvpassidd.supabase.co" crossorigin>
   <link rel="dns-prefetch" href="//aqkasetqystwvpassidd.supabase.co">
@@ -434,6 +437,33 @@ body.admin-body,.admin-body{background:#f6f8fb!important;color:#183247!important
 }
 </style>
 
+<style id="ptt-admin-navigation-failsafe-v1">
+.admin-sidebar{
+  position:sticky!important;
+  z-index:60!important;
+  pointer-events:auto!important;
+  isolation:isolate;
+}
+.admin-sidebar .side-link{
+  position:relative!important;
+  z-index:61!important;
+  pointer-events:auto!important;
+  user-select:none;
+}
+.admin-main{
+  position:relative!important;
+  z-index:1!important;
+}
+.admin-body .modal:not(.open){
+  visibility:hidden!important;
+  pointer-events:none!important;
+}
+.admin-body .modal.open{
+  visibility:visible!important;
+  pointer-events:auto!important;
+}
+</style>
+
 </head>
 <body class="admin-body">
   <header class="admin-topbar">
@@ -447,14 +477,14 @@ body.admin-body,.admin-body{background:#f6f8fb!important;color:#183247!important
   <div class="admin-layout">
     <aside class="admin-sidebar">
       <p class="side-label">WORKSPACE</p>
-      <button class="side-link active" data-view="dashboard">▦ <span>Dashboard</span></button>
-      <button class="side-link" data-view="assignments">▤ <span>Bài tập</span></button>
-      <button class="side-link" data-view="projects">⌁ <span>Dự án</span></button>
-      <button class="side-link" data-view="site-image">▣ <span>Ảnh giới thiệu</span></button>
-      <button class="side-link" data-view="feedback">◌ <span>Nhận xét</span></button>
-      <button class="side-link" data-view="messages">✉ <span>Lời nhắn</span></button>
-      <button class="side-link" data-view="accounts">◎ <span>Tài khoản</span></button>
-      <button class="side-link" data-view="security">⌾ <span>Bảo mật</span></button>
+      <button type="button" class="side-link active" data-view="dashboard">▦ <span>Dashboard</span></button>
+      <button type="button" class="side-link" data-view="assignments">▤ <span>Bài tập</span></button>
+      <button type="button" class="side-link" data-view="projects">⌁ <span>Dự án</span></button>
+      <button type="button" class="side-link" data-view="site-image">▣ <span>Ảnh giới thiệu</span></button>
+      <button type="button" class="side-link" data-view="feedback">◌ <span>Nhận xét</span></button>
+      <button type="button" class="side-link" data-view="messages">✉ <span>Lời nhắn</span></button>
+      <button type="button" class="side-link" data-view="accounts">◎ <span>Tài khoản</span></button>
+      <button type="button" class="side-link" data-view="security">⌾ <span>Bảo mật</span></button>
       <div class="sidebar-note"><strong>Cloud workspace</strong><span>Dữ liệu được đồng bộ qua Supabase Database, Auth và Storage.</span></div>
     </aside>
 
@@ -846,13 +876,27 @@ function populateAssignmentSubjectSelect(currentValue=''){
 }
 
 function go(view){
-  $$('.admin-view').forEach(panel=>panel.classList.toggle('active',panel.dataset.panel===view));
-  $$('.side-link').forEach(button=>button.classList.toggle('active',button.dataset.view===view));
-  renderAll();
-  if(view==='accounts'&&!accountUsersLoaded) loadUserAccounts();
+  const target=$('.admin-view').find(panel=>panel.dataset.panel===view);
+  if(!target){
+    console.warn('Admin panel not found:',view);
+    return;
+  }
+  $('.admin-view').forEach(panel=>panel.classList.toggle('active',panel===target));
+  $('.side-link').forEach(button=>button.classList.toggle('active',button.dataset.view===view));
+  if(view==='accounts'&&!accountUsersLoaded){
+    loadUserAccounts().catch(error=>console.warn('Không tải được mục Tài khoản:',error));
+  }
 }
-$$('.side-link').forEach(button=>button.addEventListener('click',()=>go(button.dataset.view)));
-$$('[data-go]').forEach(button=>button.addEventListener('click',()=>go(button.dataset.go)));
+window.pttAdminGo=go;
+
+document.addEventListener('click',event=>{
+  const nav=event.target.closest('.side-link[data-view],[data-go]');
+  if(!nav)return;
+  const view=nav.dataset.view||nav.dataset.go;
+  if(!view)return;
+  event.preventDefault();
+  go(view);
+});
 
 async function ensureAdminSession(){
   if(!sb){ location.replace('admin-login.html'); return false; }
