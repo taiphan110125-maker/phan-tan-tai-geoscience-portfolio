@@ -3,7 +3,12 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="theme-color" content="#071a24">\n  <link rel="icon" href="assets/ptt-emblem.svg" type="image/svg+xml">
+  <meta name="theme-color" content="#071a24">
+  <link rel="icon" href="assets/ptt-emblem.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://aqkasetqystwvpassidd.supabase.co" crossorigin>
+  <link rel="dns-prefetch" href="//aqkasetqystwvpassidd.supabase.co">
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="dns-prefetch" href="//cdn.jsdelivr.net">
   <title>Admin Dashboard | Phan Tấn Tài</title>
   <style>
 :root{
@@ -213,7 +218,8 @@ body,button,input,select,textarea,.hero h1,.hero h2,.section-head h2,.about-copy
 .btn-gold{background:linear-gradient(135deg,#f0c55d,#d59b27);color:#0d2d47}
 .btn-outline{border-color:#c7d6e1;color:#dceaf2;background:rgba(255,255,255,.04)}
 .admin-modal-card{border:1px solid #dbe5ed;box-shadow:0 28px 80px rgba(8,37,60,.22)}
-</style>\n<style id="ptt-admin-v5-light">
+</style>
+<style id="ptt-admin-v5-light">
 
 body.admin-body,.admin-body{background:#f6f8fb!important;color:#183247!important}
 .admin-topbar{
@@ -375,6 +381,19 @@ body.admin-body,.admin-body{background:#f6f8fb!important;color:#183247!important
 @media(max-width:850px){
   .site-image-admin-grid{grid-template-columns:1fr}
   .site-image-card{width:min(100%,340px)}
+}
+</style>
+
+
+<style id="ptt-admin-reduced-motion-v1">
+@media (prefers-reduced-motion: reduce){
+  html{scroll-behavior:auto!important}
+  *,*::before,*::after{
+    animation-duration:.01ms!important;
+    animation-iteration-count:1!important;
+    transition-duration:.01ms!important;
+    scroll-behavior:auto!important;
+  }
 }
 </style>
 
@@ -948,7 +967,7 @@ function reuploadAssignmentFile(item){
     const newPath=`${item.id}/${Date.now()}-${safeName(file.name)}`;
     try{
       toast('Đang tải file lên…');
-      const up=await sb.storage.from('assignments').upload(newPath,file,{upsert:false,contentType:file.type||undefined});
+      const up=await sb.storage.from('assignments').upload(newPath,file,{upsert:false,cacheControl:'31536000',contentType:file.type||undefined});
       if(up.error) throw up.error;
       const publicUrl=sb.storage.from('assignments').getPublicUrl(newPath).data.publicUrl;
       const ext=(file.name.split('.').pop()||item.type||'FILE').toUpperCase();
@@ -1208,7 +1227,7 @@ $('#assignmentForm')?.addEventListener('submit',async event=>{
         const file=files[0];
         newPath=`date-${assignmentDate}/${editId}/${Date.now()}-${safeName(file.name)}`;
         $('#assignmentStatus').textContent=`Đang tải file mới: ${file.name}`;
-        const up=await sb.storage.from('assignments').upload(newPath,file,{upsert:false,contentType:file.type||undefined});
+        const up=await sb.storage.from('assignments').upload(newPath,file,{upsert:false,cacheControl:'31536000',contentType:file.type||undefined});
         if(up.error)throw up.error;
         uploadedPaths.push(newPath);
         fileName=file.name;
@@ -1267,7 +1286,7 @@ $('#assignmentForm')?.addEventListener('submit',async event=>{
       if(file){
         path=`date-${assignmentDate}/${id}/${Date.now()}-${safeName(file.name)}`;
         $('#assignmentStatus').textContent=`Đang tải ${i+1}/${items.length}: ${file.name}`;
-        const up=await sb.storage.from('assignments').upload(path,file,{upsert:false,contentType:file.type||undefined});
+        const up=await sb.storage.from('assignments').upload(path,file,{upsert:false,cacheControl:'31536000',contentType:file.type||undefined});
         if(up.error)throw up.error;
         uploadedPaths.push(path);
         fileUrl=sb.storage.from('assignments').getPublicUrl(path).data.publicUrl;
@@ -1379,7 +1398,7 @@ $('#projectForm')?.addEventListener('submit',async event=>{
       const file=pendingProjectReportFiles[i];
       $('#projectStatus').textContent=`Đang tải báo cáo ${i+1}/${pendingProjectReportFiles.length}: ${file.name}`;
       const path=`${id}/${Date.now()}-${i}-${safeName(file.name)}`;
-      const up=await sb.storage.from('project-reports').upload(path,file,{upsert:false,contentType:file.type||'application/octet-stream'});
+      const up=await sb.storage.from('project-reports').upload(path,file,{upsert:false,cacheControl:'31536000',contentType:file.type||'application/octet-stream'});
       if(up.error)throw up.error;
       newReportPaths.push(path);
       const url=sb.storage.from('project-reports').getPublicUrl(path).data.publicUrl;
