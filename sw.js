@@ -1,6 +1,6 @@
 'use strict';
 
-const CACHE_NAME='ptt-static-v9-20260930';
+const CACHE_NAME='ptt-static-v10-20260930';
 const PRECACHE=[
   '/',
   '/index.html',
@@ -38,6 +38,9 @@ self.addEventListener('fetch',event=>{
 
   const url=new URL(request.url);
   if(url.origin!==self.location.origin)return;
+
+  // Admin pages must always come directly from the network.
+  if(url.pathname==='/admin.html'||url.pathname==='/admin-login.html')return;
 
   if(request.mode==='navigate'){
     event.respondWith((async()=>{
