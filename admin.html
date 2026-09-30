@@ -1002,12 +1002,12 @@ async function loadNotificationState(){
     notificationSeen.messagesSeenAt=data.messages_seen_at||'';
   }else{
     const now=new Date().toISOString();
-    const {error:insertError}=await client.from('admin_notification_state').insert({
+    const {error:insertError}=await client.from('admin_notification_state').upsert({
       admin_id:adminUser.id,
       feedback_seen_at:now,
       messages_seen_at:now,
       updated_at:now
-    });
+    },{onConflict:'admin_id',ignoreDuplicates:true});
     if(insertError)throw insertError;
     notificationSeen.feedbackSeenAt=now;
     notificationSeen.messagesSeenAt=now;
@@ -1580,14 +1580,22 @@ document.addEventListener('click',async event=>{
     const item=trashAssignments.find(a=>a.id===id);
     if(!item||!confirm(`Xóa vĩnh viễn bài tập “${item.title}”?\n\nFile đính kèm và nhận xét liên quan sẽ bị xóa và không thể khôi phục.`))return;
     try{
-      if(item.filePath){
-        const remove=await sb.storage.from('assignments').remove([item.filePath]);
-        if(remove.error)console.warn('Không xóa được file bài tập:',remove.error);
-      }
-      const commentsDelete=await sb.from('comments').delete().eq('assignment_id',id);
-      if(commentsDelete.error)throw commentsDelete.error;
+      const commentLookup=await sb.from('comments').select('id').eq('assignment_id',id);
+      if(commentLookup.error)throw commentLookup.error;
+      const commentIds=(commentLookup.data||[]).map(row=>row.id);
+
       const {error}=await sb.from('assignments').delete().eq('id',id);
       if(error)throw error;
+
+      if(commentIds.length){
+        const commentsDelete=await sb.from('comments').delete().in('id',commentIds);
+        if(commentsDelete.error)console.warn('Không xóa được một số nhận xét cũ:',commentsDelete.error);
+      }
+      if(item.filePath){
+        const remove=await sb.storage.from('assignments').remove([item.filePath]);
+        if(remove.error)console.warn('Không xóa được file bài tập mồ côi:',remove.error);
+      }
+
       await loadAdminData();
       notifyPublicContentChanged('assignments');
       notifyPublicContentChanged('comments');
@@ -1617,17 +1625,19 @@ document.addEventListener('click',async event=>{
     const item=trashProjects.find(p=>p.id===id);
     if(!item||!confirm(`Xóa vĩnh viễn dự án “${item.title}”?\n\nẢnh và file báo cáo sẽ bị xóa và không thể khôi phục.`))return;
     try{
-      if(item.imagePath){
-        const removeImage=await sb.storage.from('project-images').remove([item.imagePath]);
-        if(removeImage.error)console.warn('Không xóa được ảnh dự án:',removeImage.error);
-      }
       const reportPaths=(item.reportFiles||[]).map(file=>file.path).filter(Boolean);
-      if(reportPaths.length){
-        const removeReports=await sb.storage.from('project-reports').remove(reportPaths);
-        if(removeReports.error)console.warn('Không xóa được file báo cáo:',removeReports.error);
-      }
       const {error}=await sb.from('projects').delete().eq('id',id);
       if(error)throw error;
+
+      if(item.imagePath){
+        const removeImage=await sb.storage.from('project-images').remove([item.imagePath]);
+        if(removeImage.error)console.warn('Không xóa được ảnh dự án mồ côi:',removeImage.error);
+      }
+      if(reportPaths.length){
+        const removeReports=await sb.storage.from('project-reports').remove(reportPaths);
+        if(removeReports.error)console.warn('Không xóa được file báo cáo mồ côi:',removeReports.error);
+      }
+
       await loadAdminData();
       notifyPublicContentChanged('projects');
       toast('Đã xóa vĩnh viễn dự án');
