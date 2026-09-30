@@ -1481,6 +1481,27 @@ body{color:var(--ink-strong)!important}
 }
 </style>
 
+
+<style id="ptt-performance-hardening-v1">
+.contact-honeypot{
+  position:absolute!important;
+  left:-10000px!important;
+  top:auto!important;
+  width:1px!important;
+  height:1px!important;
+  overflow:hidden!important;
+  opacity:0!important;
+  pointer-events:none!important;
+}
+#projects,#assignments,#contact,#geo-ai{
+  content-visibility:auto;
+  contain-intrinsic-size:850px;
+}
+@media(max-width:700px){
+  #projects,#assignments,#contact,#geo-ai{contain-intrinsic-size:1050px}
+}
+</style>
+
 </head>
 <body>
   <a class="skip-link" href="#main">Bỏ qua menu</a>
@@ -1550,12 +1571,12 @@ body{color:var(--ink-strong)!important}
       <div class="shell">
         <div class="section-head light reveal">
           <div><p class="eyebrow">KHÁM PHÁ HỒ SƠ</p><h2>Nền tảng học thuật</h2></div>
-          <p>Ba khu vực kết nối dự án nghiên cứu, tài liệu học tập và trợ lý Geo AI trong cùng một portfolio.</p>
+          <p>Ba khu vực kết nối dự án nghiên cứu, tài liệu học tập và trợ lý ảo trong cùng một portfolio.</p>
         </div>
 
         <div class="feature-grid">
           <article class="visual-card reveal">
-            <img src="assets/about-fieldwork.svg" alt="Sinh viên khảo sát địa chất thực địa">
+            <img src="assets/about-fieldwork.svg" alt="Sinh viên khảo sát địa chất thực địa" loading="lazy" decoding="async">
             <div class="visual-card-overlay"></div>
             <div class="visual-card-body">
               <span class="icon-box">⌁</span>
@@ -1565,7 +1586,7 @@ body{color:var(--ink-strong)!important}
             </div>
           </article>
           <article class="visual-card reveal delay-1">
-            <img src="assets/assignments-review.svg" alt="Không gian học tập với tài liệu địa chất và hệ thống nhận xét">
+            <img src="assets/assignments-review.svg" alt="Không gian học tập với tài liệu địa chất và hệ thống nhận xét" loading="lazy" decoding="async">
             <div class="visual-card-overlay"></div>
             <div class="visual-card-body">
               <span class="icon-box">▤</span>
@@ -1575,7 +1596,7 @@ body{color:var(--ink-strong)!important}
             </div>
           </article>
           <article class="visual-card reveal delay-2">
-            <img src="assets/geo-ai.svg" alt="Giao diện trợ lý AI chuyên ngành địa chất và địa vật lý">
+            <img src="assets/geo-ai.svg" alt="Giao diện trợ lý ảo" loading="lazy" decoding="async">
             <div class="visual-card-overlay"></div>
             <div class="visual-card-body">
               <span class="icon-box">AI</span>
@@ -1592,7 +1613,7 @@ body{color:var(--ink-strong)!important}
       <div class="shell about-layout">
         <div class="about-media reveal">
           <div class="about-photo-card" id="aboutPhotoCard">
-            <img id="aboutProfileImage" src="assets/about-fieldwork.svg" alt="Ảnh chân dung Phan Tấn Tài">
+            <img id="aboutProfileImage" src="assets/about-fieldwork.svg" alt="Ảnh chân dung Phan Tấn Tài" loading="lazy" decoding="async" fetchpriority="low">
           </div>
         </div>
         <div class="about-copy reveal delay-1">
@@ -1681,12 +1702,13 @@ body{color:var(--ink-strong)!important}
           <p>Gửi góp ý, trao đổi học thuật hoặc đề nghị cộng tác trong các chủ đề liên quan đến Địa chất – Địa vật lý.</p>
         </div>
         <form class="contact-form reveal delay-1" id="contactForm" novalidate>
+          <input class="contact-honeypot" name="website" type="text" tabindex="-1" autocomplete="off" aria-hidden="true">
           <div class="field-grid">
-            <label>Họ và tên<input name="name" required minlength="2" placeholder="Nguyễn Văn A"></label>
-            <label>Email<input name="email" type="email" required placeholder="email@example.com"></label>
+            <label>Họ và tên<input name="name" required minlength="2" maxlength="100" autocomplete="name" placeholder="Nguyễn Văn A"></label>
+            <label>Email<input name="email" type="email" required maxlength="160" autocomplete="email" placeholder="email@example.com"></label>
           </div>
           <label>Chủ đề<select name="topic"><option>Trao đổi học thuật</option><option>Góp ý bài tập</option><option>Hợp tác nghiên cứu</option><option>Khác</option></select></label>
-          <label>Nội dung<textarea name="message" rows="5" required minlength="10" placeholder="Nội dung bạn muốn trao đổi..."></textarea></label>
+          <label>Nội dung<textarea name="message" rows="5" required minlength="10" maxlength="2000" placeholder="Nội dung bạn muốn trao đổi..."></textarea></label>
           <div class="form-footer"><small>Lời nhắn được lưu vào hệ thống quản trị để tôi có thể xem và phản hồi.</small><button class="btn btn-dark" type="submit">Gửi lời nhắn</button></div>
           <p class="form-status" id="contactStatus" role="status"></p>
         </form>
@@ -1700,7 +1722,7 @@ body{color:var(--ink-strong)!important}
           <button class="btn btn-gold" id="aiOpenFromSection">Mở trợ lý ảo →</button>
         </div>
         <div class="ai-media reveal delay-1">
-          <img src="assets/geo-ai.svg" alt="Hình minh họa trợ lý ảo">
+          <img src="assets/geo-ai.svg" alt="Hình minh họa trợ lý ảo" loading="lazy" decoding="async">
           <div class="ai-badge"><span class="pulse"></span> SẴN SÀNG HỖ TRỢ</div>
         </div>
       </div>
@@ -1750,7 +1772,7 @@ body{color:var(--ink-strong)!important}
     </div>
   </footer>
 
-  <button class="ai-fab" id="aiFab" aria-label="Mở Geo AI"><span>AI</span></button>
+  <button class="ai-fab" id="aiFab" aria-label="Mở trợ lý ảo"><span>AI</span></button>
   <aside class="ai-panel" id="aiPanel" aria-hidden="true">
     <div class="ai-panel-head">
       <div><strong>Trợ lý ảo</strong><small id="aiStatus">Hỗ trợ thông tin trên website</small></div>
@@ -1767,7 +1789,7 @@ body{color:var(--ink-strong)!important}
       <button type="button" data-ai-q="Định hướng nghề nghiệp là gì?">Định hướng</button>
     </div>
     <form class="ai-input" id="aiForm">
-      <input id="aiInput" aria-label="Nhập câu hỏi cho Geo AI" placeholder="Bạn cần hỗ trợ gì?" autocomplete="off">
+      <input id="aiInput" aria-label="Nhập câu hỏi cho trợ lý ảo" placeholder="Bạn cần hỗ trợ gì?" autocomplete="off">
       <button type="submit" aria-label="Gửi câu hỏi">↑</button>
     </form>
   </aside>
@@ -1904,7 +1926,7 @@ async function loadAboutImage(){
     if(error)throw error;
     const row=(data||[]).find(item=>item.key==='about_image_url');
     const url=row?.value||'';
-    img.src=url ? url+(url.includes('?')?'&':'?')+'v='+Date.now() : DEFAULT_ABOUT_IMAGE;
+    img.src=url || DEFAULT_ABOUT_IMAGE;
   }catch(error){
     console.warn('Không tải được ảnh Giới thiệu:',error);
     img.src=DEFAULT_ABOUT_IMAGE;
@@ -2357,6 +2379,16 @@ $('#contactForm')?.addEventListener('submit', async event => {
     return;
   }
   const data = Object.fromEntries(new FormData(form).entries());
+  if(String(data.website||'').trim()){
+    form.reset();
+    $('#contactStatus').textContent='Đã gửi lời nhắn thành công.';
+    return;
+  }
+  const lastContact=Number(localStorage.getItem('ptt-contact-last')||0);
+  if(lastContact&&Date.now()-lastContact<10000){
+    $('#contactStatus').textContent='Vui lòng chờ vài giây trước khi gửi thêm lời nhắn.';
+    return;
+  }
   const submit = form.querySelector('button[type="submit"]');
   submit.disabled = true;
   $('#contactStatus').textContent = 'Đang gửi…';
@@ -2365,6 +2397,7 @@ $('#contactForm')?.addEventListener('submit', async event => {
     const { error } = await client.from('messages').insert({name:data.name,email:data.email,topic:data.topic || '',message:data.message});
     if (error) throw error;
     form.reset();
+    localStorage.setItem('ptt-contact-last',String(Date.now()));
     $('#contactStatus').textContent = 'Đã gửi lời nhắn thành công.';
     showToast('Đã ghi nhận lời nhắn');
   } catch (error){ $('#contactStatus').textContent = error.message || 'Không gửi được lời nhắn.'; }
@@ -2413,8 +2446,8 @@ async function loadPublicContent({silent = false} = {}){
   try {
     const client = requireSupabase();
     const [pRes, aRes, cRes, sRes] = await Promise.all([
-      client.from('projects').select('*').eq('published', true).order('sort_order', {ascending:true}).order('created_at', {ascending:false}),
-      client.from('assignments').select('*').eq('published', true).order('assignment_date', {ascending:true}).order('assignment_number', {ascending:true}).order('created_at', {ascending:true}),
+      client.from('projects').select('id,title,type,image_url,image_path,summary,tags,objective,data_text,method,output,report_files,sort_order,created_at').eq('published', true).order('sort_order', {ascending:true}).order('created_at', {ascending:false}),
+      client.from('assignments').select('id,type,title,topic,content_text,external_url,subject,assignment_date,assignment_number,date_text,created_at,file_name,file_url,file_path').eq('published', true).order('assignment_date', {ascending:true}).order('assignment_number', {ascending:true}).order('created_at', {ascending:true}),
       client.from('comments').select('id,assignment_id,name,role,body,created_at,assignment_title,assignment_date,assignment_number,assignment_subject').order('created_at', {ascending:false}),
       client.from('assignment_subjects').select('slug,name,sort_order').eq('active', true).order('sort_order', {ascending:true}).order('name', {ascending:true})
     ]);
@@ -2489,13 +2522,13 @@ function initLazyAcademicChat(){
 }
 // Safety refresh is intentionally slow because realtime handles normal updates.
 setInterval(()=>{
-  if(document.visibilityState==='visible'&&Date.now()-lastPublicSync>55000) schedulePublicRefresh(0);
-},60000);
+  if(document.visibilityState==='visible'&&Date.now()-lastPublicSync>240000) schedulePublicRefresh(0);
+},300000);
 window.addEventListener('focus',()=>{
-  if(Date.now()-lastPublicSync>30000)schedulePublicRefresh(0);
+  if(Date.now()-lastPublicSync>90000)schedulePublicRefresh(0);
 });
 document.addEventListener('visibilitychange',()=>{
-  if(document.visibilityState==='visible'&&Date.now()-lastPublicSync>45000)schedulePublicRefresh(0);
+  if(document.visibilityState==='visible'&&Date.now()-lastPublicSync>120000)schedulePublicRefresh(0);
 });
 
 // Geo AI
@@ -2564,7 +2597,7 @@ function localSmartAnswer(query){
 }
 async function askGeoAI(message){
   const status=$('#aiStatus');
-  if(status) status.textContent='Trợ lý AI · đang phân tích ngữ cảnh…';
+  if(status) status.textContent='Trợ lý ảo · đang phân tích ngữ cảnh…';
   try{
     const client=requireSupabase();
     const history=aiHistory.slice(0,-1).slice(-10).map(item=>({
@@ -2576,7 +2609,7 @@ async function askGeoAI(message){
       {body:{message,history}}
     );
     if(error) throw error;
-    if(!data?.answer) throw new Error('Geo AI chưa trả về nội dung.');
+    if(!data?.answer) throw new Error('Trợ lý ảo chưa trả về nội dung.');
     const sourceList=Array.isArray(data.sources)?data.sources.filter(Boolean):[];
     const sourceText=sourceList.length?'\n\nNguồn tham khảo: '+sourceList.join(' · '):'';
     if(status){
@@ -2590,12 +2623,12 @@ async function askGeoAI(message){
         profile:'hồ sơ website',
         fallback:'chế độ hỗ trợ'
       };
-      status.textContent='Trợ lý AI · '+(modeLabels[data.mode]||'học thuật + dữ liệu website');
+      status.textContent='Trợ lý ảo · '+(modeLabels[data.mode]||'học thuật + dữ liệu website');
     }
     return String(data.answer)+sourceText;
   }catch(error){
     console.warn('Geo AI server unavailable, using local fallback:',error);
-    if(status) status.textContent='Trợ lý AI · chế độ dự phòng cục bộ';
+    if(status) status.textContent='Trợ lý ảo · chế độ dự phòng cục bộ';
     await new Promise(resolve=>setTimeout(resolve,120));
     return localSmartAnswer(message);
   }
@@ -2740,20 +2773,6 @@ document.addEventListener('keydown', event => { if (event.key === 'Escape') $$('
 
 </script>
 
-<script>
-(function(){
-  const q=new URLSearchParams(location.search);
-  if(q.get('adminsetup')!=='1') return;
-  window.addEventListener('DOMContentLoaded',()=>{
-    const name=document.getElementById('userRegisterName');
-    const email=document.getElementById('userRegisterEmail');
-    if(name) name.value='Phan Tấn Tài';
-    if(email) email.value='phantantai1101@gmail.com';
-    const btn=document.getElementById('userRegisterOpen');
-    if(btn) btn.click();
-  });
-})();
-</script>
 
 <script>
 if('serviceWorker' in navigator){
@@ -2771,7 +2790,7 @@ if('serviceWorker' in navigator){
     try{
       const parts=await Promise.all(
         Array.from({length:9},(_,i)=>
-          fetch(`assets/hero-user-hq/${String(i).padStart(2,'0')}.txt?v=20260930-hq1`,{cache:'no-store'})
+          fetch(`assets/hero-user-hq/${String(i).padStart(2,'0')}.txt?v=20260930-hq1`,{cache:'force-cache'})
             .then(r=>{if(!r.ok)throw new Error('Không tải được phần ảnh '+i);return r.text();})
         )
       );
