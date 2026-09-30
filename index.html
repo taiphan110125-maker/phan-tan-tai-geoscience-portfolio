@@ -1615,18 +1615,18 @@ body{color:var(--ink-strong)!important}
   <button class="ai-fab" id="aiFab" aria-label="Mở Geo AI"><span>AI</span></button>
   <aside class="ai-panel" id="aiPanel" aria-hidden="true">
     <div class="ai-panel-head">
-      <div><strong>Geo AI Assistant</strong><small id="aiStatus">Geo AI Free · không tốn phí</small></div>
+      <div><strong>Trợ lý AI</strong><small id="aiStatus">Hỗ trợ thông tin trên website</small></div>
       <button id="aiClose" aria-label="Đóng trợ lý">×</button>
     </div>
     <div class="ai-messages" id="aiMessages" aria-live="polite">
-      <div class="msg bot">Xin chào! Mình là Geo AI Free. Bạn có thể hỏi về Địa chất – Địa vật lý, dự án hoặc bài tập trên website.</div>
+      <div class="msg bot">Xin chào! Mình là trợ lý AI của website. Bạn có thể hỏi về hồ sơ, dự án, bài tập, quá trình học tập hoặc định hướng nghề nghiệp.</div>
     </div>
     <div class="ai-quick" id="aiQuick">
-      <button type="button" data-ai-q="Quy trình đánh giá thông số vỉa">Formation Evaluation</button>
-      <button type="button" data-ai-q="Vsh là gì?">Vsh</button>
-      <button type="button" data-ai-q="Giải thích Archie và Sw">Archie / Sw</button>
+      <button type="button" data-ai-q="Giới thiệu ngắn về Phan Tấn Tài">Giới thiệu</button>
       <button type="button" data-ai-q="Website có những dự án nào?">Dự án</button>
       <button type="button" data-ai-q="Có những bài tập nào?">Bài tập</button>
+      <button type="button" data-ai-q="Có những hoạt động thực địa nào?">Thực địa</button>
+      <button type="button" data-ai-q="Định hướng nghề nghiệp là gì?">Định hướng</button>
     </div>
     <form class="ai-input" id="aiForm">
       <input id="aiInput" aria-label="Nhập câu hỏi cho Geo AI" placeholder="Bạn cần hỗ trợ gì?" autocomplete="off">
@@ -2398,51 +2398,35 @@ function aiProjectLine(p){ return '• '+p.title+(p.type?' — '+p.type:'')+(p.s
 function aiAssignmentLine(a){ return '• '+formatAssignmentDate(a.assignmentDate)+' · Bài '+a.assignmentNumber+' — '+a.title+(a.topic?' · '+a.topic:''); }
 function localSmartAnswer(query){
   const t=aiNormalize(query);
-  if(!t) return 'Bạn hãy nhập câu hỏi về Địa chất – Địa vật lý, dự án hoặc bài tập trên website.';
-  if(t==='hi'||t==='hello'||t.indexOf('xin chao')===0||t.indexOf('chao')===0) return 'Xin chào! Bạn có thể hỏi mình về petrophysics, well logging, seismic, địa chất, địa nhiệt, khảo sát thực địa hoặc nội dung trên website.';
-  if(t.includes('ban la ai')||t.includes('geo ai')) return 'Mình là Geo AI Free trên portfolio của Phan Tấn Tài. Mình dùng bộ kiến thức cục bộ kết hợp dữ liệu dự án và bài tập đang công khai trên website nên không phát sinh phí API.';
-  if(t.includes('phan tan tai')||t.includes('chu website')||t.includes('tac gia')) return 'Website là portfolio học thuật của Phan Tấn Tài, tập trung vào Địa chất – Địa vật lý, petrophysics, well logging, seismic, khảo sát thực địa và các bài tập/nghiên cứu liên quan.';
-
+  if(!t) return 'Bạn hãy nhập câu hỏi cụ thể hơn để mình hỗ trợ.';
+  if(t==='hi'||t==='hello'||t.includes('xin chao')||t==='chao'){
+    return 'Xin chào! Mình có thể giúp bạn tìm hiểu về hồ sơ, dự án, bài tập, hoạt động học tập và định hướng nghề nghiệp trên website.';
+  }
+  if(t.includes('ban la ai')||t.includes('tro ly')||t.includes('geo ai')){
+    return 'Mình là trợ lý AI của website Phan Tấn Tài. Mình hỗ trợ tìm thông tin có trên website và giải thích ngắn gọn, dễ hiểu.';
+  }
+  if(t.includes('phan tan tai')||t.includes('chu website')||t.includes('tac gia')||t.includes('gioi thieu')){
+    return 'Phan Tấn Tài là sinh viên ngành Địa chất và Địa vật lý, đang tìm kiếm cơ hội học hỏi và thực tập để phát triển kỹ năng thực tế trong môi trường chuyên nghiệp.';
+  }
   if(t.includes('du an')||t.includes('project')||t.includes('nghien cuu')){
-    const found=aiFind(query,projects,4); const list=found.length?found:projects.slice(0,4);
-    return list.length ? 'Mình tìm thấy '+list.length+' mục phù hợp:\n'+list.map(aiProjectLine).join('\n')+'\n\nBạn có thể mở mục Dự án trên website để xem chi tiết.' : 'Hiện chưa có dự án nào được công bố.';
+    const found=aiFind(query,projects,4);
+    const list=found.length?found:projects.slice(0,4);
+    return list.length
+      ? 'Một số dự án đang có trên website:\n'+list.map(aiProjectLine).join('\n')
+      : 'Hiện chưa có dự án nào được công bố.';
   }
-  if(t.includes('bai tap')||t.includes('assignment')||t.includes('tai lieu')||t.includes('docx')||t.includes('pdf')||t.includes('pptx')){
-    const found=aiFind(query,assignments,5); const list=found.length?found:assignments.slice(0,5);
-    return list.length ? 'Kho bài tập hiện có '+assignments.length+' tài liệu. Các mục phù hợp:\n'+list.map(aiAssignmentLine).join('\n')+'\n\nBạn có thể mở trực tiếp file từ mục Bài tập.' : 'Hiện chưa có bài tập hoặc tài liệu nào được công bố.';
+  if(t.includes('bai tap')||t.includes('tai lieu')||t.includes('assignment')){
+    const found=aiFind(query,assignments,5);
+    const list=found.length?found:assignments.slice(0,5);
+    return list.length
+      ? 'Một số bài tập và tài liệu đang có:\n'+list.map(aiAssignmentLine).join('\n')
+      : 'Hiện chưa có bài tập hoặc tài liệu nào được công bố.';
   }
-
-  if(t.includes('formation evaluation')||t.includes('danh gia thong so via')||t.includes('danh gia via')||t.includes('quy trinh via')||t.includes('petrophysics')) return 'Workflow Formation Evaluation gợi ý:\n1) QC dữ liệu log và xác định khoảng nghiên cứu.\n2) Nhận dạng thạch học, xác định baseline và tính IGR/Vsh.\n3) Tính độ rỗng tổng và hiệu dụng từ Density–Neutron–Sonic.\n4) Xác định Rw, Rt và mô hình bão hòa nước.\n5) Tính Sw; vỉa sạch có thể dùng Archie, vỉa sét cần mô hình shaly-sand phù hợp.\n6) Đặt cutoff Vsh–Phi–Sw để xác định net reservoir/net pay.\n7) Kiểm tra chéo với core, mud log và test vỉa.';
-  if(t.includes('vsh')||t.includes('shale volume')||t.includes('the tich set')||t.includes('igr')) return 'Vsh là thể tích sét trong thành hệ. Từ Gamma Ray thường tính IGR = (GRlog − GRclean)/(GRshale − GRclean), sau đó chọn mô hình Vsh phù hợp. Vsh dùng để hiệu chỉnh độ rỗng và lựa chọn mô hình Sw.';
-  if(t.includes('archie')||t==='sw'||t.includes('bao hoa nuoc')||t.includes('water saturation')) return 'Archie cho đá chứa sạch: Sw^n = (a·Rw)/(Rt·φ^m). Rw là điện trở suất nước vỉa, Rt là điện trở suất thật, φ là độ rỗng, m là hệ số xi măng, n là số mũ bão hòa. Nếu vỉa có sét đáng kể, nên kiểm tra Simandoux, Indonesia hoặc mô hình shaly-sand khác.';
-  if(t.includes('do rong')||t.includes('porosity')||t.includes('density neutron')||t.includes('rhob')||t.includes('nphi')) return 'Độ rỗng thường được ước tính từ Density, Neutron và Sonic. Density–Neutron giúp nhận biết lithology và hiệu ứng khí. Với vỉa sét, cần phân biệt độ rỗng tổng và độ rỗng hiệu dụng.';
-  if(t.includes('gamma ray')||t==='gr'||t.includes(' gr ')) return 'Gamma Ray đo phóng xạ tự nhiên của thành hệ. GR cao thường liên quan shale/clay; GR thấp thường gợi ý cát sạch, carbonate hoặc evaporite, nhưng luôn cần kết hợp các log khác và bối cảnh địa chất.';
-  if(t.includes('resistivity')||t.includes('dien tro suat')||t==='rt') return 'Resistivity log phản ánh khả năng dẫn điện của thành hệ. Nước mặn thường cho điện trở suất thấp; hydrocarbon thường làm điện trở suất tăng. Cần chú ý invasion và shallow/deep resistivity khi suy luận Rt.';
-  if(t.includes('sonic')||t.includes('acoustic')||t.includes('dt log')) return 'Sonic log đo thời gian truyền sóng âm qua thành hệ. Nó hỗ trợ tính độ rỗng, nhận dạng lithology, liên kết giếng–địa chấn và ước tính vận tốc.';
-  if(t.includes('sp log')||t.includes('spontaneous potential')) return 'SP đo thế điện tự nhiên trong giếng. Nó hỗ trợ nhận dạng lớp thấm, tương quan địa tầng và đôi khi ước tính Rw trong điều kiện phù hợp.';
-
-  if(t.includes('twt')||t.includes('two way travel')) return 'TWT là thời gian sóng địa chấn đi từ nguồn xuống mặt phản xạ rồi quay lại máy thu. Trên mặt cắt địa chấn, trục đứng thường biểu diễn TWT thay vì độ sâu trực tiếp.';
-  if(t.includes('cmp')||t.includes('common midpoint')) return 'CMP gather tập hợp các trace có cùng điểm giữa source–receiver. Sau hiệu chỉnh NMO, các phản xạ cùng sự kiện được căn chỉnh để stack và tăng tỷ lệ tín hiệu/nhiễu.';
-  if(t.includes('nmo')||t.includes('normal moveout')) return 'NMO hiệu chỉnh chênh lệch thời gian phản xạ do offset source–receiver khác nhau. Mục tiêu là làm phẳng sự kiện phản xạ trong CMP gather trước khi stack.';
-  if(t.includes('migration')||t.includes('dich chuyen dia chan')) return 'Seismic migration đưa năng lượng phản xạ về vị trí không gian gần đúng của cấu trúc gây phản xạ, giúp xử lý dipping reflector và diffraction.';
-  if(t.includes('impedance')||t.includes('tro khang am')) return 'Trở kháng âm Z = ρV. Hệ số phản xạ tại biên hai lớp: R = (Z2 − Z1)/(Z2 + Z1). Độ tương phản impedance càng lớn thì biên độ phản xạ tiềm năng càng mạnh.';
-  if(t.includes('song p')||t.includes('p wave')||t.includes('song s')||t.includes('s wave')) return 'Sóng P là sóng dọc, truyền qua rắn, lỏng và khí; sóng S là sóng ngang, không truyền qua chất lỏng lý tưởng. Trong môi trường rắn, vận tốc P thường lớn hơn vận tốc S.';
-
-  if(t.includes('facies')||t.includes('tuong tram tich')) return 'Facies là tập hợp đặc trưng thạch học, cấu trúc trầm tích, cổ sinh và/hoặc tín hiệu địa vật lý phản ánh một môi trường lắng đọng. Với well log, facies thường được suy luận từ motif GR, tổ hợp log và dữ liệu core/cuttings.';
-  if(t.includes('moi truong tram tich')||t.includes('depositional environment')) return 'Xác định môi trường trầm tích nên kết hợp facies, motif log, core/cuttings, kiến trúc địa tầng và quan hệ theo chiều đứng–ngang; không nên kết luận chỉ từ một đường GR.';
-  if(t.includes('rtk')||t.includes('gps')) return 'RTK GPS dùng hiệu chỉnh thời gian thực để đạt độ chính xác vị trí cao, phù hợp định vị điểm đo, thiết kế tuyến khảo sát và xây dựng mô hình địa hình.';
-  if(t.includes('ert')||t.includes('electrical resistivity')) return 'Khảo sát điện trở suất khai thác sự khác biệt điện trở suất của đất đá và chất lưu, thường dùng cho địa chất công trình, nước ngầm, đới phong hóa, đứt gãy và trượt lở.';
-  if(t.includes('dia nhiet')||t.includes('geothermal')) return 'Tiềm năng địa nhiệt phụ thuộc gradient nhiệt, nguồn nhiệt, độ thấm, chất lưu và cấu trúc địa chất. Đánh giá thường kết hợp địa chất, địa hóa, địa vật lý và dữ liệu nhiệt độ giếng.';
-
-  const pHit=aiFind(query,projects,2);
-  if(pHit.length && aiScore(query,pHit[0])>=3) return 'Có vẻ bạn đang hỏi về dự án:\n'+pHit.map(aiProjectLine).join('\n')+'\n\nBạn có thể xem chi tiết trong mục Dự án.';
-  const aHit=aiFind(query,assignments,2);
-  if(aHit.length && aiScore(query,aHit[0])>=3) return 'Mình tìm thấy tài liệu liên quan:\n'+aHit.map(aiAssignmentLine).join('\n');
-  return 'Mình chưa có đủ dữ liệu để trả lời chính xác câu này. Geo AI trên website tập trung vào Địa chất – Địa vật lý, dầu khí, petrophysics, seismic, địa chất công trình/địa kỹ thuật và dữ liệu dự án – bài tập. Bạn hãy nêu rõ thuật ngữ hoặc nội dung chuyên ngành cần hỏi.';
+  return 'Mình chưa hiểu rõ câu hỏi này. Bạn có thể hỏi về giới thiệu bản thân, dự án, bài tập, hoạt động thực địa hoặc định hướng nghề nghiệp.';
 }
 async function askGeoAI(message){
   const status=$('#aiStatus');
-  if(status) status.textContent='Geo AI · đang phân tích ngữ cảnh…';
+  if(status) status.textContent='Trợ lý AI · đang phân tích ngữ cảnh…';
   try{
     const client=requireSupabase();
     const history=aiHistory.slice(0,-1).slice(-10).map(item=>({
@@ -2459,21 +2443,21 @@ async function askGeoAI(message){
     const sourceText=sourceList.length?'\n\nNguồn tham khảo: '+sourceList.join(' · '):'';
     if(status){
       const modeLabels={
-        llm:'AI chuyên ngành',
-        site:'dữ liệu website',
-        knowledge:'kiến thức chuyên ngành',
-        clarify:'cần làm rõ câu hỏi',
-        out_of_scope:'ngoài phạm vi chuyên môn',
-        scope:'trợ lý chuyên ngành',
+        llm:'đang hỗ trợ',
+        site:'thông tin website',
+        knowledge:'giải thích đơn giản',
+        clarify:'cần làm rõ',
+        out_of_scope:'ngoài phạm vi',
+        scope:'trợ lý website',
         profile:'hồ sơ website',
         fallback:'chế độ hỗ trợ'
       };
-      status.textContent='Geo AI · '+(modeLabels[data.mode]||'học thuật + dữ liệu website');
+      status.textContent='Trợ lý AI · '+(modeLabels[data.mode]||'học thuật + dữ liệu website');
     }
     return String(data.answer)+sourceText;
   }catch(error){
     console.warn('Geo AI server unavailable, using local fallback:',error);
-    if(status) status.textContent='Geo AI · chế độ dự phòng cục bộ';
+    if(status) status.textContent='Trợ lý AI · chế độ dự phòng cục bộ';
     await new Promise(resolve=>setTimeout(resolve,120));
     return localSmartAnswer(message);
   }
