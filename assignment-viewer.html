@@ -213,25 +213,49 @@
     if(!assignmentId){showState('Thiếu mã bài tập','Đường dẫn xem trước không hợp lệ.',true);return;}
     try{
       let a=null;
+      let snapshot=null;
       if(sb){
-        const {data,error}=await sb.from('assignments').select('id,title,topic,assignment_date,assignment_number,subject,content_text,external_url,file_path,file_url,file_name,type').eq('id',assignmentId).eq('published',true).is('deleted_at',null).single();
-        if(error)throw error;
-        a=data;
-      }else{
-        const select=encodeURIComponent('id,title,topic,assignment_date,assignment_number,subject,content_text,external_url,file_path,file_url,file_name,type');
-        const rows=await restRows('assignments',`select=${select}&id=eq.${encodeURIComponent(assignmentId)}&published=eq.true&deleted_at=is.null&limit=1`);
-        a=rows?.[0]||null;
+        try{
+          const {data,error}=await sb.from('assignments').select('id,title,topic,assignment_date,assignment_number,subject,content_text,external_url,file_path,file_url,file_name,type').eq('id',assignmentId).eq('published',true).is('deleted_at',null).single();
+          if(error)throw error;
+          a=data;
+        }catch(clientError){
+          console.warn('Supabase assignment lookup failed:',clientError);
+        }
+      }
+      if(!a){
+        try{
+          const select=encodeURIComponent('id,title,topic,assignment_date,assignment_number,subject,content_text,external_url,file_path,file_url,file_name,type');
+          const rows=await restRows('assignments',`select=${select}&id=eq.${encodeURIComponent(assignmentId)}&published=eq.true&deleted_at=is.null&limit=1`);
+          a=rows?.[0]||null;
+        }catch(restError){
+          console.warn('REST assignment lookup failed; using snapshot:',restError);
+          const response=await fetch('/public-content.json?v=20261001-mobile-snapshot1',{cache:'no-store'});
+          if(!response.ok)throw new Error(`Snapshot failed (${response.status})`);
+          snapshot=await response.json();
+          a=(snapshot.assignments||[]).find(item=>String(item.id)===String(assignmentId))||null;
+        }
       }
       if(!a)throw new Error('Không tìm thấy bài tập.');
 
       let subjectName=a.subject||'Khác';
       if(a.subject){
-        if(sb){
-          const {data:subjectRow}=await sb.from('assignment_subjects').select('name').eq('slug',a.subject).maybeSingle();
-          if(subjectRow?.name)subjectName=subjectRow.name;
-        }else{
-          const rows=await restRows('assignment_subjects',`select=name&slug=eq.${encodeURIComponent(a.subject)}&active=eq.true&limit=1`);
-          if(rows?.[0]?.name)subjectName=rows[0].name;
+        if(snapshot){
+          subjectName=(snapshot.subjects||[]).find(item=>item.slug===a.subject)?.name||subjectName;
+        }else if(sb){
+          try{
+            const {data:subjectRow,error}=await sb.from('assignment_subjects').select('name').eq('slug',a.subject).maybeSingle();
+            if(error)throw error;
+            if(subjectRow?.name)subjectName=subjectRow.name;
+          }catch(subjectError){
+            console.warn('Subject lookup failed:',subjectError);
+          }
+        }
+        if(subjectName===a.subject){
+          try{
+            const rows=await restRows('assignment_subjects',`select=name&slug=eq.${encodeURIComponent(a.subject)}&active=eq.true&limit=1`);
+            if(rows?.[0]?.name)subjectName=rows[0].name;
+          }catch{}
         }
       }
 
