@@ -1,13 +1,12 @@
 'use strict';
 
-const CACHE_NAME='ptt-static-v7-20260930';
+const CACHE_NAME='ptt-static-v8-20260930';
 const PRECACHE=[
   '/',
   '/index.html',
   '/assignment-viewer.html',
   '/assets/ptt-brand.svg',
   '/assets/ptt-emblem.svg',
-  '/assets/hero-oil-exact-v3.webp?v=20260930-hero2',
 
 
 
