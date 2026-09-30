@@ -2123,6 +2123,8 @@ let lastPublicSync = 0;
 let academicChatLoaded = false;
 let lastOwnCommentId = '';
 let lastOwnChatId = '';
+let pendingOwnCommentKey = '';
+let pendingOwnChatKey = '';
 const PUBLIC_CACHE_KEY = 'ptt-public-cache-v1';
 const PUBLIC_CACHE_TTL = 10 * 60 * 1000;
 
@@ -2575,6 +2577,7 @@ $('#commentForm')?.addEventListener('submit', async event => {
       assignment_number: assignment?.assignmentNumber || null,
       assignment_subject: assignment ? assignmentSubjectName(assignment.subject) : ''
     };
+    pendingOwnCommentKey=[assignmentId,name,text].join('\u0000');
     const {data:created,error}=await client.from('comments')
       .insert(payload)
       .select('id,created_at')
@@ -2582,6 +2585,7 @@ $('#commentForm')?.addEventListener('submit', async event => {
     if (error) throw error;
 
     lastOwnCommentId=created?.id||'';
+    pendingOwnCommentKey='';
     if(assignment) assignment.commentCount=Number(assignment.commentCount||0)+1;
     academicExchanges.unshift({
       id:created?.id||('local-'+Date.now()),
@@ -2602,6 +2606,7 @@ $('#commentForm')?.addEventListener('submit', async event => {
     showToast('Đã gửi nhận xét');
     setTimeout(() => closeModal(commentModal), 300);
   } catch (error){
+    pendingOwnCommentKey='';
     console.warn('Không gửi được nhận xét:',error);
     $('#commentStatus').textContent = 'Không gửi được nhận xét. Vui lòng thử lại.';
   } finally {
@@ -2624,6 +2629,7 @@ $('#academicChatForm')?.addEventListener('submit',async event=>{
   status.textContent='Đang gửi…';
   try{
     const client=requireSupabase();
+    pendingOwnChatKey=[name,role,body].join('\u0000');
     const {data:created,error}=await client.from('academic_chat_messages')
       .insert({user_id:currentUser?.id||null,name,role,body})
       .select('id,user_id,name,role,body,created_at')
@@ -2631,6 +2637,7 @@ $('#academicChatForm')?.addEventListener('submit',async event=>{
     if(error)throw error;
 
     lastOwnChatId=created?.id||'';
+    pendingOwnChatKey='';
     academicChatMessages.push({
       id:created.id,
       userId:created.user_id,
@@ -2645,6 +2652,7 @@ $('#academicChatForm')?.addEventListener('submit',async event=>{
     status.textContent='Đã gửi.';
     setTimeout(()=>{if(status.textContent==='Đã gửi.')status.textContent='';},800);
   }catch(error){
+    pendingOwnChatKey='';
     console.warn('Không gửi được tin nhắn:',error);
     status.textContent='Không gửi được tin nhắn. Vui lòng thử lại.';
   }finally{
@@ -2781,14 +2789,26 @@ function subscribeRealtime(){
       .on('postgres_changes',{event:'*',schema:'public',table:'assignments'},()=>schedulePublicRefresh())
       .on('postgres_changes',{event:'*',schema:'public',table:'comments'},payload=>{
         const id=payload?.new?.id||payload?.old?.id||'';
-        if(id&&id===lastOwnCommentId){lastOwnCommentId='';return;}
+        const newRow=payload?.new||{};
+        const key=[newRow.assignment_id||'',newRow.name||'',newRow.body||''].join('\u0000');
+        if((id&&id===lastOwnCommentId)||(pendingOwnCommentKey&&key===pendingOwnCommentKey)){
+          lastOwnCommentId='';
+          pendingOwnCommentKey='';
+          return;
+        }
         schedulePublicRefresh();
       })
       .on('postgres_changes',{event:'*',schema:'public',table:'assignment_subjects'},()=>schedulePublicRefresh())
       .on('postgres_changes',{event:'*',schema:'public',table:'site_settings'},()=>loadAboutImage())
       .on('postgres_changes',{event:'*',schema:'public',table:'academic_chat_messages'},payload=>{
         const id=payload?.new?.id||payload?.old?.id||'';
-        if(id&&id===lastOwnChatId){lastOwnChatId='';return;}
+        const newRow=payload?.new||{};
+        const key=[newRow.name||'',newRow.role||'',newRow.body||''].join('\u0000');
+        if((id&&id===lastOwnChatId)||(pendingOwnChatKey&&key===pendingOwnChatKey)){
+          lastOwnChatId='';
+          pendingOwnChatKey='';
+          return;
+        }
         if(academicChatLoaded)loadAcademicChat({stickToBottom:true});
       })
       .subscribe();
