@@ -1503,6 +1503,38 @@ body{color:var(--ink-strong)!important}
 }
 </style>
 
+
+<style id="ptt-project-empty-user-v1">
+#projects .project-empty{
+  min-height:150px!important;
+  border:1px solid #dce4e9!important;
+  border-radius:20px!important;
+  background:rgba(255,255,255,.52)!important;
+  padding:28px!important;
+}
+#projects .project-empty strong{
+  margin:0!important;
+  font-size:18px!important;
+  font-weight:700!important;
+  color:#345064!important;
+}
+#projects .project-showcase.single-project{
+  grid-template-columns:1fr!important;
+}
+#projects .project-showcase.single-project .project-feature{
+  width:100%!important;
+}
+@media(max-width:700px){
+  #projects .project-empty{
+    min-height:120px!important;
+    padding:22px!important;
+  }
+  #projects .project-empty strong{
+    font-size:16px!important;
+  }
+}
+</style>
+
 </head>
 <body>
   <a class="skip-link" href="#main">Bỏ qua menu</a>
@@ -2143,9 +2175,11 @@ function renderProjects(){
   const host = $('#projectShowcase');
   if (!host) return;
   if (!projects.length){
-    host.innerHTML = `<div class="project-empty"><strong>Chưa có dự án được công bố.</strong><span>Quản trị viên có thể thêm dự án trong Admin Dashboard.</span></div>`;
+    host.classList.remove('single-project');
+    host.innerHTML = `<div class="project-empty"><strong>Chưa có dự án được công bố.</strong></div>`;
     return;
   }
+  host.classList.toggle('single-project',projects.length===1);
   const featured = projects[0];
   const side = projects.slice(1);
   host.innerHTML = `
@@ -2159,8 +2193,8 @@ function renderProjects(){
         <button type="button" class="btn btn-gold project-open" data-project-id="${escapeHtml(featured.id)}">Xem chi tiết →</button>
       </div>
     </article>
-    <div class="project-side ${side.length > 2 ? 'project-side-scroll' : ''}">
-      ${side.length ? side.map(project => `
+    ${side.length ? `<div class="project-side ${side.length > 2 ? 'project-side-scroll' : ''}">
+      ${side.map(project => `
         <article class="project-mini reveal visible" data-project-id="${escapeHtml(project.id)}">
           <img src="${escapeHtml(project.image || 'assets/hero-geoscience.svg')}" alt="Minh họa ${escapeHtml(project.title)}" loading="lazy" decoding="async">
           <div>
@@ -2169,8 +2203,8 @@ function renderProjects(){
             <p>${escapeHtml(project.summary || '')}</p>
             <button type="button" class="text-btn project-open" data-project-id="${escapeHtml(project.id)}">Chi tiết →</button>
           </div>
-        </article>`).join('') : '<div class="project-side-empty">Thêm dự án mới trong trang quản trị để hiển thị tại đây.</div>'}
-    </div>`;
+        </article>`).join('')}
+    </div>` : ''}`;
 }
 
 const projectModal = $('#projectModal');
