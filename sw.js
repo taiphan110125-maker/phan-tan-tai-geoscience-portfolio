@@ -1,6 +1,6 @@
 'use strict';
 
-const CACHE_NAME='ptt-static-v14-20261001';
+const CACHE_NAME='ptt-static-v15-20261001';
 const PRECACHE=[
   '/',
   '/index.html',
@@ -42,6 +42,22 @@ self.addEventListener('fetch',event=>{
 
   // Admin pages must always come directly from the network.
   if(url.pathname==='/admin.html'||url.pathname==='/admin-login.html')return;
+
+  if(url.pathname==='/public-content.json'){
+    event.respondWith((async()=>{
+      const cache=await caches.open(CACHE_NAME);
+      try{
+        const response=await fetch(request,{cache:'no-store'});
+        if(response&&response.ok)await cache.put(request,response.clone());
+        return response;
+      }catch{
+        return (await cache.match(request))
+          || (await cache.match('/public-content.json'))
+          || Response.error();
+      }
+    })());
+    return;
+  }
 
   if(request.mode==='navigate'){
     event.respondWith((async()=>{
