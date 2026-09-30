@@ -2121,6 +2121,8 @@ let publicRefreshPending = false;
 let publicRefreshTimer = null;
 let lastPublicSync = 0;
 let academicChatLoaded = false;
+let lastOwnCommentId = '';
+let lastOwnChatId = '';
 const PUBLIC_CACHE_KEY = 'ptt-public-cache-v1';
 const PUBLIC_CACHE_TTL = 10 * 60 * 1000;
 
@@ -2560,28 +2562,51 @@ $('#commentForm')?.addEventListener('submit', async event => {
   if (name.length < 2 || text.length < 5){ $('#commentStatus').textContent = 'Vui lòng nhập đầy đủ họ tên và nhận xét.'; return; }
   const submit = form.querySelector('button[type="submit"]');
   submit.disabled = true;
-  $('#commentStatus').textContent = 'Đang gửi nhận xét…';
+  $('#commentStatus').textContent = 'Đang gửi…';
   try {
     const client = requireSupabase();
-    const { data: authData } = await client.auth.getUser();
     const assignment=assignments.find(item=>item.id===assignmentId);
-    const { error } = await client.from('comments').insert({
+    const payload={
       assignment_id: assignmentId,
-      user_id: authData?.user?.id || null,
+      user_id: currentUser?.id || null,
       name, role, body: text,
       assignment_title: assignment?.title || 'Bài tập',
       assignment_date: assignment?.assignmentDate || null,
       assignment_number: assignment?.assignmentNumber || null,
       assignment_subject: assignment ? assignmentSubjectName(assignment.subject) : ''
-    });
+    };
+    const {data:created,error}=await client.from('comments')
+      .insert(payload)
+      .select('id,created_at')
+      .single();
     if (error) throw error;
+
+    lastOwnCommentId=created?.id||'';
+    if(assignment) assignment.commentCount=Number(assignment.commentCount||0)+1;
+    academicExchanges.unshift({
+      id:created?.id||('local-'+Date.now()),
+      assignmentId,
+      assignmentTitle:payload.assignment_title,
+      assignmentDate:payload.assignment_date||'',
+      assignmentNumber:Number(payload.assignment_number||0),
+      assignmentSubject:payload.assignment_subject||'',
+      name,role,body:text,
+      createdAt:created?.created_at||new Date().toISOString()
+    });
+    renderAssignments();
+    renderAcademicExchanges({stickToBottom:true});
+    savePublicCache();
+
     form.reset();
-    $('#commentStatus').textContent = 'Đã lưu nhận xét vào hệ thống.';
-    await loadPublicContent({silent:true});
+    $('#commentStatus').textContent = 'Đã gửi.';
     showToast('Đã gửi nhận xét');
-    setTimeout(() => closeModal(commentModal), 650);
-  } catch (error){ console.warn('Không gửi được nhận xét:',error); $('#commentStatus').textContent = 'Không gửi được nhận xét. Vui lòng thử lại.'; }
-  finally { submit.disabled = false; }
+    setTimeout(() => closeModal(commentModal), 300);
+  } catch (error){
+    console.warn('Không gửi được nhận xét:',error);
+    $('#commentStatus').textContent = 'Không gửi được nhận xét. Vui lòng thử lại.';
+  } finally {
+    submit.disabled = false;
+  }
 });
 
 // Live academic chat
@@ -2595,21 +2620,36 @@ $('#academicChatForm')?.addEventListener('submit',async event=>{
   if(name.length<2){status.textContent='Hãy nhập tên của bạn.';return;}
   if(!body){status.textContent='Hãy nhập nội dung tin nhắn.';return;}
   const button=form.querySelector('button[type="submit"]');
-  button.disabled=true;status.textContent='Đang gửi…';
+  button.disabled=true;
+  status.textContent='Đang gửi…';
   try{
     const client=requireSupabase();
-    const {data:authData}=await client.auth.getUser();
-    const {error}=await client.from('academic_chat_messages').insert({
-      user_id:authData?.user?.id||null,
-      name,role,body
-    });
+    const {data:created,error}=await client.from('academic_chat_messages')
+      .insert({user_id:currentUser?.id||null,name,role,body})
+      .select('id,user_id,name,role,body,created_at')
+      .single();
     if(error)throw error;
+
+    lastOwnChatId=created?.id||'';
+    academicChatMessages.push({
+      id:created.id,
+      userId:created.user_id,
+      name:created.name,
+      role:created.role,
+      body:created.body,
+      createdAt:created.created_at
+    });
+    renderAcademicExchanges({stickToBottom:true});
+
     $('#academicChatMessage').value='';
-    status.textContent='';
-    await loadAcademicChat({stickToBottom:true});
+    status.textContent='Đã gửi.';
+    setTimeout(()=>{if(status.textContent==='Đã gửi.')status.textContent='';},800);
   }catch(error){
-    console.warn('Không gửi được tin nhắn:',error); status.textContent='Không gửi được tin nhắn. Vui lòng thử lại.';
-  }finally{button.disabled=false;}
+    console.warn('Không gửi được tin nhắn:',error);
+    status.textContent='Không gửi được tin nhắn. Vui lòng thử lại.';
+  }finally{
+    button.disabled=false;
+  }
 });
 
 // Contact
@@ -2739,10 +2779,16 @@ function subscribeRealtime(){
     sb.channel('ptt-public-content')
       .on('postgres_changes',{event:'*',schema:'public',table:'projects'},()=>schedulePublicRefresh())
       .on('postgres_changes',{event:'*',schema:'public',table:'assignments'},()=>schedulePublicRefresh())
-      .on('postgres_changes',{event:'*',schema:'public',table:'comments'},()=>schedulePublicRefresh())
+      .on('postgres_changes',{event:'*',schema:'public',table:'comments'},payload=>{
+        const id=payload?.new?.id||payload?.old?.id||'';
+        if(id&&id===lastOwnCommentId){lastOwnCommentId='';return;}
+        schedulePublicRefresh();
+      })
       .on('postgres_changes',{event:'*',schema:'public',table:'assignment_subjects'},()=>schedulePublicRefresh())
       .on('postgres_changes',{event:'*',schema:'public',table:'site_settings'},()=>loadAboutImage())
-      .on('postgres_changes',{event:'*',schema:'public',table:'academic_chat_messages'},()=>{
+      .on('postgres_changes',{event:'*',schema:'public',table:'academic_chat_messages'},payload=>{
+        const id=payload?.new?.id||payload?.old?.id||'';
+        if(id&&id===lastOwnChatId){lastOwnChatId='';return;}
         if(academicChatLoaded)loadAcademicChat({stickToBottom:true});
       })
       .subscribe();
