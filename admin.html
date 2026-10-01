@@ -1449,14 +1449,36 @@ function reuploadAssignmentFile(item){
   input.click();
 }
 
+async function getNextAssignmentNumber(dateKey,excludeId=''){
+  let query=sb.from('assignments')
+    .select('assignment_number')
+    .eq('assignment_date',dateKey)
+    .is('deleted_at',null)
+    .order('assignment_number',{ascending:false})
+    .limit(1);
+  if(excludeId)query=query.neq('id',excludeId);
+  const {data,error}=await query;
+  if(error)throw error;
+  return Number(data?.[0]?.assignment_number||0)+1;
+}
+function isAssignmentNumberConflict(error){
+  const message=String(error?.message||'');
+  return error?.code==='23505'||message.includes('assignments_date_assignment_number_uidx')||/duplicate key/i.test(message);
+}
 async function normalizeAssignmentNumbers(dateKey){
-  const items=assignments.filter(a=>a.assignmentDate===dateKey).sort((a,b)=>a.assignmentNumber-b.assignmentNumber||a.id.localeCompare(b.id));
+  const {data,error}=await sb.from('assignments')
+    .select('id,assignment_number')
+    .eq('assignment_date',dateKey)
+    .is('deleted_at',null)
+    .order('assignment_number',{ascending:true})
+    .order('created_at',{ascending:true});
+  if(error)throw error;
+  const items=data||[];
   for(let i=0;i<items.length;i++){
     const wanted=i+1;
-    if(items[i].assignmentNumber!==wanted){
-      const {error}=await sb.from('assignments').update({assignment_number:wanted}).eq('id',items[i].id);
-      if(error) throw error;
-      items[i].assignmentNumber=wanted;
+    if(Number(items[i].assignment_number)!==wanted){
+      const {error:updateError}=await sb.from('assignments').update({assignment_number:wanted}).eq('id',items[i].id);
+      if(updateError)throw updateError;
     }
   }
 }
@@ -1477,10 +1499,12 @@ document.addEventListener('change',async event=>{
     if(!item||!targetDate){if(item)dateInput.value=item.assignmentDate;return;}
     if(targetDate===item.assignmentDate)return;
     const sourceDate=item.assignmentDate;
-    const maxTarget=assignments.filter(a=>a.id!==id&&a.assignmentDate===targetDate).reduce((m,a)=>Math.max(m,a.assignmentNumber),0);
-    const {error}=await sb.from('assignments').update({assignment_date:targetDate,assignment_number:maxTarget+1,date_text:formatAssignmentDate(targetDate)}).eq('id',id);
+    let nextNumber;
+    try{nextNumber=await getNextAssignmentNumber(targetDate,id);}
+    catch(error){toast(error.message||'Không xác định được số bài tiếp theo.');await loadAdminData();return;}
+    const {error}=await sb.from('assignments').update({assignment_date:targetDate,assignment_number:nextNumber,date_text:formatAssignmentDate(targetDate)}).eq('id',id);
     if(error){toast(error.message);await loadAdminData();return;}
-    item.assignmentDate=targetDate;item.assignmentNumber=maxTarget+1;
+    item.assignmentDate=targetDate;item.assignmentNumber=nextNumber;
     try{await normalizeAssignmentNumbers(sourceDate);}catch(e){console.warn(e);}
     await loadAdminData();notifyPublicContentChanged('assignments');toast('Đã đổi ngày học');return;
   }
@@ -1558,9 +1582,7 @@ document.addEventListener('click',async event=>{
     const item=trashAssignments.find(a=>a.id===id);
     if(!item)return;
     try{
-      const nextNumber=assignments
-        .filter(a=>a.assignmentDate===item.assignmentDate)
-        .reduce((max,a)=>Math.max(max,Number(a.assignmentNumber||0)),0)+1;
+      const nextNumber=await getNextAssignmentNumber(item.assignmentDate,id);
       const {error}=await sb.from('assignments').update({
         deleted_at:null,
         deleted_by:null,
@@ -1800,10 +1822,7 @@ $('#assignmentForm')?.addEventListener('submit',async event=>{
       const dateChanged=assignmentDate!==oldDate;
       let assignmentNumber=editingItem.assignmentNumber;
       if(dateChanged){
-        const maxTarget=assignments
-          .filter(a=>a.id!==editId&&a.assignmentDate===assignmentDate)
-          .reduce((m,a)=>Math.max(m,a.assignmentNumber),0);
-        assignmentNumber=maxTarget+1;
+        assignmentNumber=await getNextAssignmentNumber(assignmentDate,editId);
       }
 
       let fileName=editingItem.fileName||'';
@@ -1865,11 +1884,9 @@ $('#assignmentForm')?.addEventListener('submit',async event=>{
       return;
     }
 
-    const maxExisting=assignments.filter(a=>a.assignmentDate===assignmentDate).reduce((m,a)=>Math.max(m,a.assignmentNumber),0);
     const items=files.length?files:[null];
     for(let i=0;i<items.length;i++){
       const file=items[i];
-      const number=maxExisting+i+1;
       const id=`a_${Date.now()}_${i}_${Math.random().toString(36).slice(2,7)}`;
       let path='',fileUrl='',fileName='',ext='BÀI';
       if(file){
@@ -1884,13 +1901,26 @@ $('#assignmentForm')?.addEventListener('submit',async event=>{
       }else{
         $('#assignmentStatus').textContent='Đang lưu bài tập không có file đính kèm…';
       }
-      const title=file
-        ? (titlePrefix ? (items.length===1?titlePrefix:`${titlePrefix} ${number}`) : fileBaseName(file.name))
-        : (titlePrefix || `Bài tập ${number}`);
-      const row={id,type:ext,title,topic,content_text:contentText,external_url:externalUrl,subject,assignment_date:assignmentDate,assignment_number:number,date_text:formatAssignmentDate(assignmentDate),file_name:fileName,file_url:fileUrl,file_path:path,published:true};
-      const {error}=await sb.from('assignments').insert(row);
-      if(error)throw error;
-      insertedIds.push(id);
+
+      let number=await getNextAssignmentNumber(assignmentDate);
+      let saved=false;
+      let lastError=null;
+      for(let attempt=0;attempt<3&&!saved;attempt++){
+        const title=file
+          ? (titlePrefix ? (items.length===1?titlePrefix:`${titlePrefix} ${number}`) : fileBaseName(file.name))
+          : (titlePrefix || `Bài tập ${number}`);
+        const row={id,type:ext,title,topic,content_text:contentText,external_url:externalUrl,subject,assignment_date:assignmentDate,assignment_number:number,date_text:formatAssignmentDate(assignmentDate),file_name:fileName,file_url:fileUrl,file_path:path,published:true};
+        const {error}=await sb.from('assignments').insert(row);
+        if(!error){
+          saved=true;
+          insertedIds.push(id);
+          break;
+        }
+        lastError=error;
+        if(!isAssignmentNumberConflict(error))throw error;
+        number=await getNextAssignmentNumber(assignmentDate);
+      }
+      if(!saved)throw lastError||new Error('Không cấp được số bài tập mới.');
     }
     form.reset();resetAssignmentRichEditor();$('#selectedFilesPreview').textContent='Chưa chọn file — bạn vẫn có thể lưu bài tập.';
     const savedCount=items.length;
