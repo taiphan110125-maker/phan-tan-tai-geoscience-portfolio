@@ -1728,6 +1728,49 @@ body{color:var(--ink-strong)!important}
 </style>
 
 
+<style id="ptt-private-feedback-v1">
+.private-feedback-note{
+  margin:10px 0 12px;
+  padding:11px 12px;
+  border:1px solid #d9e5ec;
+  border-radius:11px;
+  background:#f5f9fb;
+  color:#587080;
+  font-size:12px;
+  line-height:1.5;
+}
+.private-comment-history{
+  display:grid;
+  gap:8px;
+  max-height:180px;
+  overflow:auto;
+  margin:0 0 12px;
+}
+.private-comment-entry{
+  padding:10px 12px;
+  border:1px solid #dce5eb;
+  border-radius:11px;
+  background:#fff;
+}
+.private-comment-entry time{
+  display:block;
+  margin-bottom:4px;
+  color:#82939e;
+  font-size:10px;
+}
+.private-comment-entry p{
+  margin:0;
+  color:#29485f;
+  font-size:12px;
+  line-height:1.55;
+}
+.private-comment-empty{
+  padding:9px 0;
+  color:#8798a3;
+  font-size:11px;
+}
+</style>
+
 <style id="ptt-reduced-motion-v1">
 @media (prefers-reduced-motion: reduce){
   html{scroll-behavior:auto!important}
@@ -2246,11 +2289,11 @@ body{color:var(--ink-strong)!important}
           <aside class="feedback-card reveal delay-1">
             <div class="feedback-body">
               <div class="exchange-title-row">
-                <h3>Trao đổi học thuật</h3>
+                <h3>Thảo luận công khai</h3>
                 <span class="exchange-live-status"><span class="live-dot"></span> Trực tiếp</span>
               </div>
               <div id="academicExchangeHistory" class="academic-exchange-history unified-exchange-stream" aria-live="polite">
-                <div class="exchange-empty">Chưa có trao đổi học thuật.</div>
+                <div class="exchange-empty">Chưa có thảo luận công khai.</div>
               </div>
               <form id="academicChatForm" class="academic-chat-form unified-chat-form">
                 <div class="chat-fields">
@@ -2262,7 +2305,7 @@ body{color:var(--ink-strong)!important}
                   </select>
                 </div>
                 <div class="chat-send-row">
-                  <textarea id="academicChatMessage" maxlength="1000" rows="2" required aria-label="Nội dung trao đổi" placeholder="Nhập nội dung trao đổi..."></textarea>
+                  <textarea id="academicChatMessage" maxlength="1000" rows="2" required aria-label="Nội dung thảo luận công khai" placeholder="Nhập nội dung thảo luận công khai..."></textarea>
                   <button type="submit" aria-label="Gửi tin nhắn">Gửi</button>
                 </div>
                 <p id="academicChatStatus" class="chat-status" role="status"></p>
@@ -2401,9 +2444,11 @@ body{color:var(--ink-strong)!important}
   <div class="modal" id="commentModal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="commentModalTitle">
     <div class="modal-card compact">
       <button class="modal-close" id="commentModalClose" aria-label="Đóng">×</button>
-      <p class="eyebrow">FEEDBACK</p>
-      <h3 id="commentModalTitle">Gửi nhận xét</h3>
+      <p class="eyebrow">PRIVATE FEEDBACK</p>
+      <h3 id="commentModalTitle">Nhận xét riêng tư</h3>
       <p id="commentTarget" class="muted"></p>
+      <div class="private-feedback-note">Chỉ bạn và Admin có thể xem các nhận xét trong mục này. Nhận xét không xuất hiện trong thảo luận công khai.</div>
+      <div id="privateCommentHistory" class="private-comment-history" aria-live="polite"></div>
       <form id="commentForm" class="stack-form">
         <input type="hidden" id="commentAssignmentId">
         <label>Họ tên<input id="commentName" required minlength="2" maxlength="100" autocomplete="name" placeholder="Tên người nhận xét"></label>
@@ -2500,7 +2545,7 @@ let currentUser = null;
 let projects = [];
 let assignments = [];
 let assignmentSubjects = [];
-let academicExchanges = [];
+let academicExchanges = []; // kept empty: private feedback is never part of public discussion
 let academicChatMessages = [];
 let publicContentLoading = false;
 let publicContentLoadedOnce = false;
@@ -2512,8 +2557,8 @@ let lastOwnCommentId = '';
 let lastOwnChatId = '';
 let pendingOwnCommentKey = '';
 let pendingOwnChatKey = '';
-const PUBLIC_CACHE_KEY = 'ptt-public-cache-v2';
-const LEGACY_PUBLIC_CACHE_KEYS = ['ptt-public-cache-v1'];
+const PUBLIC_CACHE_KEY = 'ptt-public-cache-v3';
+const LEGACY_PUBLIC_CACHE_KEYS = ['ptt-public-cache-v1','ptt-public-cache-v2'];
 const PUBLIC_CACHE_TTL = 10 * 60 * 1000;
 
 const DEFAULT_ABOUT_IMAGE='assets/about-fieldwork.svg';
@@ -2593,7 +2638,7 @@ function renderPublicState(){
 function savePublicCache(){
   try{
     localStorage.setItem(PUBLIC_CACHE_KEY,JSON.stringify({
-      at:Date.now(),projects,assignments,assignmentSubjects,academicExchanges
+      at:Date.now(),projects,assignments,assignmentSubjects
     }));
   }catch{}
 }
@@ -2607,7 +2652,7 @@ function restorePublicCache(){
     projects=Array.isArray(cached.projects)?cached.projects:[];
     assignments=Array.isArray(cached.assignments)?cached.assignments:[];
     assignmentSubjects=Array.isArray(cached.assignmentSubjects)?cached.assignmentSubjects:[];
-    academicExchanges=Array.isArray(cached.academicExchanges)?cached.academicExchanges:[];
+    academicExchanges=[];
     renderPublicState();
     publicContentLoadedOnce=true;
     return true;
@@ -2649,53 +2694,27 @@ function formatExchangeTime(value){
   }catch{return String(value);}
 }
 function unifiedAcademicItems(){
-  const assignmentItems=academicExchanges.map(item=>({
-    ...item,
-    kind:'assignment',
-    sortTime:new Date(item.createdAt||0).getTime()
-  }));
-  const chatItems=academicChatMessages.map(item=>({
-    ...item,
-    kind:'chat',
-    sortTime:new Date(item.createdAt||0).getTime()
-  }));
-  return [...assignmentItems,...chatItems].sort((a,b)=>a.sortTime-b.sortTime);
+  return academicChatMessages
+    .map(item=>({...item,kind:'chat',sortTime:new Date(item.createdAt||0).getTime()}))
+    .sort((a,b)=>a.sortTime-b.sortTime);
 }
 function renderAcademicExchanges({stickToBottom=false}={}){
   const host=$('#academicExchangeHistory');
   if(!host)return;
   const items=unifiedAcademicItems();
   if(!items.length){
-    host.innerHTML='<div class="exchange-empty">Chưa có trao đổi học thuật. Bạn có thể bắt đầu cuộc trao đổi bên dưới.</div>';
+    host.innerHTML='<div class="exchange-empty">Chưa có thảo luận công khai. Bạn có thể bắt đầu cuộc thảo luận bên dưới.</div>';
     return;
   }
   const nearBottom=host.scrollHeight-host.scrollTop-host.clientHeight<90;
-  host.innerHTML=items.map(item=>{
-    if(item.kind==='assignment'){
-      return `
-        <article class="exchange-entry assignment-exchange">
-          <div class="exchange-person">
-            <div><strong>${escapeHtml(item.name)}</strong><span>${escapeHtml(item.role||'Người xem')}</span></div>
-            <time>${escapeHtml(formatExchangeTime(item.createdAt))}</time>
-          </div>
-          <div class="exchange-assignment">
-            <span>Bài ${Number(item.assignmentNumber||1)}</span>
-            ${item.assignmentDate?`<span>${escapeHtml(formatAssignmentDate(item.assignmentDate))}</span>`:''}
-            ${item.assignmentSubject?`<span>${escapeHtml(item.assignmentSubject)}</span>`:''}
-          </div>
-          <h4>${escapeHtml(item.assignmentTitle||'Bài tập')}</h4>
-          <p>${escapeHtml(item.body)}</p>
-        </article>`;
-    }
-    return `
-      <article class="exchange-entry chat-exchange">
-        <div class="exchange-person">
-          <div><strong>${escapeHtml(item.name)}</strong><span>${escapeHtml(item.role||'Người xem')}</span></div>
-          <time>${escapeHtml(formatExchangeTime(item.createdAt))}</time>
-        </div>
-        <p>${escapeHtml(item.body)}</p>
-      </article>`;
-  }).join('');
+  host.innerHTML=items.map(item=>`
+    <article class="exchange-entry chat-exchange">
+      <div class="exchange-person">
+        <div><strong>${escapeHtml(item.name)}</strong><span>${escapeHtml(item.role||'Người xem')}</span></div>
+        <time>${escapeHtml(formatExchangeTime(item.createdAt))}</time>
+      </div>
+      <p>${escapeHtml(item.body)}</p>
+    </article>`).join('');
   if(stickToBottom||nearBottom)requestAnimationFrame(()=>{host.scrollTop=host.scrollHeight;});
 }
 async function loadAcademicChat({stickToBottom=false}={}){
@@ -3101,7 +3120,7 @@ function renderAssignments(){
               <div class="assignment-meta"><span class="subject-pill">${escapeHtml(assignmentSubjectName(a.subject))}</span><span class="file-pill">${escapeHtml(a.type)}</span></div>
               <h4>${escapeHtml(a.title)}</h4>
               ${a.topic?`<p>${escapeHtml(a.topic)}</p>`:''}
-              <small>${escapeHtml(a.fileName || (a.externalUrl?'Có link tài liệu':'Không có file đính kèm'))} · ${Number(a.commentCount||0)} trao đổi</small>
+              <small>${escapeHtml(a.fileName || (a.externalUrl?'Có link tài liệu':'Không có file đính kèm'))} · Nhận xét riêng</small>
             </div>
             <div class="assignment-actions">
               ${a.filePath||a.fileUrl||a.externalUrl||a.contentText
@@ -3128,77 +3147,88 @@ document.addEventListener('click', event => {
 });
 
 const commentModal = $('#commentModal');
-function openComment(id){
-  const assignment = assignments.find(item => item.id === id);
-  if (!assignment) return;
-  $('#commentAssignmentId').value = id;
-  $('#commentTarget').textContent = `${formatAssignmentDate(assignment.assignmentDate)} · Bài ${assignment.assignmentNumber} · ${assignment.title}`;
-  $('#commentStatus').textContent = '';
-  if (currentUser?.name) $('#commentName').value = currentUser.name;
-  openModal(commentModal);
+async function loadPrivateComments(assignmentId){
+  const host=$('#privateCommentHistory');
+  if(!host)return;
+  if(!currentUser?.id){
+    host.innerHTML='<div class="private-comment-empty">Đăng nhập để xem nhận xét riêng của bạn.</div>';
+    return;
+  }
+  host.innerHTML='<div class="private-comment-empty">Đang tải nhận xét riêng…</div>';
+  try{
+    const client=requireSupabase();
+    const {data,error}=await client.from('comments')
+      .select('id,body,created_at')
+      .eq('assignment_id',assignmentId)
+      .order('created_at',{ascending:false});
+    if(error)throw error;
+    host.innerHTML=(data||[]).length
+      ? data.map(item=>`<article class="private-comment-entry"><time>${escapeHtml(formatExchangeTime(item.created_at))}</time><p>${escapeHtml(item.body)}</p></article>`).join('')
+      : '<div class="private-comment-empty">Bạn chưa gửi nhận xét riêng cho bài tập này.</div>';
+  }catch(error){
+    console.warn('Không tải được nhận xét riêng:',error);
+    host.innerHTML='<div class="private-comment-empty">Không tải được nhận xét riêng lúc này.</div>';
+  }
 }
-$('#commentModalClose')?.addEventListener('click', () => closeModal(commentModal));
-$('#commentForm')?.addEventListener('submit', async event => {
+function openComment(id){
+  const assignment=assignments.find(item=>item.id===id);
+  if(!assignment)return;
+  if(!currentUser?.id){
+    showToast('Đăng nhập để gửi và xem nhận xét riêng tư.');
+    $('#userLoginStatus').textContent='Đăng nhập để gửi và xem nhận xét riêng tư.';
+    openModal(userLoginModal);
+    return;
+  }
+  $('#commentAssignmentId').value=id;
+  $('#commentTarget').textContent=`${formatAssignmentDate(assignment.assignmentDate)} · Bài ${assignment.assignmentNumber} · ${assignment.title}`;
+  $('#commentStatus').textContent='';
+  $('#commentName').value=currentUser.name||'';
+  openModal(commentModal);
+  loadPrivateComments(id);
+}
+$('#commentModalClose')?.addEventListener('click',()=>closeModal(commentModal));
+$('#commentForm')?.addEventListener('submit',async event=>{
   event.preventDefault();
-  const form = event.currentTarget;
-  const name = $('#commentName').value.trim();
-  const role = $('#commentRole').value;
-  const text = $('#commentText').value.trim();
-  const assignmentId = $('#commentAssignmentId').value;
-  if (!form.checkValidity() || name.length < 2 || text.length < 5){
-    $('#commentStatus').textContent = 'Vui lòng nhập đầy đủ họ tên và nhận xét.';
+  const form=event.currentTarget;
+  const name=$('#commentName').value.trim();
+  const role=$('#commentRole').value;
+  const text=$('#commentText').value.trim();
+  const assignmentId=$('#commentAssignmentId').value;
+  if(!currentUser?.id){
+    $('#commentStatus').textContent='Bạn cần đăng nhập để gửi nhận xét riêng tư.';
+    return;
+  }
+  if(!form.checkValidity()||name.length<2||text.length<5){
+    $('#commentStatus').textContent='Vui lòng nhập đầy đủ họ tên và nhận xét.';
     form.reportValidity();
     return;
   }
-  const submit = form.querySelector('button[type="submit"]');
-  submit.disabled = true;
-  $('#commentStatus').textContent = 'Đang gửi…';
-  try {
-    const client = requireSupabase();
+  const submit=form.querySelector('button[type="submit"]');
+  submit.disabled=true;
+  $('#commentStatus').textContent='Đang gửi riêng tư…';
+  try{
+    const client=requireSupabase();
     const assignment=assignments.find(item=>item.id===assignmentId);
     const payload={
-      assignment_id: assignmentId,
-      user_id: currentUser?.id || null,
-      name, role, body: text,
-      assignment_title: assignment?.title || 'Bài tập',
-      assignment_date: assignment?.assignmentDate || null,
-      assignment_number: assignment?.assignmentNumber || null,
-      assignment_subject: assignment ? assignmentSubjectName(assignment.subject) : ''
-    };
-    pendingOwnCommentKey=[assignmentId,name,text].join('\u0000');
-    const {data:created,error}=await client.from('comments')
-      .insert(payload)
-      .select('id,created_at')
-      .single();
-    if (error) throw error;
-
-    lastOwnCommentId=created?.id||'';
-    pendingOwnCommentKey='';
-    if(assignment) assignment.commentCount=Number(assignment.commentCount||0)+1;
-    academicExchanges.unshift({
-      id:created?.id||('local-'+Date.now()),
-      assignmentId,
-      assignmentTitle:payload.assignment_title,
-      assignmentDate:payload.assignment_date||'',
-      assignmentNumber:Number(payload.assignment_number||0),
-      assignmentSubject:payload.assignment_subject||'',
+      assignment_id:assignmentId,
+      user_id:currentUser.id,
       name,role,body:text,
-      createdAt:created?.created_at||new Date().toISOString()
-    });
-    renderAssignments();
-    renderAcademicExchanges({stickToBottom:true});
-    savePublicCache();
-
-    form.reset();
-    $('#commentStatus').textContent = 'Đã gửi.';
-    showToast('Đã gửi nhận xét');
-    setTimeout(() => closeModal(commentModal), 300);
-  } catch (error){
-    pendingOwnCommentKey='';
-    console.warn('Không gửi được nhận xét:',error);
-    $('#commentStatus').textContent = 'Không gửi được nhận xét. Vui lòng thử lại.';
-  } finally {
-    submit.disabled = false;
+      assignment_title:assignment?.title||'Bài tập',
+      assignment_date:assignment?.assignmentDate||null,
+      assignment_number:assignment?.assignmentNumber||null,
+      assignment_subject:assignment?assignmentSubjectName(assignment.subject):''
+    };
+    const {error}=await client.from('comments').insert(payload);
+    if(error)throw error;
+    $('#commentText').value='';
+    $('#commentStatus').textContent='Đã gửi nhận xét riêng tư.';
+    await loadPrivateComments(assignmentId);
+    showToast('Đã gửi nhận xét riêng tư');
+  }catch(error){
+    console.warn('Không gửi được nhận xét riêng:',error);
+    $('#commentStatus').textContent='Không gửi được nhận xét. Vui lòng thử lại.';
+  }finally{
+    submit.disabled=false;
   }
 });
 
@@ -3346,52 +3376,35 @@ async function publicRest(table,query=''){
 async function loadPublicContentViaRest(){
   const projectSelect=encodeURIComponent('id,title,type,image_url,image_path,summary,tags,objective,data_text,method,output,report_files,sort_order,created_at');
   const assignmentSelect=encodeURIComponent('id,type,title,topic,content_text,external_url,subject,assignment_date,assignment_number,date_text,created_at,file_name,file_url,file_path');
-  const commentSelect=encodeURIComponent('id,assignment_id,name,role,body,created_at,assignment_title,assignment_date,assignment_number,assignment_subject');
   const subjectSelect=encodeURIComponent('slug,name,sort_order');
-  const [projectsData,assignmentsData,commentsData,subjectsData]=await Promise.all([
+  const [projectsData,assignmentsData,subjectsData]=await Promise.all([
     publicRest('projects',`select=${projectSelect}&published=eq.true&deleted_at=is.null&order=sort_order.asc,created_at.desc`),
     publicRest('assignments',`select=${assignmentSelect}&published=eq.true&deleted_at=is.null&order=assignment_date.asc,assignment_number.asc,created_at.asc`),
-    publicRest('comments',`select=${commentSelect}&order=created_at.desc`),
     publicRest('assignment_subjects',`select=${subjectSelect}&active=eq.true&order=sort_order.asc,name.asc`)
   ]);
   return [
     {data:projectsData,error:null},
     {data:assignmentsData,error:null},
-    {data:commentsData,error:null},
+    {data:[],error:null},
     {data:subjectsData,error:null}
   ];
 }
 async function loadPublicContentSnapshot(){
-  const response=await fetch('/public-content.json?v=20261001-mobile-snapshot1',{cache:'no-store'});
+  const response=await fetch('/public-content.json?v=20261001-privacy1',{cache:'no-store'});
   if(!response.ok)throw new Error(`Snapshot failed (${response.status})`);
   const snapshot=await response.json();
   return [
     {data:Array.isArray(snapshot.projects)?snapshot.projects:[],error:null},
     {data:Array.isArray(snapshot.assignments)?snapshot.assignments:[],error:null},
-    {data:Array.isArray(snapshot.comments)?snapshot.comments:[],error:null},
+    {data:[],error:null},
     {data:Array.isArray(snapshot.subjects)?snapshot.subjects:[],error:null}
   ];
 }
-function applyPublicResponses(pRes,aRes,cRes,sRes,{markSynced=false,saveCache=false}={}){
-  const activeAssignmentIds=new Set((aRes.data||[]).map(row=>row.id));
-  const publicComments=(cRes.data||[]).filter(row=>row.assignment_id&&activeAssignmentIds.has(row.assignment_id));
-  const counts={};
-  for(const c of publicComments)counts[c.assignment_id]=(counts[c.assignment_id]||0)+1;
+function applyPublicResponses(pRes,aRes,_cRes,sRes,{markSynced=false,saveCache=false}={}){
   projects=(pRes.data||[]).map(mapProject);
-  assignments=(aRes.data||[]).map(row=>mapAssignment(row,counts));
+  assignments=(aRes.data||[]).map(row=>mapAssignment(row,{}));
   assignmentSubjects=(sRes.data||[]).map(row=>({slug:row.slug,name:row.name,sortOrder:Number(row.sort_order||0)}));
-  academicExchanges=publicComments.map(row=>({
-    id:row.id,
-    assignmentId:row.assignment_id,
-    assignmentTitle:row.assignment_title||'Bài tập',
-    assignmentDate:row.assignment_date||'',
-    assignmentNumber:Number(row.assignment_number||0),
-    assignmentSubject:row.assignment_subject||'',
-    name:row.name||'Người xem',
-    role:row.role||'Người xem',
-    body:row.body||'',
-    createdAt:row.created_at
-  }));
+  academicExchanges=[];
   renderPublicState();
   publicContentLoadedOnce=true;
   if(markSynced)lastPublicSync=Date.now();
@@ -3419,12 +3432,12 @@ async function loadPublicContent({silent = false} = {}){
           Promise.all([
             sb.from('projects').select('id,title,type,image_url,image_path,summary,tags,objective,data_text,method,output,report_files,sort_order,created_at').eq('published', true).is('deleted_at', null).order('sort_order', {ascending:true}).order('created_at', {ascending:false}),
             sb.from('assignments').select('id,type,title,topic,content_text,external_url,subject,assignment_date,assignment_number,date_text,created_at,file_name,file_url,file_path').eq('published', true).is('deleted_at', null).order('assignment_date', {ascending:true}).order('assignment_number', {ascending:true}).order('created_at', {ascending:true}),
-            sb.from('comments').select('id,assignment_id,name,role,body,created_at,assignment_title,assignment_date,assignment_number,assignment_subject').order('created_at', {ascending:false}),
             sb.from('assignment_subjects').select('slug,name,sort_order').eq('active', true).order('sort_order', {ascending:true}).order('name', {ascending:true})
           ]),
           waitTimeout(6500,'Supabase public sync timeout')
         ]);
-        [pRes,aRes,cRes,sRes]=results;
+        [pRes,aRes,sRes]=results;
+        cRes={data:[],error:null};
         for(const res of results)if(res.error)throw res.error;
       }catch(clientError){
         console.warn('Supabase client failed; trying public REST fallback:',clientError);
@@ -3468,17 +3481,6 @@ function subscribeRealtime(){
     sb.channel('ptt-public-content')
       .on('postgres_changes',{event:'*',schema:'public',table:'projects'},()=>schedulePublicRefresh())
       .on('postgres_changes',{event:'*',schema:'public',table:'assignments'},()=>schedulePublicRefresh())
-      .on('postgres_changes',{event:'*',schema:'public',table:'comments'},payload=>{
-        const id=payload?.new?.id||payload?.old?.id||'';
-        const newRow=payload?.new||{};
-        const key=[newRow.assignment_id||'',newRow.name||'',newRow.body||''].join('\u0000');
-        if((id&&id===lastOwnCommentId)||(pendingOwnCommentKey&&key===pendingOwnCommentKey)){
-          lastOwnCommentId='';
-          pendingOwnCommentKey='';
-          return;
-        }
-        schedulePublicRefresh();
-      })
       .on('postgres_changes',{event:'*',schema:'public',table:'assignment_subjects'},()=>schedulePublicRefresh())
       .on('postgres_changes',{event:'*',schema:'public',table:'site_settings'},()=>loadAboutImage())
       .on('postgres_changes',{event:'*',schema:'public',table:'academic_chat_messages'},payload=>{
@@ -3816,7 +3818,7 @@ document.addEventListener('keydown', event => { if (event.key === 'Escape') $$('
 <script>
 if('serviceWorker' in navigator){
   window.addEventListener('load',()=>{
-    navigator.serviceWorker.register('/sw.js?v=20261001-performance1',{scope:'/',updateViaCache:'none'})
+    navigator.serviceWorker.register('/sw.js?v=20261001-privacy1',{scope:'/',updateViaCache:'none'})
       .then(registration=>registration.update())
       .catch(error=>console.warn('Service worker unavailable:',error));
   },{once:true});
