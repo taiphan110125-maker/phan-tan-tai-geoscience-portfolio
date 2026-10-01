@@ -2290,7 +2290,7 @@ body{color:var(--ink-strong)!important}
             <div class="feedback-body">
               <div class="exchange-title-row">
                 <h3>Thảo luận công khai</h3>
-                <span class="exchange-live-status"><span class="live-dot"></span> Trực tiếp</span>
+                <span class="exchange-live-status"><span class="live-dot"></span> Công khai</span>
               </div>
               <div id="academicExchangeHistory" class="academic-exchange-history unified-exchange-stream" aria-live="polite">
                 <div class="exchange-empty">Chưa có thảo luận công khai.</div>
@@ -2553,9 +2553,7 @@ let publicRefreshPending = false;
 let publicRefreshTimer = null;
 let lastPublicSync = 0;
 let academicChatLoaded = false;
-let lastOwnCommentId = '';
 let lastOwnChatId = '';
-let pendingOwnCommentKey = '';
 let pendingOwnChatKey = '';
 const PUBLIC_CACHE_KEY = 'ptt-public-cache-v3';
 const LEGACY_PUBLIC_CACHE_KEYS = ['ptt-public-cache-v1','ptt-public-cache-v2'];
@@ -2718,20 +2716,39 @@ function renderAcademicExchanges({stickToBottom=false}={}){
   if(stickToBottom||nearBottom)requestAnimationFrame(()=>{host.scrollTop=host.scrollHeight;});
 }
 async function loadAcademicChat({stickToBottom=false}={}){
-  if(!sb)return;
   academicChatLoaded=true;
   try{
-    const {data,error}=await sb.from('academic_chat_messages')
-      .select('id,user_id,name,role,body,created_at')
-      .order('created_at',{ascending:false})
-      .limit(80);
-    if(error)throw error;
-    academicChatMessages=(data||[]).reverse().map(row=>({
+    let rows=null;
+    if(sb){
+      try{
+        const {data,error}=await sb.from('academic_chat_messages')
+          .select('id,user_id,name,role,body,created_at')
+          .order('created_at',{ascending:false})
+          .limit(80);
+        if(error)throw error;
+        rows=(data||[]).reverse();
+      }catch(clientError){
+        console.warn('Public discussion client unavailable:',clientError);
+      }
+    }
+    if(!rows){
+      try{
+        const select=encodeURIComponent('id,user_id,name,role,body,created_at');
+        rows=await publicRest('academic_chat_messages',`select=${select}&order=created_at.asc&limit=80`);
+      }catch(restError){
+        console.warn('Public discussion REST unavailable; using snapshot:',restError);
+        const response=await fetch('/public-content.json?v=20261001-privacy1',{cache:'no-store'});
+        if(!response.ok)throw new Error(`Discussion snapshot failed (${response.status})`);
+        const snapshot=await response.json();
+        rows=Array.isArray(snapshot.discussions)?snapshot.discussions:[];
+      }
+    }
+    academicChatMessages=(rows||[]).map(row=>({
       id:row.id,userId:row.user_id,name:row.name,role:row.role,body:row.body,createdAt:row.created_at
     }));
     renderAcademicExchanges({stickToBottom});
   }catch(error){
-    console.warn('Academic chat unavailable:',error);
+    console.warn('Public discussion unavailable:',error);
   }
 }
 
