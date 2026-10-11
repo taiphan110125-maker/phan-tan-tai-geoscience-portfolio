@@ -1,6 +1,6 @@
 'use strict';
 
-const CACHE_NAME='ptt-static-v16-20261001';
+const CACHE_NAME='ptt-static-v17-20261011';;
 const PRECACHE=[
   '/',
   '/index.html',
