@@ -14,7 +14,7 @@
   <link rel="dns-prefetch" href="//aqkasetqystwvpassidd.supabase.co">
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
   <link rel="dns-prefetch" href="//cdn.jsdelivr.net">
-  <title>Admin Dashboard | Phan Tấn Tài</title>
+  <title>Quản trị website | Phan Tấn Tài</title>
   <style>
 :root{
   --navy:#061822;--navy-2:#0a2330;--navy-3:#102f3b;--ink:#132129;--paper:#f5f2eb;--paper-2:#ebe6db;
@@ -532,20 +532,43 @@ body.admin-body,.admin-body{background:#f6f8fb!important;color:#183247!important
   .trash-actions{width:100%;justify-content:flex-start}
 }
 </style>
+
+<style id="ptt-admin-vietnamese-editorial-polish">
+#projectFormEyebrow[hidden],#assignmentFormEyebrow[hidden]{display:none!important}
+.admin-heading{margin-bottom:20px!important}
+.admin-heading h1{font-size:clamp(23px,2.5vw,32px)!important;line-height:1.2!important;letter-spacing:-.03em!important}
+.admin-panel{border-color:#dce6ec!important;border-radius:16px!important}
+.admin-panel .panel-head h2{letter-spacing:-.015em!important;line-height:1.3!important}
+.admin-sidebar .side-link{font-size:12px!important;line-height:1.4!important;min-height:43px!important}
+.admin-project-toolbar,.project-admin-toolbar{gap:14px!important}
+.admin-form-actions{gap:10px!important}
+.admin-form-actions .btn{min-height:42px}
+.feedback-split-grid{gap:17px!important}
+.privacy-badge,.public-badge{font-size:10px!important;letter-spacing:0!important;padding:5px 9px!important}
+.admin-table th{font-size:11px!important;letter-spacing:0!important}
+.admin-table td{line-height:1.55!important}
+.security-grid{grid-template-columns:minmax(0,1fr)!important}
+@media(max-width:800px){
+ .admin-heading{margin-bottom:14px!important}
+ .admin-heading h1{font-size:25px!important}
+ .feedback-split-grid{grid-template-columns:1fr!important}
+ .admin-panel{border-radius:13px!important}
+}
+</style>
 </head>
 <body class="admin-body">
   <header class="admin-topbar">
     <div class="brand">
       <img class="admin-brand-emblem" src="assets/ptt-emblem.svg" alt="Logo Phan Tấn Tài" width="180" height="180" decoding="async">
-      <span class="brand-copy"><strong>PHAN TẤN TÀI</strong><small>ADMIN CONSOLE</small></span>
+      <span class="brand-copy"><strong>PHAN TẤN TÀI</strong><small>KHU VỰC QUẢN TRỊ</small></span>
     </div>
     <div class="admin-top-actions"><a class="btn btn-outline" href="index.html">Xem website công khai</a><button class="btn btn-gold" id="logoutBtn">Đăng xuất</button></div>
   </header>
 
   <div class="admin-layout">
     <aside class="admin-sidebar">
-      <p class="side-label">WORKSPACE</p>
-      <button type="button" class="side-link active" data-view="dashboard">▦ <span>Dashboard</span></button>
+      <p class="side-label">QUẢN LÝ WEBSITE</p>
+      <button type="button" class="side-link active" data-view="dashboard">▦ <span>Tổng quan</span></button>
       <button type="button" class="side-link" data-view="assignments">▤ <span>Bài tập</span></button>
       <button type="button" class="side-link" data-view="projects">⌁ <span>Dự án</span></button>
       <button type="button" class="side-link" data-view="site-image">▣ <span>Ảnh giới thiệu</span></button>
@@ -554,12 +577,12 @@ body.admin-body,.admin-body{background:#f6f8fb!important;color:#183247!important
       <button type="button" class="side-link" data-view="accounts">◎ <span>Tài khoản</span></button>
       <button type="button" class="side-link" data-view="trash">♲ <span>Thùng rác</span><span class="side-badge" id="trashCountBadge" hidden aria-label="Nội dung trong thùng rác">0</span></button>
       <button type="button" class="side-link" data-view="security">⌾ <span>Bảo mật</span></button>
-      <div class="sidebar-note"><strong>Cloud workspace</strong><span>Dữ liệu được đồng bộ qua Supabase Database, Auth và Storage.</span></div>
+      
     </aside>
 
     <main class="admin-main">
       <section class="admin-view active" data-panel="dashboard">
-        <div class="admin-heading"><div><p class="eyebrow">OVERVIEW</p><h1>Dashboard</h1></div><p>Quản lý nội dung học thuật và theo dõi hoạt động website.</p></div>
+        <div class="admin-heading"><div><h1>Tổng quan</h1></div></div>
         <div class="metric-grid" id="metricGrid"></div>
         <div class="admin-grid-2">
           <div class="admin-panel"><div class="panel-head"><h2>Bài tập gần đây</h2><button class="text-btn" data-go="assignments">Quản lý →</button></div><div id="recentAssignments"></div></div>
@@ -569,31 +592,31 @@ body.admin-body,.admin-body{background:#f6f8fb!important;color:#183247!important
 
       <section class="admin-view" data-panel="assignments">
         <div class="admin-heading">
-          <div><p class="eyebrow">CONTENT</p><h1>Quản lý bài tập</h1><p>Nhóm bài theo Ngày, tự đánh số Bài và tải nhiều file trong một lần.</p></div>
+          <div><h1>Quản lý bài tập</h1></div>
           <div class="admin-assignment-actions">
             <button class="btn btn-outline" id="manageSubjectsBtn">Quản lý môn học</button>
             <button class="btn btn-gold" id="addAssignmentBtn">+ Tải nhiều bài tập</button>
           </div>
         </div>
         <div class="admin-panel">
-          <div class="assignment-admin-note"><strong>Cấu trúc hiển thị:</strong><span>Mỗi ngày/tháng/năm là một nhóm riêng: 29/09/2026 → Bài 1, Bài 2, Bài 3...</span></div>
-          <div class="table-scroll"><table class="admin-table assignment-admin-table"><thead><tr><th>Bài tập</th><th>Môn học</th><th>Nhóm ngày</th><th>Chủ đề</th><th>Nhận xét</th><th></th></tr></thead><tbody id="adminAssignmentRows"></tbody></table></div>
+          
+          <div class="table-scroll"><table class="admin-table assignment-admin-table"><thead><tr><th>Bài tập</th><th>Môn học</th><th>Ngày học</th><th>Chủ đề</th><th>Nhận xét</th><th></th></tr></thead><tbody id="adminAssignmentRows"></tbody></table></div>
         </div>
       </section>
 
       <section class="admin-view" data-panel="projects">
         <div class="admin-heading">
-          <div><p class="eyebrow">PROJECTS</p><h1>Quản lý dự án</h1></div>
+          <div><h1>Quản lý dự án</h1></div>
           <button class="btn btn-gold" id="addProjectBtn">+ Thêm dự án</button>
         </div>
         <div class="admin-panel">
           <div class="project-admin-toolbar">
-            <div><strong>Dự án & nghiên cứu</strong><small>Thêm, sửa hoặc xóa dự án. Mọi thay đổi được lưu trên cloud và đồng bộ cho người xem.</small></div>
+            <div><strong>Danh sách dự án</strong></div>
             <label class="admin-search"><span>⌕</span><input id="projectSearch" type="search" placeholder="Tìm dự án..."></label>
           </div>
           <div class="table-scroll">
             <table class="admin-table project-admin-table">
-              <thead><tr><th>Dự án</th><th>Lĩnh vực</th><th>Tags</th><th>Hình ảnh</th><th>Thao tác</th></tr></thead>
+              <thead><tr><th>Dự án</th><th>Lĩnh vực</th><th>Từ khóa</th><th>Hình ảnh</th><th>Thao tác</th></tr></thead>
               <tbody id="adminProjectRows"></tbody>
             </table>
           </div>
@@ -603,9 +626,9 @@ body.admin-body,.admin-body{background:#f6f8fb!important;color:#183247!important
       <section class="admin-view" data-panel="site-image">
         <div class="admin-heading">
           <div>
-            <p class="eyebrow">HOMEPAGE</p>
+            
             <h1>Ảnh giới thiệu</h1>
-            <p>Thay ảnh thẻ hiển thị trong phần Giới thiệu trên trang chủ. Sau khi lưu, trang người dùng sẽ tự cập nhật ảnh mới.</p>
+            
           </div>
         </div>
         <div class="admin-panel site-image-admin-panel">
@@ -618,7 +641,7 @@ body.admin-body,.admin-body{background:#f6f8fb!important;color:#183247!important
             </div>
             <div class="site-image-admin-form">
               <div>
-                <h2>Thay ảnh thẻ</h2>
+                <h2>Tải ảnh mới</h2>
                 <p>Chọn ảnh JPG, PNG hoặc WebP. Hệ thống sẽ tự tối ưu ảnh trước khi tải lên. Tối đa 8 MB.</p>
               </div>
               <label class="site-image-file-picker">
@@ -636,34 +659,34 @@ body.admin-body,.admin-body{background:#f6f8fb!important;color:#183247!important
       <section class="admin-view" data-panel="feedback">
         <div class="admin-heading">
           <div>
-            <p class="eyebrow">FEEDBACK & DISCUSSION</p>
-            <h1>Phản hồi & thảo luận</h1>
-            <p>Nhận xét theo bài tập là riêng tư giữa người gửi và Admin; thảo luận học thuật là nội dung công khai trên website.</p>
+            
+            <h1>Nhận xét &amp; thảo luận</h1>
+            
           </div>
         </div>
         <div class="admin-grid-2 feedback-split-grid">
           <div class="admin-panel">
-            <div class="panel-head"><h2>Nhận xét riêng tư</h2><span class="privacy-badge">PRIVATE</span></div>
+            <div class="panel-head"><h2>Nhận xét riêng tư</h2><span class="privacy-badge">Riêng tư</span></div>
             <div id="privateFeedbackList"></div>
           </div>
           <div class="admin-panel">
-            <div class="panel-head"><h2>Thảo luận công khai</h2><span class="public-badge">PUBLIC</span></div>
+            <div class="panel-head"><h2>Thảo luận công khai</h2><span class="public-badge">Công khai</span></div>
             <div id="publicDiscussionList"></div>
           </div>
         </div>
       </section>
 
       <section class="admin-view" data-panel="messages">
-        <div class="admin-heading"><div><p class="eyebrow">CONTACT</p><h1>Lời nhắn</h1></div></div>
+        <div class="admin-heading"><div><h1>Lời nhắn</h1></div></div>
         <div class="admin-panel"><div id="messageList"></div></div>
       </section>
 
       <section class="admin-view" data-panel="accounts">
         <div class="admin-heading">
           <div>
-            <p class="eyebrow">USERS</p>
+            
             <h1>Tài khoản người dùng</h1>
-            <p>Xem và quản lý các tài khoản đăng ký trên website. Tài khoản Admin được bảo vệ khỏi thao tác xóa.</p>
+            
           </div>
         </div>
         <div class="admin-panel account-admin-panel">
@@ -687,9 +710,9 @@ body.admin-body,.admin-body{background:#f6f8fb!important;color:#183247!important
       <section class="admin-view" data-panel="trash">
         <div class="admin-heading">
           <div>
-            <p class="eyebrow">RECOVERY</p>
+            
             <h1>Thùng rác</h1>
-            <p>Dự án và bài tập đã xóa được giữ lại tại đây cho đến khi bạn khôi phục hoặc xóa vĩnh viễn.</p>
+            
           </div>
         </div>
         <div class="trash-grid">
@@ -705,10 +728,10 @@ body.admin-body,.admin-body{background:#f6f8fb!important;color:#183247!important
       </section>
 
       <section class="admin-view" data-panel="security">
-        <div class="admin-heading"><div><p class="eyebrow">SECURITY</p><h1>Bảo mật</h1></div></div>
+        <div class="admin-heading"><div><h1>Bảo mật</h1></div></div>
         <div class="security-grid">
-          <div class="admin-panel"><h2>Trạng thái hệ thống</h2><ul class="status-list"><li><span class="status warn"></span><div><strong>Admin authentication</strong><small>Khu quản trị bắt buộc đăng nhập bằng Supabase Auth và kiểm tra vai trò admin bằng Row Level Security.</small></div></li><li><span class="status good"></span><div><strong>Không lưu API key trong frontend</strong><small>Thiết kế giữ khóa bí mật ra khỏi mã nguồn public.</small></div></li><li><span class="status good"></span><div><strong>Escape nội dung hiển thị</strong><small>Giảm rủi ro chèn HTML từ dữ liệu người dùng khi hiển thị trong khu quản trị.</small></div></li></ul></div>
-          <div class="admin-panel"><h2>Production checklist</h2><ul class="check-list admin-check"><li>Supabase Auth + quản lý tài khoản người dùng</li><li>Row Level Security cho database và Storage</li><li>2FA cho tài khoản chủ website</li><li>Rate limit + CAPTCHA cho form public</li><li>Audit log + backup + rollback</li></ul></div>
+          <div class="admin-panel"><h2>Trạng thái hệ thống</h2><ul class="status-list"><li><span class="status warn"></span><div><strong>Xác thực quản trị viên</strong><small>Chỉ tài khoản có quyền quản trị viên được phép truy cập.</small></div></li><li><span class="status good"></span><div><strong>Không công khai khóa truy cập bí mật</strong><small>Khóa truy cập đặc quyền không được đưa vào mã nguồn trình duyệt.</small></div></li><li><span class="status good"></span><div><strong>Escape nội dung hiển thị</strong><small>Giảm rủi ro chèn HTML từ dữ liệu người dùng khi hiển thị trong khu quản trị.</small></div></li></ul></div>
+          
         </div>
       </section>
     </main>
@@ -718,16 +741,16 @@ body.admin-body,.admin-body{background:#f6f8fb!important;color:#183247!important
   <div class="modal" id="projectAdminModal" aria-hidden="true">
     <div class="modal-card project-editor-card">
       <button class="modal-close" id="projectAdminModalClose" aria-label="Đóng">×</button>
-      <p class="eyebrow" id="projectFormEyebrow">NEW PROJECT</p>
+      <p class="eyebrow" id="projectFormEyebrow" hidden></p>
       <h3 id="projectFormHeading">Thêm dự án & nghiên cứu</h3>
       <form id="projectForm" class="stack-form project-form">
         <input id="projectId" type="hidden">
         <div class="admin-field-grid">
           <label>Tiêu đề dự án<input id="projectTitle" required minlength="3" placeholder="Tên dự án hoặc đề tài"></label>
-          <label>Lĩnh vực / loại dự án<input id="projectType" required placeholder="Ví dụ: Petrophysics · Well Logs"></label>
+          <label>Lĩnh vực / loại dự án<input id="projectType" required placeholder="Ví dụ: Địa vật lý giếng khoan · Đánh giá tầng chứa"></label>
         </div>
         <label>Tóm tắt<textarea id="projectSummary" rows="3" required minlength="10" placeholder="Mô tả ngắn hiển thị trên thẻ dự án"></textarea></label>
-        <label>Tags<input id="projectTags" placeholder="Well Logging, Petrophysics, Formation Evaluation"></label>
+        <label>Từ khóa<input id="projectTags" placeholder="Địa vật lý giếng khoan, Petrophysics, Đánh giá tầng chứa"></label>
         <div class="admin-field-grid">
           <label>Mục tiêu<textarea id="projectObjective" rows="3" placeholder="Mục tiêu chính của dự án"></textarea></label>
           <label>Dữ liệu<textarea id="projectData" rows="3" placeholder="Dữ liệu sử dụng"></textarea></label>
@@ -763,7 +786,7 @@ body.admin-body,.admin-body{background:#f6f8fb!important;color:#183247!important
   <div class="modal" id="assignmentModal" aria-hidden="true">
     <div class="modal-card compact assignment-batch-modal">
       <button class="modal-close" id="assignmentModalClose" aria-label="Đóng">×</button>
-      <p class="eyebrow" id="assignmentFormEyebrow">BATCH UPLOAD</p><h3 id="assignmentFormHeading">Tải nhiều bài tập</h3>
+      <p class="eyebrow" id="assignmentFormEyebrow" hidden></p><h3 id="assignmentFormHeading">Tải nhiều bài tập</h3>
       <form id="assignmentForm" class="stack-form">
         <input id="assignmentEditId" type="hidden" value="">
         <div class="assignment-batch-grid">
@@ -771,7 +794,7 @@ body.admin-body,.admin-body{background:#f6f8fb!important;color:#183247!important
           <label>Môn học<select id="assignmentSubject" required></select></label>
         </div>
         <label>Tiêu đề chung <small class="muted">(không bắt buộc)</small><input id="assignmentTitle" placeholder="Ví dụ: Bài tập Petrophysics"></label>
-        <label>Chủ đề / mô tả chung <small class="muted">(không bắt buộc)</small><input id="assignmentTopic" placeholder="Ví dụ: Formation Evaluation · Chương 2"></label>
+        <label>Chủ đề / mô tả chung <small class="muted">(không bắt buộc)</small><input id="assignmentTopic" placeholder="Ví dụ: Đánh giá tầng chứa · Chương 2"></label>
         <div class="rich-field">
           <div class="rich-field-label">Nội dung <small class="muted">(không bắt buộc)</small></div>
           <div class="rich-toolbar" id="assignmentContentToolbar" role="toolbar" aria-label="Định dạng nội dung bài tập">
@@ -798,7 +821,7 @@ body.admin-body,.admin-body{background:#f6f8fb!important;color:#183247!important
         <label>Link tài liệu <small class="muted">(không bắt buộc)</small><input id="assignmentLink" type="url" placeholder="https://drive.google.com/... hoặc https://..."></label>
         <label>File đính kèm <small class="muted">(không bắt buộc · có thể chọn nhiều file)</small><input id="assignmentFile" type="file" multiple accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx"></label>
         <div id="selectedFilesPreview" class="selected-files-preview">Chưa chọn file — bạn vẫn có thể lưu bài tập.</div>
-        <small class="muted">Bạn có thể dùng file, link, cả hai hoặc không dùng gì. File và link đều không bắt buộc.</small>
+        
         <button class="btn btn-dark" type="submit" id="assignmentSaveBtn">Tải lên & lưu tất cả</button>
         <p class="form-status" id="assignmentStatus"></p>
       </form>
@@ -808,7 +831,7 @@ body.admin-body,.admin-body{background:#f6f8fb!important;color:#183247!important
   <div class="modal" id="subjectModal" aria-hidden="true">
     <div class="modal-card compact">
       <button class="modal-close" id="subjectModalClose" aria-label="Đóng">×</button>
-      <p class="eyebrow">SUBJECTS</p><h3>Quản lý môn học</h3>
+      <h3>Quản lý môn học</h3>
       <p class="muted">Bạn có thể thêm môn mới, đổi tên hoặc ẩn môn khỏi bộ lọc công khai.</p>
       <form id="subjectForm" class="subject-add-form">
         <input id="subjectName" required minlength="2" maxlength="80" aria-label="Tên môn học mới" placeholder="Tên môn học mới">
@@ -1724,7 +1747,7 @@ function resetAssignmentModal(){
   resetAssignmentRichEditor();
   $('#assignmentEditId').value='';
   $('#assignmentStatus').textContent='';
-  $('#assignmentFormEyebrow').textContent='BATCH UPLOAD';
+  $('#assignmentFormEyebrow').textContent='';
   $('#assignmentFormHeading').textContent='Tải nhiều bài tập';
   $('#assignmentSaveBtn').textContent='Tải lên & lưu tất cả';
   $('#selectedFilesPreview').textContent='Chưa chọn file — bạn vẫn có thể lưu bài tập.';
@@ -1735,7 +1758,7 @@ function openAssignmentModal(item=null){
   resetAssignmentModal();
   if(item){
     $('#assignmentEditId').value=item.id;
-    $('#assignmentFormEyebrow').textContent='EDIT ASSIGNMENT';
+    $('#assignmentFormEyebrow').textContent='';
     $('#assignmentFormHeading').textContent=`Chỉnh sửa · Bài ${item.assignmentNumber}`;
     $('#assignmentSaveBtn').textContent='Lưu thay đổi';
     $('#assignmentDate').value=item.assignmentDate||localToday();
@@ -1981,8 +2004,8 @@ function renderProjectReportPreview(project=null){
     ...pending.map((f,i)=>`<div class="project-report-admin-item pending"><span class="report-type">${esc(reportType(f.name))}</span><div><strong>${esc(f.name)}</strong><small>Chờ tải lên khi bấm Lưu dự án</small></div><button type="button" class="danger-btn" data-remove-pending-report="${i}">Bỏ</button></div>`)
   ].join('');
 }
-function resetProjectForm(){ if(pendingProjectPreviewUrl){URL.revokeObjectURL(pendingProjectPreviewUrl);pendingProjectPreviewUrl='';} $('#projectForm').reset();$('#projectId').value='';$('#projectStatus').textContent='';$('#projectFormEyebrow').textContent='NEW PROJECT';$('#projectFormHeading').textContent='Thêm dự án & nghiên cứu';$('#projectSaveBtn').textContent='Lưu dự án';$('#projectImage').value='assets/hero-geoscience.svg';pendingProjectImageFile=null;pendingProjectReportFiles=[];removedProjectReportPaths=new Set();setProjectPreview('assets/hero-geoscience.svg');renderProjectReportPreview(); }
-function openProjectEditor(project=null){ resetProjectForm(); if(project){$('#projectId').value=project.id;$('#projectTitle').value=project.title||'';$('#projectType').value=project.type||'';$('#projectSummary').value=project.summary||'';$('#projectTags').value=(project.tags||[]).join(', ');$('#projectObjective').value=project.objective||'';$('#projectData').value=project.data||'';$('#projectMethod').value=project.method||'';$('#projectOutput').value=project.output||'';$('#projectImage').value=project.imagePath?'':(project.image||'');setProjectPreview(project.image);$('#projectFormEyebrow').textContent='EDIT PROJECT';$('#projectFormHeading').textContent='Chỉnh sửa dự án';$('#projectSaveBtn').textContent='Lưu thay đổi';renderProjectReportPreview(project);} projectModal.classList.add('open');projectModal.setAttribute('aria-hidden','false');document.body.classList.add('modal-open');setTimeout(()=>$('#projectTitle').focus(),80); }
+function resetProjectForm(){ if(pendingProjectPreviewUrl){URL.revokeObjectURL(pendingProjectPreviewUrl);pendingProjectPreviewUrl='';} $('#projectForm').reset();$('#projectId').value='';$('#projectStatus').textContent='';$('#projectFormEyebrow').textContent='';$('#projectFormHeading').textContent='Thêm dự án & nghiên cứu';$('#projectSaveBtn').textContent='Lưu dự án';$('#projectImage').value='assets/hero-geoscience.svg';pendingProjectImageFile=null;pendingProjectReportFiles=[];removedProjectReportPaths=new Set();setProjectPreview('assets/hero-geoscience.svg');renderProjectReportPreview(); }
+function openProjectEditor(project=null){ resetProjectForm(); if(project){$('#projectId').value=project.id;$('#projectTitle').value=project.title||'';$('#projectType').value=project.type||'';$('#projectSummary').value=project.summary||'';$('#projectTags').value=(project.tags||[]).join(', ');$('#projectObjective').value=project.objective||'';$('#projectData').value=project.data||'';$('#projectMethod').value=project.method||'';$('#projectOutput').value=project.output||'';$('#projectImage').value=project.imagePath?'':(project.image||'');setProjectPreview(project.image);$('#projectFormEyebrow').textContent='';$('#projectFormHeading').textContent='Chỉnh sửa dự án';$('#projectSaveBtn').textContent='Lưu thay đổi';renderProjectReportPreview(project);} projectModal.classList.add('open');projectModal.setAttribute('aria-hidden','false');document.body.classList.add('modal-open');setTimeout(()=>$('#projectTitle').focus(),80); }
 function closeProjectEditor(){ projectModal.classList.remove('open');projectModal.setAttribute('aria-hidden','true');if(!$('.modal.open'))document.body.classList.remove('modal-open'); }
 $('#addProjectBtn')?.addEventListener('click',()=>openProjectEditor());$('#projectAdminModalClose')?.addEventListener('click',closeProjectEditor);$('#projectCancelBtn')?.addEventListener('click',closeProjectEditor);projectModal?.addEventListener('click',e=>{if(e.target===projectModal)closeProjectEditor();});
 $('#projectImage')?.addEventListener('input',e=>{const v=e.target.value.trim();if(v){pendingProjectImageFile=null;if(pendingProjectPreviewUrl){URL.revokeObjectURL(pendingProjectPreviewUrl);pendingProjectPreviewUrl='';}setProjectPreview(v);}});
