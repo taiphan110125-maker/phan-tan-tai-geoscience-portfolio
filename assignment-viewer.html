@@ -63,11 +63,24 @@
 }
 </style>
 
+
+<style id="ptt-document-editorial-polish">
+.viewer-head{padding:22px 25px!important;align-items:center!important}
+.viewer-head h1{font-size:clamp(24px,3vw,34px)!important;line-height:1.24!important;letter-spacing:-.03em!important;overflow-wrap:anywhere}
+.viewer-head p{line-height:1.65!important}
+.viewer-card,.info-card{border-color:#d9e4eb!important;box-shadow:0 12px 34px rgba(22,50,74,.065)!important}
+.info-card h2{font-size:17px!important;letter-spacing:-.02em!important}
+.info-card .meta dt{font-size:10px!important;letter-spacing:0!important;text-transform:none!important}
+.info-card .meta dd{font-size:13px!important}
+.viewer-card .type-badge{font-size:11px!important;letter-spacing:0!important}
+.back{min-height:42px!important}
+@media(max-width:600px){.viewer-head{padding:16px!important;gap:10px!important}.viewer-head h1{font-size:24px!important}}
+</style>
 </head>
 <body>
   <header class="topbar">
     <div class="topbar-inner">
-      <a class="brand" href="index.html" aria-label="Về trang chủ"><img src="assets/ptt-brand.svg" alt="Phan Tấn Tài · Geology & Geophysics" width="720" height="170" decoding="async"></a>
+      <a class="brand" href="index.html" aria-label="Về trang chủ"><img src="assets/ptt-brand.svg" alt="Phan Tấn Tài · Địa chất và Địa vật lý" width="720" height="170" decoding="async"></a>
       <div class="spacer"></div>
       <a class="back" href="index.html#assignments">← Quay lại bài tập</a>
     </div>
@@ -77,14 +90,14 @@
     <section class="viewer-card">
       <header class="viewer-head">
         <div>
-          <p class="eyebrow">NỘI DUNG BÀI TẬP</p>
+          
           <h1 id="title">Đang tải tài liệu…</h1>
           <p id="subtitle">Vui lòng chờ trong giây lát.</p>
         </div>
-        <span class="type-badge" id="typeBadge">FILE</span>
+        <span class="type-badge" id="typeBadge">Tài liệu</span>
       </header>
       <div class="preview-shell" id="previewShell">
-        <div class="preview-state" id="previewState"><div><div class="loader"></div><h2>Đang chuẩn bị nội dung</h2><p>Hệ thống đang tạo nội dung tài liệu.</p></div></div>
+        <div class="preview-state" id="previewState"><div><div class="loader"></div><h2>Đang mở tài liệu</h2><p>Vui lòng chờ trong giây lát.</p></div></div>
       </div>
     </section>
 
