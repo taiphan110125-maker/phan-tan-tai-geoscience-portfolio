@@ -1,6 +1,6 @@
 'use strict';
 
-const CACHE_NAME='ptt-static-v22-20261015';
+const CACHE_NAME='ptt-static-v23-20261015';
 const PRECACHE=[
   '/',
   '/index.html',
@@ -62,19 +62,28 @@ self.addEventListener('fetch',event=>{
   if(request.mode==='navigate'){
     event.respondWith((async()=>{
       const cache=await caches.open(CACHE_NAME);
-      try{
-        const response=await fetch(request,{cache:'no-store'});
-        if(response&&response.ok)await cache.put(request,response.clone());
-        return response;
-      }catch{
-        if(url.pathname==='/assignment-viewer.html'){
-          return (await cache.match('/assignment-viewer.html'))
-            || Response.error();
-        }
-        return (await cache.match(request))
-          || (await cache.match('/index.html'))
-          || Response.error();
+      const fallback=(await cache.match(request))
+        || (await cache.match(url.pathname==='/assignment-viewer.html'?'/assignment-viewer.html':'/index.html'));
+      const controller=new AbortController();
+      const network=fetch(request,{cache:'no-store',signal:controller.signal})
+        .then(async response=>{
+          if(response&&response.ok)await cache.put(request,response.clone());
+          return response;
+        });
+      // First navigation prefers fresh HTML; slow reloads can show a cached page.
+      if(!fallback){
+        try{return await network}catch{return Response.error()}
       }
+      let timeoutId;
+      const timeout=new Promise(resolve=>{timeoutId=setTimeout(()=>resolve(null),1200)});
+      try{
+        const response=await Promise.race([network,timeout]);
+        if(response){clearTimeout(timeoutId);return response}
+      }catch{}
+      clearTimeout(timeoutId);
+      // Keep updating in background for the next navigation.
+      event.waitUntil(network.catch(()=>undefined));
+      return fallback;
     })());
     return;
   }
