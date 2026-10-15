@@ -3967,7 +3967,7 @@ document.addEventListener('keydown', event => { if (event.key === 'Escape') $$('
 <script>
 if('serviceWorker' in navigator){
   window.addEventListener('load',()=>{
-    navigator.serviceWorker.register('/sw.js?v=20261011-editorial1',{scope:'/',updateViaCache:'none'})
+    navigator.serviceWorker.register('/sw.js?v=20261015-perf1',{scope:'/',updateViaCache:'none'})
       .then(registration=>registration.update())
       .catch(error=>console.warn('Service worker unavailable:',error));
   },{once:true});
@@ -3975,6 +3975,6 @@ if('serviceWorker' in navigator){
 </script>
 
 
-<script src="assets/site-language.js?v=20261015-aboutfix3" defer></script>
+<script src="assets/site-language.js?v=20261015-perf1" defer></script>
 </body>
 </html>
