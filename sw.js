@@ -1,6 +1,6 @@
 'use strict';
 
-const CACHE_NAME='ptt-static-v21-20261015';;
+const CACHE_NAME='ptt-static-v22-20261015';
 const PRECACHE=[
   '/',
   '/index.html',
@@ -91,6 +91,8 @@ self.addEventListener('fetch',event=>{
         });
 
       if(cached){
+        // Versioned assets are immutable for this URL; avoid repeated refresh requests.
+        if(url.searchParams.has('v'))return cached;
         event.waitUntil(update.catch(()=>undefined));
         return cached;
       }
