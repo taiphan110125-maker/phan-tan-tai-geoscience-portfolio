@@ -15,6 +15,7 @@ const renderedText=new WeakMap();
 const originalAttrs=new WeakMap();
 const excluded='script,style,noscript,code,pre,[contenteditable],#aiMessages,#aiHistory,#userAccountName,#userMenuName,#userMenuEmail,.project-description,.project-content,.project-details,.rich-content-view,.assignment-content h4,.assignment-content p,.exchange-entry p,.private-comment-entry p,.global-search-copy strong';
 let scheduled=false;
+const pendingNodes=new Set();
 function translated(original){return lang==='vi'?original:(STRINGS[original]?.[lang]||original)}
 function skip(el){return el?.closest?.(excluded)}
 function translateText(node){
@@ -62,12 +63,28 @@ function init(){
  const selector=document.getElementById('pttLanguageSelector');
  if(selector)selector.addEventListener('change',e=>selectLanguage(e.target.value));
  selectLanguage(lang);
- new MutationObserver(mutations=>{
-  if(scheduled)return;
-  if(!mutations.some(m=>m.type==='childList'||m.type==='characterData'))return;
+ const observer=new MutationObserver(mutations=>{
+  for(const mutation of mutations){
+    if(mutation.type==='characterData'){
+      if(mutation.target.parentElement&&!skip(mutation.target.parentElement))pendingNodes.add(mutation.target);
+    }else if(mutation.type==='childList'){
+      for(const node of mutation.addedNodes){
+        if(node.nodeType===Node.ELEMENT_NODE||node.nodeType===Node.TEXT_NODE)pendingNodes.add(node);
+      }
+    }
+  }
+  if(scheduled||pendingNodes.size===0)return;
   scheduled=true;
-  requestAnimationFrame(()=>{scheduled=false;walk()});
- }).observe(document.body,{subtree:true,childList:true,characterData:true});
+  requestAnimationFrame(()=>{
+    scheduled=false;
+    const pending=[...pendingNodes];
+    pendingNodes.clear();
+    for(const node of pending){
+      if(node.isConnected)walk(node);
+    }
+  });
+ });
+ observer.observe(document.body,{subtree:true,childList:true,characterData:true});
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
 })();
