@@ -12,7 +12,7 @@ if(!Object.hasOwn(LOCALES,lang))lang='vi';
 const originalText=new WeakMap();
 const renderedText=new WeakMap();
 const originalAttrs=new WeakMap();
-const excluded='script,style,noscript,code,pre,[contenteditable],#projectShowcase,#assignmentGroups,#academicExchangeHistory,#privateCommentHistory,#projectModalContent,#globalSearchResults,#aiMessages,#aiHistory,#userAccountName,#userMenuName,#userMenuEmail';
+const excluded='script,style,noscript,code,pre,[contenteditable],#aiMessages,#aiHistory,#userAccountName,#userMenuName,#userMenuEmail,.project-description,.project-content,.project-details,.rich-content-view,.assignment-content h4,.assignment-content p,.exchange-entry p,.private-comment-entry p,.global-search-copy strong';
 let scheduled=false;
 function translated(original){return lang==='vi'?original:(STRINGS[original]?.[lang]||original)}
 function skip(el){return el?.closest?.(excluded)}
