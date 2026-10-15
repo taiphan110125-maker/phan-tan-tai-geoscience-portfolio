@@ -2150,6 +2150,32 @@ body{color:var(--ink-strong)!important}
 }
 @media(prefers-reduced-motion:reduce){#projects .project-user-card{transition:none!important}}
 </style>
+<style id="ptt-language-selector-style">
+.site-language-control{
+  position:relative;display:inline-flex;align-items:center;gap:7px;flex:0 0 auto;
+  height:40px;padding:0 10px;border-radius:11px;background:#edf6f4;
+  color:#0c6570;border:1px solid #bedddc;white-space:nowrap;
+}
+.site-language-icon{font-size:17px;line-height:1}
+.site-language-control select{
+  appearance:none;-webkit-appearance:none;border:0;background:transparent;color:inherit;
+  font:600 12px "Segoe UI",Arial,sans-serif;max-width:108px;
+  padding:0 14px 0 0;cursor:pointer;outline:0;
+}
+.site-language-control select option{background:#fff;color:#18374d}
+.site-language-chevron{position:absolute;right:9px;pointer-events:none;font-size:15px}
+.site-language-control:focus-within{outline:2px solid #168b94;outline-offset:2px}
+@media(max-width:1100px){
+ .site-language-control{height:38px;padding:0 8px}
+ .site-language-control select{font-size:11px;max-width:94px}
+}
+@media(max-width:700px){
+ .site-language-control{order:2;min-width:0;height:36px;padding:0 6px;gap:4px}
+ .site-language-icon{font-size:14px}
+ .site-language-control select{font-size:11px;max-width:78px;padding-right:12px}
+ .site-language-chevron{right:5px}
+}
+</style>
 </head>
 <body>
   <a class="skip-link" href="#main">Bỏ qua menu</a>
@@ -2169,6 +2195,15 @@ body{color:var(--ink-strong)!important}
         <a href="#contact">Liên hệ</a>
         <a href="#geo-ai">Trợ lý ảo</a>
       </nav>
+      <label class="site-language-control" for="pttLanguageSelector">
+        <span class="site-language-icon" aria-hidden="true">🌐</span>
+        <select id="pttLanguageSelector" aria-label="Ngôn ngữ website">
+          <option value="vi">Tiếng Việt</option>
+          <option value="en">English</option>
+          <option value="fr">Français</option>
+        </select>
+        <span class="site-language-chevron" aria-hidden="true">⌄</span>
+      </label>
       <div class="account-actions" id="accountActions">
         <button class="global-search-open" id="globalSearchOpen" type="button" aria-label="Tìm kiếm toàn website" aria-haspopup="dialog">
           <span aria-hidden="true">⌕</span><span class="global-search-label">Tìm kiếm</span><kbd>Ctrl K</kbd>
@@ -3872,5 +3907,6 @@ if('serviceWorker' in navigator){
 </script>
 
 
+<script src="assets/site-language.js?v=20261015-1" defer></script>
 </body>
 </html>
