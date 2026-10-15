@@ -2176,6 +2176,71 @@ body{color:var(--ink-strong)!important}
  .site-language-chevron{right:5px}
 }
 </style>
+
+<style id="ptt-header-redesign-20261015">
+/* Unified light header: quiet navigation and coordinated controls. */
+.site-header{background:rgba(255,255,255,.97)!important;border-bottom:1px solid #e3ebf0!important;box-shadow:0 5px 26px rgba(19,55,78,.055)!important;backdrop-filter:blur(18px)}
+.site-header .shell.nav-row{min-height:76px!important;gap:clamp(12px,1.4vw,24px)!important;justify-content:space-between}
+.site-header .brand-header{margin-right:0!important;flex:0 1 auto;min-width:0}
+.site-header .brand-lockup{max-width:clamp(175px,16vw,230px)!important;height:auto!important}
+.site-header .primary-nav{display:flex;gap:clamp(10px,1.3vw,23px)!important;align-items:center;flex:1 1 auto;justify-content:center;min-width:0}
+.site-header .primary-nav a{font-size:12px!important;letter-spacing:0!important;font-weight:650!important;color:#486278!important;padding:28px 0!important;white-space:nowrap}
+.site-header .primary-nav a:hover,.site-header .primary-nav a.active{color:#15466d!important}
+.site-header .primary-nav a::after{height:2px!important;bottom:21px!important;background:#2675a5!important;border-radius:99px}
+.site-header .account-actions{gap:9px!important;flex:0 0 auto}
+.site-header .site-language-control,.site-header .global-search-open,.site-header .account-chip,.site-header .btn-login,.site-header .btn-register{
+  height:42px!important;min-height:42px!important;border-radius:13px!important;box-shadow:none!important;transform:none!important;
+}
+.site-header .site-language-control{order:0!important;gap:7px!important;padding:0 12px!important;background:#f7fafc!important;border:1px solid #dae6ee!important;color:#264f69!important;transition:border-color .18s,background .18s}
+.site-header .site-language-control:hover{background:#ecf5f9!important;border-color:#b5d6e5!important}
+.site-header .site-language-icon{font-size:16px!important}
+.site-header .site-language-control select{max-width:115px!important;font-size:12px!important;font-weight:650!important;cursor:pointer}
+.site-header .site-language-chevron{right:10px!important;color:#66869b}
+.site-header .global-search-open{gap:8px!important;padding:0 13px!important;background:#fff!important;border:1px solid #dae6ee!important;color:#31536b!important;font-size:12px!important;font-weight:650!important;transition:border-color .18s,background .18s!important}
+.site-header .global-search-open:hover{background:#f7fafc!important;border-color:#b5d6e5!important}
+.site-header .global-search-open kbd{font-size:9px!important;color:#8b9ca7!important;background:#f7f9fb!important;border-color:#e1e8ee!important}
+.site-header .account-chip{gap:9px!important;padding:0 13px 0 6px!important;border:1px solid #dce6ed!important;background:#fff!important;color:#244962!important;transition:background .18s,border-color .18s!important}
+.site-header .account-chip:hover{background:#f6f9fb!important;border-color:#b7ccd9!important}
+.site-header .account-avatar{width:30px!important;height:30px!important;font-size:13px!important;background:#eaf2f7!important;color:#265475!important}
+.site-header .account-copy{line-height:1.25!important}
+.site-header .account-copy strong{font-size:11px!important;font-weight:750!important;max-width:135px!important}
+.site-header .account-copy small{display:none!important}
+.site-header .btn-login{padding:0 14px!important;background:#fff!important;border:1px solid #dae6ee!important;color:#244962!important;font-weight:650!important}
+.site-header .btn-register{padding:0 15px!important;background:#173e5d!important;border:1px solid #173e5d!important;color:#fff!important;font-weight:700!important}
+.site-header .nav-toggle{border-radius:11px!important;min-width:42px;min-height:42px;align-items:center;justify-content:center;color:#244962!important}
+@media(max-width:1250px){
+ .site-header .shell.nav-row{gap:12px!important}
+ .site-header .primary-nav{gap:12px!important}
+ .site-header .primary-nav a{font-size:11px!important}
+ .site-header .global-search-open kbd{display:none!important}
+}
+@media(max-width:1080px){
+ .site-header .primary-nav{display:none}
+ .site-header .primary-nav.open{display:flex}
+ .site-header .brand-header{margin-right:auto!important}
+ .site-header .nav-toggle{display:inline-flex!important;order:5}
+ .site-header .site-language-control{margin-left:auto}
+ .site-header .account-actions{order:3}
+}
+@media(max-width:700px){
+ .site-header .shell.nav-row{min-height:68px!important;gap:7px!important;flex-wrap:nowrap!important}
+ .site-header .brand-header{flex:1 1 auto;min-width:0!important;margin-right:auto!important}
+ .site-header .brand-lockup{width:clamp(113px,30vw,177px)!important;max-width:100%!important}
+ .site-header .site-language-control{order:2!important;height:38px!important;min-height:38px!important;padding:0 7px!important;gap:4px!important}
+ .site-header .site-language-control select{max-width:73px!important;font-size:10px!important;padding-right:12px!important}
+ .site-header .site-language-icon{font-size:13px!important}
+ .site-header .site-language-chevron{right:5px!important}
+ .site-header .account-actions{order:3;gap:5px!important}
+ .site-header .global-search-open{height:38px!important;min-height:38px!important;width:38px!important;padding:0!important;justify-content:center!important}
+ .site-header .global-search-label,.site-header .global-search-open kbd{display:none!important}
+ .site-header .account-chip{height:38px!important;min-height:38px!important;width:38px!important;padding:3px!important;justify-content:center!important}
+ .site-header .account-chip .account-copy,.site-header .account-chip>span:last-child{display:none!important}
+ .site-header .account-avatar{width:30px!important;height:30px!important}
+ .site-header .btn-register{height:38px!important;min-height:38px!important;font-size:11px!important;padding:0 9px!important}
+ .site-header .nav-toggle{order:5!important;min-width:38px!important;min-height:38px!important;font-size:20px!important}
+}
+@media(prefers-reduced-motion:reduce){.site-header *{transition:none!important}}
+</style>
 </head>
 <body>
   <a class="skip-link" href="#main">Bỏ qua menu</a>
