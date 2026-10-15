@@ -2216,7 +2216,10 @@ body{color:var(--ink-strong)!important}
 }
 @media(max-width:1080px){
  .site-header .primary-nav{display:none}
- .site-header .primary-nav.open{display:flex}
+ .site-header .primary-nav.open{display:flex;position:absolute;top:calc(100% + 5px);left:16px;right:16px;z-index:190;flex-direction:column;align-items:stretch;justify-content:flex-start;background:#fff;border:1px solid #dce6ed;border-radius:16px;padding:10px 14px;box-shadow:0 24px 60px rgba(19,55,78,.16)}
+ .site-header .primary-nav.open a{padding:12px 10px!important;color:#31536b!important;font-size:13px!important;border-radius:9px}
+ .site-header .primary-nav.open a:hover,.site-header .primary-nav.open a.active{background:#eef5fa;color:#15527e!important}
+ .site-header .primary-nav.open a::after{display:none}
  .site-header .brand-header{margin-right:auto!important}
  .site-header .nav-toggle{display:inline-flex!important;order:5}
  .site-header .site-language-control{margin-left:auto}
