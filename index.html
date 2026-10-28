@@ -2290,6 +2290,13 @@ body{color:var(--ink-strong)!important}
 }
 @media (prefers-reduced-motion:reduce){.scroll-progress{display:none}}
 </style>
+<style id="ptt-hero-sea-v1">
+/* Mặt biển chuyển động trên chính ảnh trang chủ (WebGL). Ảnh gốc vẫn nằm bên dưới:
+   trình duyệt không hỗ trợ hoặc bật "giảm chuyển động" thì chỉ thấy ảnh tĩnh như cũ. */
+.hero-sea{pointer-events:none;opacity:0;transition:opacity 1.2s ease}
+.hero-sea.ready{opacity:1}
+@media (prefers-reduced-motion:reduce){.hero-sea{display:none}}
+</style>
 </head>
 <body>
   <div class="scroll-progress" id="scrollProgress" aria-hidden="true"></div>
@@ -2341,6 +2348,7 @@ body{color:var(--ink-strong)!important}
   <main id="main">
     <section class="hero" id="home" aria-labelledby="heroTitle">
       <img class="hero-media" id="heroUserImage" src="assets/hero-user.webp?v=20261001-native1" alt="Địa tầng ven biển, biển xanh và các giàn khoan dầu khí ngoài khơi" width="1672" height="941" fetchpriority="high" decoding="async">
+      <canvas class="hero-media hero-sea" id="heroSea" aria-hidden="true"></canvas>
       <div class="hero-overlay"></div>
       <div class="shell hero-content">
         <div class="hero-copy reveal">
@@ -4079,6 +4087,86 @@ if('serviceWorker' in navigator){
     if(entries.some(e=>e.isIntersecting)){io.disconnect();stats.forEach(run);}
   },{threshold:.6});
   io.observe(stats[0].closest('.stats-row'));
+})();
+</script>
+<script>
+// Mặt biển chuyển động như thật: shader làm gợn sóng và lấp lánh ánh nắng chỉ ở vùng nước
+// (nhận diện theo màu xanh nước biển, dưới đường chân trời); vách đá, bầu trời, giàn khoan đứng yên.
+(function(){
+  'use strict';
+  if(window.matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+  const conn=navigator.connection;if(conn&&conn.saveData)return;
+  const img=document.getElementById('heroUserImage'),cv=document.getElementById('heroSea');
+  if(!img||!cv)return;
+  let gl;
+  try{gl=cv.getContext('webgl',{alpha:false,antialias:false,premultipliedAlpha:false,powerPreference:'low-power'});}catch(e){}
+  if(!gl){cv.remove();return;}
+  const VS='attribute vec2 p;varying vec2 v;void main(){v=vec2(p.x*.5+.5,.5-p.y*.5);gl_Position=vec4(p,0.,1.);}';
+  const FS=['precision mediump float;','uniform sampler2D u_img;uniform vec2 u_scale,u_offset;uniform float u_t;varying vec2 v;',
+  'void main(){',
+  ' vec2 t=v*u_scale+u_offset;',
+  ' vec3 base=texture2D(u_img,t).rgb;',
+  ' float w=smoothstep(.05,.18,max(base.b,base.g)-base.r)*smoothstep(.33,.40,t.y);',
+  ' float depth=clamp((t.y-.34)/.66,0.,1.);',
+  ' float amp=mix(.0006,.0032,depth);',
+  ' float f=mix(220.,70.,depth);',
+  ' vec2 d;',
+  ' d.x=sin(t.y*f*.6+u_t*1.3+sin(t.x*25.+u_t*.4)*2.);',
+  ' d.y=sin(t.y*f-u_t*1.8+sin(t.x*40.-u_t*.6)*1.6)+.5*sin(t.x*f*.8+u_t*1.1);',
+  ' vec3 c=texture2D(u_img,t+d*amp*w).rgb;',
+  ' float g=sin(dot(t,vec2(f*3.1,f*.7))+u_t*2.2+d.x*3.)*sin(dot(t,vec2(-f*1.3,f*2.6))-u_t*1.7+d.y*2.)*sin(dot(t,vec2(f*2.,-f*1.9))+u_t*1.3);',
+  ' g=pow(max(g,0.),9.);',
+  ' float lum=dot(c,vec3(.299,.587,.114));',
+  ' c+=g*w*(.06+lum*.5)*vec3(1.,.96,.88);',
+  ' gl_FragColor=vec4(c,1.);',
+  '}'].join('\n');
+  function sh(type,src){const s=gl.createShader(type);gl.shaderSource(s,src);gl.compileShader(s);if(!gl.getShaderParameter(s,gl.COMPILE_STATUS))throw new Error(gl.getShaderInfoLog(s));return s;}
+  let prog,uScale,uOffset,uT,running=true,visible=true,raf=0,last=0;
+  const t0=performance.now();
+  function setup(){
+    prog=gl.createProgram();gl.attachShader(prog,sh(gl.VERTEX_SHADER,VS));gl.attachShader(prog,sh(gl.FRAGMENT_SHADER,FS));
+    gl.linkProgram(prog);if(!gl.getProgramParameter(prog,gl.LINK_STATUS))throw new Error('link');
+    gl.useProgram(prog);
+    const buf=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,buf);
+    gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,1,-1,-1,1,1,1]),gl.STATIC_DRAW);
+    const loc=gl.getAttribLocation(prog,'p');gl.enableVertexAttribArray(loc);gl.vertexAttribPointer(loc,2,gl.FLOAT,false,0,0);
+    const tex=gl.createTexture();gl.bindTexture(gl.TEXTURE_2D,tex);
+    gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
+    gl.texImage2D(gl.TEXTURE_2D,0,gl.RGB,gl.RGB,gl.UNSIGNED_BYTE,img);
+    uScale=gl.getUniformLocation(prog,'u_scale');uOffset=gl.getUniformLocation(prog,'u_offset');uT=gl.getUniformLocation(prog,'u_t');
+  }
+  function resize(){
+    const w=cv.clientWidth,h=cv.clientHeight;if(!w||!h)return;
+    const dpr=Math.min(window.devicePixelRatio||1,w<700?1:1.25);
+    cv.width=Math.round(w*dpr);cv.height=Math.round(h*dpr);gl.viewport(0,0,cv.width,cv.height);
+    const iw=img.naturalWidth,ih=img.naturalHeight,sc=Math.max(w/iw,h/ih),dw=iw*sc,dh=ih*sc;
+    const pos=getComputedStyle(img).objectPosition.split(' ');
+    const frac=(val,free)=>val.endsWith('%')?parseFloat(val)/100:(free?parseFloat(val)/free:.5);
+    const ox=(w-dw)*frac(pos[0]||'50%',w-dw),oy=(h-dh)*frac(pos[1]||'50%',h-dh);
+    gl.uniform2f(uScale,w/dw,h/dh);gl.uniform2f(uOffset,-ox/dw,-oy/dh);
+  }
+  function frame(now){
+    raf=0;
+    if(!running||!visible)return;
+    if(now-last>=33){ // khoảng 30 khung hình/giây là đủ mượt, tiết kiệm pin
+      last=now;gl.uniform1f(uT,(now-t0)/1000);gl.drawArrays(gl.TRIANGLE_STRIP,0,4);
+      if(!cv.classList.contains('ready'))cv.classList.add('ready');
+    }
+    raf=requestAnimationFrame(frame);
+  }
+  function kick(){if(!raf&&running&&visible)raf=requestAnimationFrame(frame);}
+  function start(){
+    try{setup();resize();}catch(e){console.warn('Hiệu ứng mặt biển tắt:',e);cv.remove();return;}
+    window.addEventListener('resize',()=>{resize();kick();},{passive:true});
+    document.addEventListener('visibilitychange',()=>{running=document.visibilityState==='visible';kick();});
+    if('IntersectionObserver' in window){
+      new IntersectionObserver(es=>{visible=es.some(e=>e.isIntersecting);kick();}).observe(cv);
+    }
+    cv.addEventListener('webglcontextlost',e=>{e.preventDefault();running=false;cv.classList.remove('ready');});
+    kick();
+  }
+  if(img.complete&&img.naturalWidth)start();else img.addEventListener('load',start,{once:true});
 })();
 </script>
 <script src="assets/site-language.js?v=20261028-perf2" defer></script>
