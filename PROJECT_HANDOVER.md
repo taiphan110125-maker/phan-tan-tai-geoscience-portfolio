@@ -36,8 +36,9 @@ Tài liệu bàn giao, cập nhật **28/10/2026**. Đây là điểm vào; chi 
 | Lược đồ, RLS, trigger, index, Storage, Realtime của Supabase | **Đã xác minh** | Connector Supabase (OAuth), chỉ đọc metadata |
 | Mã nguồn 3 Edge Functions | **Đã đọc** | Connector Supabase; bản sao chưa có trong repo |
 | Cấu hình, lịch sử deploy Render | **Đã xác minh** | Connector Render (OAuth), chỉ đọc |
-| Trang quản trị khi đã đăng nhập | Chỉ đọc mã | Chưa đăng nhập thử |
-| Đăng ký, đăng nhập, gửi nhận xét/thảo luận/liên hệ trên production | Chưa thử | Không ghi dữ liệu thật khi chưa được phép |
+| Trang quản trị và các luồng có đăng nhập | **Đã kiểm thử** với backend giả lập | `tests/e2e_mock_test.py` (PR #3): 170/170 đạt, VI/EN/FR, desktop và mobile; phát hiện và sửa 1 lỗi |
+| Log production 24 giờ (Supabase) | Đã đọc | Không có lỗi 5xx, không có lỗi từ Edge Functions |
+| Đăng ký, đăng nhập, gửi nhận xét/thảo luận/liên hệ trên production thật | Chưa thử | Không ghi dữ liệu thật khi chưa được phép |
 
 ## Quyền truy cập
 

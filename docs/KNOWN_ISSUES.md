@@ -35,6 +35,7 @@ Cập nhật 28/10/2026. Mức ưu tiên: **P1** xử lý trước mọi phát t
 | S-05 | Chống spam cho thảo luận công khai và form liên hệ chỉ có ở trình duyệt (đăng ký và trợ lý ảo đã có giới hạn phía server) | Có thể bị gửi hàng loạt |
 | S-06 | Tắt "Leaked Password Protection" của Supabase Auth (cảnh báo của Supabase Advisor) | Người dùng đặt được mật khẩu đã bị lộ |
 | S-07 | Quyền bảng (GRANT) cho `anon`/`authenticated` ở mức mặc định rộng; RLS đang chặn đúng nhưng nên thu hẹp để phòng vệ hai lớp | Giảm lớp phòng vệ |
+| D-03 | Thêm môn học trong admin: lưu được nhưng danh sách không cập nhật, form không xóa (`event.currentTarget` dùng sau `await`) | Dễ bấm lại, báo trùng | Đã sửa ở PR #3, chờ duyệt |
 | D-02 | Bảng `comments` không có policy UPDATE, nên khi admin sửa bài tập, thông tin bài tập lưu kèm nhận xét không được cập nhật (lỗi bị bỏ qua) | Nhận xét cũ hiện tiêu đề/ngày cũ |
 | L-06 | Trợ lý ảo (`geo-ai`) luôn trả lời tiếng Việt và từ chối câu hỏi ngoài phạm vi bằng tiếng Việt | Trộn ngôn ngữ ở EN/FR |
 | C-01 | Service worker trả HTML đã cache khi mạng chậm hơn 1,2 s; trang xem tài liệu cache riêng mỗi `?id=`, không giới hạn | Có thể thấy bản cũ sau deploy; cache phình dần |

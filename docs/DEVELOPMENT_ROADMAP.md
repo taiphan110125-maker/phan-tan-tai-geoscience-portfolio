@@ -16,7 +16,8 @@ Mỗi bước là một nhánh và một Pull Request riêng, có kiểm thử v
 
 | PR | Nội dung | Giải quyết | Kiểm thử |
 | --- | --- | --- | --- |
-| **1** | Giá trị form độc lập với ngôn ngữ — **đã xong, chờ duyệt** | I-01 | `tests/form_values_test.py` (112 kiểm tra) |
+| **1** | Giá trị form độc lập với ngôn ngữ — **PR #2, chờ duyệt** | I-01 | `tests/form_values_test.py` (112 kiểm tra) |
+| **1b** | Sửa lỗi thêm môn học + kiểm thử đầu-cuối — **PR #3, chờ duyệt** | D-03 | `tests/e2e_mock_test.py` (170 kiểm tra) |
 | 2 | Tải supabase-js không chặn trang (tự host trong `assets/vendor/` + `defer`); áp ngôn ngữ trước lần vẽ đầu bằng script nhỏ trong `<head>` | P-01, L-01 | Ảnh chụp tại 0,5 s ở EN/FR không còn tiếng Việt; thời gian DOMContentLoaded |
 | 3 | Chỉ vẽ lại danh sách khi dữ liệu đổi; Realtime chỉ mở khi người xem ở mục Bài tập | P-04, P-05 | Đếm số lần vẽ và số request |
 | 4 | Ảnh hero 3 kích thước (`srcset`, ~60/150/326 KB); xóa 10 ảnh không dùng | P-02, Q-03 | Lighthouse mobile trước/sau |

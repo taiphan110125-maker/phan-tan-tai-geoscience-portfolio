@@ -2,6 +2,8 @@
 
 Trạng thái: **Hoạt động** = đã thấy chạy trên production hoặc qua kiểm thử tự động; **Theo mã** = đọc mã, chưa chạy thử với tài khoản thật; **Một phần** = có lỗi hoặc thiếu đã biết (xem [KNOWN_ISSUES.md](KNOWN_ISSUES.md)).
 
+Các mục "Theo mã" dưới đây đã chạy đạt trong kiểm thử đầu-cuối với backend giả lập (`tests/e2e_mock_test.py`, PR #3); chưa thử trên production thật để không ghi dữ liệu.
+
 ## Trang công khai (`index.html`, `assignment-viewer.html`)
 
 | # | Chức năng | Mô tả | Dữ liệu | Trạng thái |
@@ -30,7 +32,7 @@ Trạng thái: **Hoạt động** = đã thấy chạy trên production hoặc q
 | A1 | Đăng nhập quản trị | Email + mật khẩu; từ chối và đăng xuất nếu `profiles.role ≠ admin`; tự chuyển trang nếu đã đăng nhập | Theo mã |
 | A2 | Tổng quan | Số liệu, bài tập gần đây, nhận xét mới | Theo mã |
 | A3 | Bài tập | Thêm nhiều file cùng lúc (≤ 50 MB/file) hoặc bài không file; nội dung rich-text; liên kết ngoài (chỉ `http/https`); đổi ngày/môn ngay trên danh sách; tự đánh lại số bài; mở file; tải lại file; sửa; chuyển vào Thùng rác | Theo mã |
-| A4 | Môn học | Thêm, đổi tên, ẩn/hiện, xóa | Theo mã |
+| A4 | Môn học | Thêm, đổi tên, ẩn/hiện, xóa | Một phần (D-03, đã sửa ở PR #3) |
 | A5 | Dự án | Thêm/sửa; ảnh tự nén WebP ≤ 1600 px; nhiều file báo cáo; thẻ (≤ 8); chuyển vào Thùng rác | Theo mã |
 | A6 | Ảnh giới thiệu | Đổi ảnh mục Giới thiệu (≤ 8 MB), xóa ảnh cũ | Theo mã |
 | A7 | Phản hồi | Xem và xóa nhận xét riêng, tin thảo luận công khai; huy hiệu chưa đọc; thông báo realtime | Theo mã |
