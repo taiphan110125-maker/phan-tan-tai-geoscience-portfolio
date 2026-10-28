@@ -2,6 +2,8 @@
 <html lang="vi">
 <head>
   <meta charset="utf-8">
+  <script>try{var l=localStorage.getItem("ptt-site-language");if(l==="en"||l==="fr"){var h=document.documentElement;h.lang=l;h.classList.add("ptt-i18n-pending");setTimeout(function(){h.classList.remove("ptt-i18n-pending")},2500)}}catch(e){}</script>
+  <style>html.ptt-i18n-pending body{visibility:hidden}</style>
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="theme-color" content="#071a24">
   <meta name="robots" content="noindex,nofollow,noarchive">
@@ -12,8 +14,6 @@
   <link rel="icon" href="assets/ptt-emblem.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://aqkasetqystwvpassidd.supabase.co" crossorigin>
   <link rel="dns-prefetch" href="//aqkasetqystwvpassidd.supabase.co">
-  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
-  <link rel="dns-prefetch" href="//cdn.jsdelivr.net">
   <title>Quản trị website | Phan Tấn Tài</title>
   <style>
 :root{
@@ -843,7 +843,7 @@ body.admin-body,.admin-body{background:#f6f8fb!important;color:#183247!important
   </div>
 
   <div class="toast" id="toast" role="status"></div>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2"></script>
+  <script src="assets/vendor/supabase-js-2.117.2.js?v=2.117.2"></script>
   <script>
 // CẤU HÌNH PUBLIC CHO SUPABASE
 // Publishable key được phép dùng ở frontend; không đặt service_role key ở đây.
@@ -2203,6 +2203,6 @@ document.addEventListener('keydown',event=>{if(event.key!=='Escape')return;if(pr
 })();
 
 </script>
-<script src="assets/site-language.js?v=20261028-formvalues1" defer></script>
+<script src="assets/site-language.js?v=20261028-perf2" defer></script>
 </body>
 </html>

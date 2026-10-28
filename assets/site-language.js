@@ -64,6 +64,7 @@ function init(){
  const selector=document.getElementById('pttLanguageSelector');
  if(selector)selector.addEventListener('change',e=>selectLanguage(e.target.value));
  selectLanguage(lang);
+ document.documentElement.classList.remove('ptt-i18n-pending');
  const observer=new MutationObserver(mutations=>{
   for(const mutation of mutations){
     if(mutation.type==='characterData'){

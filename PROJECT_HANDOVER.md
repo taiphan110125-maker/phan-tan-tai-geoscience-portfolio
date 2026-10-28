@@ -8,7 +8,7 @@ Tài liệu bàn giao, cập nhật **28/10/2026**. Đây là điểm vào; chi 
 | Website | https://phan-tan-tai-geoscience-portfolio.onrender.com |
 | Hosting | Render Static Site, service `srv-datbm7qd0e5s73betpbg`, deploy thủ công (merge vào `main` **không** tự lên website), phía trước là Cloudflare CDN |
 | Backend | Supabase project `aqkasetqystwvpassidd` (Postgres 17, Singapore), 11 bảng, 4 bucket, 3 Edge Functions |
-| Frontend | HTML + CSS + JavaScript thuần, không có bước build; supabase-js `2.117.2` từ jsDelivr |
+| Frontend | HTML + CSS + JavaScript thuần, không có bước build; supabase-js `2.117.2` tự host tại `assets/vendor/` (giấy phép MIT kèm theo) |
 | Lịch sử Git | 234 commit (29/09/2026 → 15/10/2026), một tác giả, phần lớn sửa trực tiếp trên GitHub |
 
 > Repository là **công khai**, nên các tài liệu này không chứa khóa bí mật, dữ liệu cá nhân hay chi tiết khai thác lỗ hổng. Báo cáo kiểm tra bảo mật chi tiết được lưu riêng, không đưa vào repo.
