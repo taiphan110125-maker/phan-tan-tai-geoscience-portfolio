@@ -161,6 +161,7 @@ def admin_suite(browser, base, mobile):
 
     # Bài tập có file
     page.click('#addAssignmentBtn')
+    page.wait_for_timeout(500)
     page.fill('#assignmentDate', '2026-10-20')
     page.select_option('#assignmentSubject', slug)
     page.fill('#assignmentTitle', 'Bài kiểm thử tự động')
@@ -181,6 +182,7 @@ def admin_suite(browser, base, mobile):
 
     # Bài tập không file, cùng ngày → số bài 2
     page.click('#addAssignmentBtn')
+    page.wait_for_timeout(500)
     page.fill('#assignmentDate', '2026-10-20')
     page.select_option('#assignmentSubject', slug)
     page.fill('#assignmentTitle', 'Bài không file')
@@ -225,6 +227,7 @@ def admin_suite(browser, base, mobile):
     # Dự án có ảnh và báo cáo
     page.evaluate("pttAdminGo('projects')")
     page.click('#addProjectBtn')
+    page.wait_for_timeout(500)  # cửa sổ tự đặt con trỏ vào ô tiêu đề sau khi mở; chờ xong rồi mới nhập
     page.fill('#projectTitle', 'Dự án kiểm thử tự động')
     page.fill('#projectType', 'Đánh giá tầng chứa')
     page.fill('#projectSummary', 'Tóm tắt dự án dùng cho kiểm thử tự động.')
@@ -236,7 +239,15 @@ def admin_suite(browser, base, mobile):
     page.click('#projectSaveBtn')
     page.wait_for_function("/Đã (thêm|lưu)/.test(document.getElementById('projectStatus').textContent)",
                            timeout=15000)
-    p1 = row(fake, 'projects', title='Dự án kiểm thử tự động')
+    p1 = None
+    for _ in range(30):  # chờ tối đa 3 giây cho bản ghi xuất hiện (tránh kết quả chập chờn)
+        p1 = row(fake, 'projects', title='Dự án kiểm thử tự động')
+        if p1:
+            break
+        page.wait_for_timeout(100)
+    if not p1:
+        print('  (gỡ lỗi) projectStatus =', page.text_content('#projectStatus'), '| projects =',
+              [r.get('title') for r in fake.db['projects']])
     check(p1 and p1['image_path'] and len(p1['report_files']) == 1 and p1['tags'] == ['Well logging', 'Petrophysics'],
           f'{tag} dự án lưu sai: {p1}')
     page.wait_for_timeout(900)

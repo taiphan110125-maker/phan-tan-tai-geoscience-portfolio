@@ -13,8 +13,8 @@ Cập nhật 28/10/2026. Mức ưu tiên: **P1** xử lý trước mọi phát t
 | I-01 | Form Liên hệ (Chủ đề) và Nhận xét riêng (Vai trò) ghi **nhãn đã dịch** vào database khi người dùng chọn English/Français | Dữ liệu trộn ngôn ngữ trong admin | **Đã sửa** (PR #2, đã deploy). Dữ liệu cũ không bị ảnh hưởng |
 | S-01 | Quy tắc gán quyền admin tự động khi tạo tài khoản kết hợp với đăng ký không xác nhận email: an toàn khi tài khoản chủ website còn tồn tại, nhưng cần làm chặt hơn | Quyền quản trị | **Đã sửa** 28/10/2026 (migration `security_hardening_20261028`): tài khoản mới luôn là `user`; admin mới chỉ cấp bằng SQL thủ công |
 | S-03 | Policy Storage cho phép khách liệt kê tên file trong 4 bucket công khai (mở file theo URL không cần quyền này) | Lộ danh sách file, kể cả file của bài đã xóa mềm | **Đã sửa** 28/10/2026 (PR #5 + migration): khách không liệt kê được; file vẫn mở bằng URL công khai |
-| P-01 | supabase-js (55 KB nén) tải **đồng bộ** từ jsDelivr, chặn toàn bộ script phía sau | Trang không tương tác được và hiện tiếng Việt cho tới khi thư viện tải xong; nếu CDN chậm hoặc bị chặn, chờ tới khi lỗi | Mở |
-| L-01 | Khi chọn EN/FR, trang luôn hiện tiếng Việt trước rồi mới dịch (do P-01 và cơ chế dịch sau khi vẽ) | Mỗi lần tải lại trông như tải hai lần | Mở |
+| P-01 | supabase-js (55 KB nén) tải **đồng bộ** từ jsDelivr, chặn toàn bộ script phía sau | Trang không tương tác được và hiện tiếng Việt cho tới khi thư viện tải xong; nếu CDN chậm hoặc bị chặn, chờ tới khi lỗi | **Đã sửa** (PR #7): supabase-js tự host trong `assets/vendor/`, service worker lưu sẵn, không còn phụ thuộc CDN ngoài |
+| L-01 | Khi chọn EN/FR, trang luôn hiện tiếng Việt trước rồi mới dịch (do P-01 và cơ chế dịch sau khi vẽ) | Mỗi lần tải lại trông như tải hai lần | **Đã sửa** (PR #7): ẩn trang tới khi bản dịch áp dụng (tối đa 2,5 giây); kiểm thử `tests/first_paint_test.py` |
 
 ## P2
 
