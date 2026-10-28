@@ -1,6 +1,6 @@
 # Kiến trúc hệ thống
 
-Website là trang tĩnh: GitHub lưu mã, Render (qua Cloudflare, tự deploy từ `main`) phát file, còn dữ liệu, đăng nhập, file và phân quyền do Supabase đảm nhận. Trình duyệt gọi Supabase trực tiếp bằng *publishable key*, nên an toàn dữ liệu phụ thuộc hoàn toàn vào Row Level Security (RLS) và policy Storage.
+Website là trang tĩnh: GitHub lưu mã, Render (qua Cloudflare, deploy thủ công từ `main`) phát file, còn dữ liệu, đăng nhập, file và phân quyền do Supabase đảm nhận. Trình duyệt gọi Supabase trực tiếp bằng *publishable key*, nên an toàn dữ liệu phụ thuộc hoàn toàn vào Row Level Security (RLS) và policy Storage.
 
 ```mermaid
 flowchart LR

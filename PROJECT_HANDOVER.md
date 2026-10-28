@@ -6,7 +6,7 @@ Tài liệu bàn giao, cập nhật **28/10/2026**. Đây là điểm vào; chi 
 | --- | --- |
 | Repository | `taiphan110125-maker/phan-tan-tai-geoscience-portfolio` (công khai, nhánh mặc định `main`) |
 | Website | https://phan-tan-tai-geoscience-portfolio.onrender.com |
-| Hosting | Render Static Site, service `srv-datbm7qd0e5s73betpbg`, tự deploy mỗi commit lên `main`, phía trước là Cloudflare CDN |
+| Hosting | Render Static Site, service `srv-datbm7qd0e5s73betpbg`, deploy thủ công (merge vào `main` **không** tự lên website), phía trước là Cloudflare CDN |
 | Backend | Supabase project `aqkasetqystwvpassidd` (Postgres 17, Singapore), 11 bảng, 4 bucket, 3 Edge Functions |
 | Frontend | HTML + CSS + JavaScript thuần, không có bước build; supabase-js `2.117.2` từ jsDelivr |
 | Lịch sử Git | 234 commit (29/09/2026 → 15/10/2026), một tác giả, phần lớn sửa trực tiếp trên GitHub |
