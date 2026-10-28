@@ -10,9 +10,9 @@ Cập nhật 28/10/2026. Mức ưu tiên: **P1** xử lý trước mọi phát t
 
 | ID | Vấn đề | Ảnh hưởng | Trạng thái |
 | --- | --- | --- | --- |
-| I-01 | Form Liên hệ (Chủ đề) và Nhận xét riêng (Vai trò) ghi **nhãn đã dịch** vào database khi người dùng chọn English/Français | Dữ liệu trộn ngôn ngữ trong admin | Đã sửa trên nhánh `fix/form-values-language-independent`, chờ duyệt. Dữ liệu hiện có không bị ảnh hưởng (đã kiểm tra) |
-| S-01 | Quy tắc gán quyền admin tự động khi tạo tài khoản kết hợp với đăng ký không xác nhận email: an toàn khi tài khoản chủ website còn tồn tại, nhưng cần làm chặt hơn | Quyền quản trị | Mở — cần migration, chờ duyệt |
-| S-03 | Policy Storage cho phép khách liệt kê tên file trong 4 bucket công khai (mở file theo URL không cần quyền này) | Lộ danh sách file, kể cả file của bài đã xóa mềm | Mở — cần migration, chờ duyệt |
+| I-01 | Form Liên hệ (Chủ đề) và Nhận xét riêng (Vai trò) ghi **nhãn đã dịch** vào database khi người dùng chọn English/Français | Dữ liệu trộn ngôn ngữ trong admin | **Đã sửa** (PR #2, đã deploy). Dữ liệu cũ không bị ảnh hưởng |
+| S-01 | Quy tắc gán quyền admin tự động khi tạo tài khoản kết hợp với đăng ký không xác nhận email: an toàn khi tài khoản chủ website còn tồn tại, nhưng cần làm chặt hơn | Quyền quản trị | **Đã sửa** 28/10/2026 (migration `security_hardening_20261028`): tài khoản mới luôn là `user`; admin mới chỉ cấp bằng SQL thủ công |
+| S-03 | Policy Storage cho phép khách liệt kê tên file trong 4 bucket công khai (mở file theo URL không cần quyền này) | Lộ danh sách file, kể cả file của bài đã xóa mềm | **Đã sửa** 28/10/2026 (PR #5 + migration): khách không liệt kê được; file vẫn mở bằng URL công khai |
 | P-01 | supabase-js (55 KB nén) tải **đồng bộ** từ jsDelivr, chặn toàn bộ script phía sau | Trang không tương tác được và hiện tiếng Việt cho tới khi thư viện tải xong; nếu CDN chậm hoặc bị chặn, chờ tới khi lỗi | Mở |
 | L-01 | Khi chọn EN/FR, trang luôn hiện tiếng Việt trước rồi mới dịch (do P-01 và cơ chế dịch sau khi vẽ) | Mỗi lần tải lại trông như tải hai lần | Mở |
 
@@ -33,10 +33,10 @@ Cập nhật 28/10/2026. Mức ưu tiên: **P1** xử lý trước mọi phát t
 | D-01 | Phông Be Vietnam Pro và Source Serif 4 khai báo nhưng không được tải | Chữ hiển thị khác nhau giữa Windows, macOS, Android |
 | S-04 | Chưa có header `Content-Security-Policy`, `frame-ancestors`/`X-Frame-Options`; supabase-js từ CDN không có kiểm tra toàn vẹn (SRI) | Giảm lớp phòng vệ |
 | S-05 | Chống spam cho thảo luận công khai và form liên hệ chỉ có ở trình duyệt (đăng ký và trợ lý ảo đã có giới hạn phía server) | Có thể bị gửi hàng loạt |
-| S-06 | Tắt "Leaked Password Protection" của Supabase Auth (cảnh báo của Supabase Advisor) | Người dùng đặt được mật khẩu đã bị lộ |
-| S-07 | Quyền bảng (GRANT) cho `anon`/`authenticated` ở mức mặc định rộng; RLS đang chặn đúng nhưng nên thu hẹp để phòng vệ hai lớp | Giảm lớp phòng vệ |
-| D-03 | Thêm môn học trong admin: lưu được nhưng danh sách không cập nhật, form không xóa (`event.currentTarget` dùng sau `await`) | Dễ bấm lại, báo trùng | Đã sửa ở PR #3, chờ duyệt |
-| D-02 | Bảng `comments` không có policy UPDATE, nên khi admin sửa bài tập, thông tin bài tập lưu kèm nhận xét không được cập nhật (lỗi bị bỏ qua) | Nhận xét cũ hiện tiêu đề/ngày cũ |
+| S-06 | Tắt "Leaked Password Protection" của Supabase Auth (cảnh báo của Supabase Advisor) | Người dùng đặt được mật khẩu đã bị lộ — tính năng chỉ có từ gói Pro; dự án đang dùng gói Free |
+| S-07 | Quyền bảng (GRANT) cho `anon`/`authenticated` ở mức mặc định rộng | Giảm lớp phòng vệ — **Một phần đã sửa** 28/10/2026: thu hồi TRUNCATE, TRIGGER, REFERENCES; SELECT/INSERT/UPDATE/DELETE vẫn do RLS chặn |
+| D-03 | Thêm môn học trong admin: lưu được nhưng danh sách không cập nhật, form không xóa (`event.currentTarget` dùng sau `await`) | Dễ bấm lại, báo trùng | **Đã sửa** (PR #3, đã deploy) |
+| D-02 | Bảng `comments` không có policy UPDATE, nên khi admin sửa bài tập, thông tin bài tập lưu kèm nhận xét không được cập nhật (lỗi bị bỏ qua) | Nhận xét cũ hiện tiêu đề/ngày cũ — **Đã sửa** 28/10/2026: thêm policy `comments_admin_update` |
 | L-06 | Trợ lý ảo (`geo-ai`) luôn trả lời tiếng Việt và từ chối câu hỏi ngoài phạm vi bằng tiếng Việt | Trộn ngôn ngữ ở EN/FR |
 | C-01 | Service worker trả HTML đã cache khi mạng chậm hơn 1,2 s; trang xem tài liệu cache riêng mỗi `?id=`, không giới hạn | Có thể thấy bản cũ sau deploy; cache phình dần |
 
