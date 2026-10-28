@@ -8,7 +8,7 @@
 | --- | --- |
 | Service | `srv-datbm7qd0e5s73betpbg` (Static Site), tạo 28/09/2026 |
 | Repository / nhánh | `taiphan110125-maker/phan-tan-tai-geoscience-portfolio` / `main` |
-| Tự động deploy | **Bật**, mỗi commit lên `main` deploy ngay |
+| Tự động deploy | Cấu hình ghi **bật**, nhưng **thực tế không chạy**: ngày 28/10/2026, merge PR #1–#3 vào `main` không tạo deploy nào. Mọi deploy trong lịch sử đều kích hoạt qua API/thủ công (`trigger: api`) |
 | Build command | `echo ready` (không build) |
 | Publish directory | `.` (toàn bộ thư mục gốc) |
 | Pull Request Previews | **Tắt** |
@@ -19,7 +19,9 @@
 
 - Cloudflare đứng trước và cache file tối đa 300 giây (`s-maxage=300`).
 - Header tùy chỉnh, rewrite/redirect và biến môi trường: connector không trả về; trang không cần biến môi trường vì không có bước build.
-- Vì auto-deploy bật, **mọi commit lên `main` là lên production**. Chỉ merge khi đã duyệt.
+- Merge vào `main` **chưa** đưa thay đổi lên website. Phải deploy thủ công: Render Dashboard › service › **Manual Deploy › Deploy latest commit**.
+- Nguyên nhân có thể: Render chưa được cấp quyền GitHub cho repository (repo được nối bằng URL công khai). Muốn tự deploy: Render › Account Settings › GitHub › cấp quyền cho repository này, rồi kiểm tra lại bằng một commit nhỏ.
+- Sau khi bật được tự deploy, mọi commit lên `main` sẽ lên production ngay; chỉ merge khi đã duyệt.
 - Toàn bộ thư mục gốc được phát công khai, kể cả `README.md` và thư mục `docs/`. Không đặt thông tin bí mật vào repository.
 
 ## Quy trình đề xuất
@@ -57,7 +59,7 @@ main ──► nhánh mới (fix/… · feat/… · docs/…) ──► commit �
 
 | Tình huống | Cách khôi phục | Thời gian |
 | --- | --- | --- |
-| PR vừa merge gây lỗi | `git revert <commit>` → push `main` → Render tự deploy (nếu bật auto-deploy) | Vài phút |
+| PR vừa merge gây lỗi | `git revert <commit>` → push `main` → Manual Deploy trên Render | Vài phút |
 | Cần quay lại ngay, chưa kịp sửa mã | Render Dashboard › service › Deploys › chọn bản deploy trước › **Rollback** | Dưới 1 phút |
 | Người dùng vẫn thấy bản cũ sau khi khôi phục | Tăng `CACHE_NAME` trong `sw.js`; Cloudflare tự hết hạn sau 300 s | Một lần tải lại |
 | Service worker gây lỗi nghiêm trọng | Deploy một `sw.js` chỉ gồm: `self.addEventListener('install',()=>self.skipWaiting()); self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(k=>Promise.all(k.map(c=>caches.delete(c)))).then(()=>self.registration.unregister())));` | Lần tải kế tiếp |
