@@ -1,19 +1,18 @@
-"""Form values must not depend on the interface language.
+"""Giá trị form lưu vào database không được phụ thuộc ngôn ngữ giao diện.
 
-Checks the contact form (messages.topic) and the private feedback form
-(comments.role) in Vietnamese, English and French, including a language switch
-while the form is open, and that an invalid value is refused with a visible
-error and no request.
+Kiểm tra form Liên hệ (messages.topic) và form Nhận xét riêng (comments.role)
+ở Tiếng Việt, English, Français; cả trường hợp đổi ngôn ngữ khi form đang mở;
+và giá trị không hợp lệ phải bị từ chối, có thông báo lỗi, không gửi request.
 
-No real data is written: every request to Supabase is answered inside the
-browser by this script, and Realtime WebSockets are mocked, never connected.
+Không ghi dữ liệu thật: mọi request tới Supabase được script trả lời ngay trong
+trình duyệt, kết nối Realtime (WebSocket) được giả lập, không nối tới máy chủ.
 
-Run from the repository root:
+Chạy từ thư mục gốc repository:
     pip install playwright && python -m playwright install chromium
     python tests/form_values_test.py
 
-Optional: SUPABASE_JS_PATH=/path/to/supabase.js serves supabase-js locally
-instead of fetching it from cdn.jsdelivr.net.
+Tùy chọn: SUPABASE_JS_PATH=/duong/dan/supabase.js để dùng supabase-js cục bộ
+thay vì tải từ cdn.jsdelivr.net.
 """
 import functools
 import http.server
@@ -58,7 +57,7 @@ def check(condition, message):
         passed += 1
     else:
         failures.append(message)
-        print('  FAIL', message)
+        print('  LỖI', message)
 
 
 def serve():
@@ -73,7 +72,7 @@ def serve():
 
 
 class FakeSupabase:
-    """Answers every Supabase request locally and records writes."""
+    """Trả lời mọi request Supabase ngay tại chỗ và ghi lại các lần ghi dữ liệu."""
 
     def __init__(self):
         self.writes = []
@@ -115,14 +114,14 @@ def open_page(browser, base, lang, fake, mobile=False):
         context.route('https://cdn.jsdelivr.net/**', lambda r: r.fulfill(status=200, body=body,
                       headers={'content-type': 'application/javascript'}))
     page = context.new_page()
-    # Mock every WebSocket (Supabase Realtime): never connected to a real server.
+    # Giả lập mọi WebSocket (Supabase Realtime): không bao giờ nối tới máy chủ thật.
     page.route_web_socket('**', lambda ws: None)
     errors = []
     page.on('pageerror', lambda e: errors.append(str(e)))
     page.add_init_script(f"localStorage.setItem('ptt-site-language','{lang}')")
     page.goto(base + '/index.html', wait_until='load')
     page.wait_for_function('typeof syncUserUI === "function" && window.supabase && assignments.length > 0', timeout=20000)
-    page.wait_for_timeout(800)  # let the initial auth state event settle before the test signs in
+    page.wait_for_timeout(800)  # chờ sự kiện trạng thái đăng nhập ban đầu xong rồi mới đăng nhập giả
     return context, page, errors
 
 
@@ -178,21 +177,21 @@ def main():
                 context, page, errors = open_page(browser, base, lang, fake, mobile)
 
                 check(option_labels(page, '#contactForm select[name=topic]') == LABELS[lang]['topic'],
-                      f'{tag} contact topic labels {option_labels(page, "#contactForm select[name=topic]")}')
+                      f'{tag} nhãn Chủ đề sai: {option_labels(page, "#contactForm select[name=topic]")}')
                 for i, expected in enumerate(TOPICS):
                     writes = submit_contact(page, fake, i)
                     check(len(writes) == 1 and writes[0][0] == 'messages' and writes[0][1].get('topic') == expected,
-                          f'{tag} contact topic #{i}: expected {expected!r}, sent {writes}')
+                          f'{tag} Chủ đề #{i}: cần {expected!r}, đã gửi {writes}')
 
                 open_comment(page)
                 check(option_labels(page, '#commentRole') == LABELS[lang]['role'],
-                      f'{tag} comment role labels {option_labels(page, "#commentRole")}')
+                      f'{tag} nhãn Vai trò sai: {option_labels(page, "#commentRole")}')
                 for i, expected in enumerate(ROLES):
                     writes = submit_comment(page, fake, i)
                     check(len(writes) == 1 and writes[0][0] == 'comments' and writes[0][1].get('role') == expected,
-                          f'{tag} comment role #{i}: expected {expected!r}, sent {writes}')
+                          f'{tag} Vai trò #{i}: cần {expected!r}, đã gửi {writes}')
 
-                # Invalid value: an option whose value is a translated label must be refused.
+                # Giá trị không hợp lệ: lựa chọn có value là nhãn đã dịch phải bị từ chối.
                 page.evaluate("""() => { const o = new Option('Lecturer', 'Lecturer');
                     document.getElementById('commentRole').add(o); }""")
                 before = len(fake.writes)
@@ -200,10 +199,10 @@ def main():
                 page.eval_on_selector('#commentRole', 's => { s.selectedIndex = s.options.length - 1; }')
                 page.evaluate("document.getElementById('commentForm').requestSubmit()")
                 page.wait_for_timeout(400)
-                check(page.eval_on_selector('#commentRole', 's => s.value') == 'Lecturer', f'{tag} invalid role not selected')
-                check(len(fake.writes) == before, f'{tag} invalid role was sent')
+                check(page.eval_on_selector('#commentRole', 's => s.value') == 'Lecturer', f'{tag} chưa chọn được vai trò không hợp lệ')
+                check(len(fake.writes) == before, f'{tag} vai trò không hợp lệ vẫn bị gửi đi')
                 check(page.text_content('#commentStatus').strip() == ERRORS[lang]['role'],
-                      f'{tag} invalid role message: {page.text_content("#commentStatus")!r}')
+                      f'{tag} thông báo lỗi Vai trò sai: {page.text_content("#commentStatus")!r}')
                 page.keyboard.press('Escape')
 
                 page.evaluate("""() => { const o = new Option('Academic exchange', 'Academic exchange');
@@ -217,15 +216,15 @@ def main():
                 page.evaluate("document.getElementById('contactForm').requestSubmit()")
                 page.wait_for_timeout(400)
                 check(page.eval_on_selector('#contactForm select[name=topic]', 's => s.value') == 'Academic exchange',
-                      f'{tag} invalid topic not selected')
-                check(len(fake.writes) == before, f'{tag} invalid topic was sent')
+                      f'{tag} chưa chọn được chủ đề không hợp lệ')
+                check(len(fake.writes) == before, f'{tag} chủ đề không hợp lệ vẫn bị gửi đi')
                 check(page.text_content('#contactStatus').strip() == ERRORS[lang]['topic'],
-                      f'{tag} invalid topic message: {page.text_content("#contactStatus")!r}')
+                      f'{tag} thông báo lỗi Chủ đề sai: {page.text_content("#contactStatus")!r}')
 
-                check(not errors, f'{tag} page errors: {errors}')
+                check(not errors, f'{tag} lỗi JavaScript trên trang: {errors}')
                 context.close()
 
-        # Switching language while a form is open keeps the selection and the stored value.
+        # Đổi ngôn ngữ khi form đang mở: giữ nguyên lựa chọn và giá trị lưu.
         for start, middle, end in [('vi', 'en', 'fr'), ('fr', 'vi', 'en'), ('en', 'fr', 'vi')]:
             tag = f'[switch {start}->{middle}->{end}]'
             print(tag)
@@ -234,15 +233,15 @@ def main():
             page.select_option('#commentRole', index=1)
             set_language(page, middle)
             set_language(page, end)
-            check(page.eval_on_selector('#commentRole', 's => s.selectedIndex') == 1, f'{tag} role selection lost')
-            check(option_labels(page, '#commentRole') == LABELS[end]['role'], f'{tag} role labels not in {end}')
+            check(page.eval_on_selector('#commentRole', 's => s.selectedIndex') == 1, f'{tag} mất lựa chọn Vai trò')
+            check(option_labels(page, '#commentRole') == LABELS[end]['role'], f'{tag} nhãn Vai trò không ở ngôn ngữ {end}')
             before = len(fake.writes)
             page.fill('#commentName', 'Kiểm thử')
             page.fill('#commentText', 'Nhận xét sau khi đổi ngôn ngữ.')
             page.evaluate("document.getElementById('commentForm').requestSubmit()")
             page.wait_for_timeout(500)
             writes = fake.writes[before:]
-            check(len(writes) == 1 and writes[0][1].get('role') == 'Sinh viên', f'{tag} comment sent {writes}')
+            check(len(writes) == 1 and writes[0][1].get('role') == 'Sinh viên', f'{tag} nhận xét đã gửi {writes}')
             page.keyboard.press('Escape')
 
             set_language(page, start)
@@ -257,15 +256,15 @@ def main():
             page.evaluate("document.getElementById('contactForm').requestSubmit()")
             page.wait_for_timeout(500)
             writes = fake.writes[before:]
-            check(len(writes) == 1 and writes[0][1].get('topic') == 'Hợp tác nghiên cứu', f'{tag} contact sent {writes}')
-            check(not errors, f'{tag} page errors: {errors}')
+            check(len(writes) == 1 and writes[0][1].get('topic') == 'Hợp tác nghiên cứu', f'{tag} lời nhắn đã gửi {writes}')
+            check(not errors, f'{tag} lỗi JavaScript trên trang: {errors}')
             context.close()
 
         browser.close()
     server.shutdown()
 
-    check(not fake.unexpected, f'unexpected Supabase requests: {fake.unexpected}')
-    print(f'\n{passed} checks passed, {len(failures)} failed; {len(fake.writes)} writes answered locally, 0 sent to Supabase.')
+    check(not fake.unexpected, f'request Supabase ngoài dự kiến: {fake.unexpected}')
+    print(f'\n{passed} kiểm tra đạt, {len(failures)} lỗi; {len(fake.writes)} lần ghi được trả lời tại chỗ, 0 lần gửi tới Supabase.')
     sys.exit(1 if failures else 0)
 
 
