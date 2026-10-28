@@ -2244,8 +2244,55 @@ body{color:var(--ink-strong)!important}
 }
 @media(prefers-reduced-motion:reduce){.site-header *{transition:none!important}}
 </style>
+<style id="ptt-motion-v1">
+/* =========================================================
+   CHUYỂN ĐỘNG V1 — nhẹ, chỉ dùng transform/opacity
+   Tắt hoàn toàn khi người dùng bật "giảm chuyển động".
+   ========================================================= */
+.scroll-progress{position:fixed;top:0;left:0;right:0;height:3px;z-index:300;pointer-events:none;
+  background:linear-gradient(90deg,var(--gold,#d9a95c),var(--gold-2,#f0c980));
+  transform-origin:0 50%;transform:scaleX(0)}
+.hero-trace{display:block;width:min(320px,70vw);height:28px;margin:6px 0 14px;overflow:visible}
+.hero-trace path{fill:none;stroke:var(--gold-2,#f0c980);stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;opacity:.9}
+@media (prefers-reduced-motion:no-preference){
+  /* Ảnh nền trang chủ: thu nhẹ một lần khi mở trang */
+  .hero-media{animation:ptt-hero-zoom 14s cubic-bezier(.2,.6,.2,1) both}
+  @keyframes ptt-hero-zoom{from{transform:scale(1.07)}to{transform:scale(1)}}
+  /* Chữ trang chủ hiện lần lượt */
+  .hero-copy>*{animation:ptt-rise .8s cubic-bezier(.2,.7,.2,1) both}
+  .hero-copy>:nth-child(1){animation-delay:.05s}
+  .hero-copy>:nth-child(2){animation-delay:.15s}
+  .hero-copy>:nth-child(3){animation-delay:.25s}
+  .hero-copy>:nth-child(4){animation-delay:.35s}
+  .hero-copy>:nth-child(5){animation-delay:.45s}
+  .hero-copy>:nth-child(6){animation-delay:.55s}
+  .hero-copy>:nth-child(7){animation-delay:.65s}
+  .hero-brief{animation:ptt-rise .9s .5s cubic-bezier(.2,.7,.2,1) both}
+  @keyframes ptt-rise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+  /* Vết địa chấn tự vẽ ra, sau đó một xung sáng chạy dọc theo vết */
+  .hero-trace path{stroke-dasharray:1;stroke-dashoffset:1;animation:ptt-draw 2.4s .5s cubic-bezier(.45,0,.2,1) forwards}
+  .hero-trace .trace-glow{stroke:#fff;stroke-width:2.2;opacity:.85;stroke-dasharray:.06 .94;stroke-dashoffset:1.06;
+    filter:drop-shadow(0 0 4px rgba(240,201,128,.9));animation:ptt-pulse 4.5s 3s linear infinite}
+  @keyframes ptt-draw{to{stroke-dashoffset:0}}
+  @keyframes ptt-pulse{from{stroke-dashoffset:1.06}to{stroke-dashoffset:0}}
+  /* Mũi tên "Khám phá" nhấp nhẹ */
+  .scroll-cue{animation:ptt-bob 2.4s 1.6s ease-in-out infinite}
+  @keyframes ptt-bob{0%,100%{transform:translateY(0)}50%{transform:translateY(6px)}}
+  /* Nút vàng: vệt sáng lướt qua khi rê chuột */
+  .btn-gold{position:relative;overflow:hidden}
+  .btn-gold::after{content:"";position:absolute;inset:0;transform:translateX(-120%) skewX(-18deg);
+    background:linear-gradient(90deg,transparent,rgba(255,255,255,.45),transparent);pointer-events:none}
+  .btn-gold:hover::after{transition:transform .7s ease;transform:translateX(120%) skewX(-18deg)}
+  /* Thẻ dự án: ảnh phóng nhẹ khi rê chuột */
+  .project-user-image{overflow:hidden}
+  .project-user-image img{transition:transform .6s cubic-bezier(.2,.7,.2,1)}
+  .project-user-card:hover .project-user-image img{transform:scale(1.045)}
+}
+@media (prefers-reduced-motion:reduce){.scroll-progress{display:none}}
+</style>
 </head>
 <body>
+  <div class="scroll-progress" id="scrollProgress" aria-hidden="true"></div>
   <a class="skip-link" href="#main">Bỏ qua menu</a>
 
   <header class="site-header" id="siteHeader">
@@ -2300,6 +2347,7 @@ body{color:var(--ink-strong)!important}
           <p class="kicker">HỒ SƠ HỌC THUẬT</p>
           <h1 id="heroTitle">Phan Tấn Tài</h1>
           <h2>Địa chất <span>&amp; Địa vật lý</span></h2>
+          <svg class="hero-trace" viewBox="0 0 320 24" preserveAspectRatio="none" aria-hidden="true" focusable="false"><path pathLength="1" d="M0,12.0 L2,11.4 L4,12.3 L6,12.5 L8,11.5 L10,11.8 L12,12.6 L14,12.0 L16,11.4 L18,12.3 L20,12.5 L22,11.5 L24,11.8 L26,12.6 L28,12.0 L30,11.4 L32,12.3 L34,12.4 L36,11.5 L38,11.8 L40,12.6 L42,11.9 L44,11.4 L46,12.3 L48,12.4 L50,11.5 L52,11.8 L54,12.6 L56,11.9 L58,11.4 L60,12.4 L62,12.9 L64,13.9 L66,15.7 L68,10.2 L70,2.9 L72,9.1 L74,16.3 L76,14.8 L78,12.0 L80,11.9 L82,12.6 L84,11.9 L86,11.5 L88,12.4 L90,12.4 L92,11.5 L94,11.9 L96,12.6 L98,11.9 L100,11.5 L102,12.4 L104,12.4 L106,11.5 L108,11.9 L110,12.6 L112,11.8 L114,11.5 L116,12.4 L118,12.3 L120,11.4 L122,11.9 L124,12.6 L126,11.8 L128,11.5 L130,12.4 L132,12.3 L134,11.4 L136,11.9 L138,12.6 L140,11.8 L142,11.5 L144,12.8 L146,14.5 L148,11.9 L150,5.9 L152,13.1 L154,14.0 L156,11.8 L158,12.5 L160,12.3 L162,11.4 L164,12.0 L166,12.6 L168,11.8 L170,11.5 L172,12.5 L174,12.3 L176,11.4 L178,12.0 L180,12.6 L182,11.7 L184,11.5 L186,12.5 L188,12.3 L190,11.4 L192,12.0 L194,12.6 L196,11.7 L198,11.5 L200,12.5 L202,12.2 L204,11.5 L206,12.6 L208,14.9 L210,16.2 L212,12.3 L214,4.3 L216,4.0 L218,12.2 L220,16.5 L222,14.9 L224,12.2 L226,11.6 L228,12.5 L230,12.2 L232,11.4 L234,12.1 L236,12.6 L238,11.7 L240,11.6 L242,12.5 L244,12.2 L246,11.4 L248,12.1 L250,12.6 L252,11.7 L254,11.6 L256,12.5 L258,12.2 L260,11.4 L262,12.1 L264,12.6 L266,11.6 L268,11.6 L270,12.5 L272,12.1 L274,11.4 L276,13.1 L278,13.6 L280,7.6 L282,12.6 L284,13.5 L286,12.2 L288,11.4 L290,12.1 L292,12.5 L294,11.6 L296,11.6 L298,12.6 L300,12.1 L302,11.4 L304,12.2 L306,12.5 L308,11.6 L310,11.7 L312,12.6 L314,12.1 L316,11.4 L318,12.2 L320,12.5"/><path class="trace-glow" pathLength="1" d="M0,12.0 L2,11.4 L4,12.3 L6,12.5 L8,11.5 L10,11.8 L12,12.6 L14,12.0 L16,11.4 L18,12.3 L20,12.5 L22,11.5 L24,11.8 L26,12.6 L28,12.0 L30,11.4 L32,12.3 L34,12.4 L36,11.5 L38,11.8 L40,12.6 L42,11.9 L44,11.4 L46,12.3 L48,12.4 L50,11.5 L52,11.8 L54,12.6 L56,11.9 L58,11.4 L60,12.4 L62,12.9 L64,13.9 L66,15.7 L68,10.2 L70,2.9 L72,9.1 L74,16.3 L76,14.8 L78,12.0 L80,11.9 L82,12.6 L84,11.9 L86,11.5 L88,12.4 L90,12.4 L92,11.5 L94,11.9 L96,12.6 L98,11.9 L100,11.5 L102,12.4 L104,12.4 L106,11.5 L108,11.9 L110,12.6 L112,11.8 L114,11.5 L116,12.4 L118,12.3 L120,11.4 L122,11.9 L124,12.6 L126,11.8 L128,11.5 L130,12.4 L132,12.3 L134,11.4 L136,11.9 L138,12.6 L140,11.8 L142,11.5 L144,12.8 L146,14.5 L148,11.9 L150,5.9 L152,13.1 L154,14.0 L156,11.8 L158,12.5 L160,12.3 L162,11.4 L164,12.0 L166,12.6 L168,11.8 L170,11.5 L172,12.5 L174,12.3 L176,11.4 L178,12.0 L180,12.6 L182,11.7 L184,11.5 L186,12.5 L188,12.3 L190,11.4 L192,12.0 L194,12.6 L196,11.7 L198,11.5 L200,12.5 L202,12.2 L204,11.5 L206,12.6 L208,14.9 L210,16.2 L212,12.3 L214,4.3 L216,4.0 L218,12.2 L220,16.5 L222,14.9 L224,12.2 L226,11.6 L228,12.5 L230,12.2 L232,11.4 L234,12.1 L236,12.6 L238,11.7 L240,11.6 L242,12.5 L244,12.2 L246,11.4 L248,12.1 L250,12.6 L252,11.7 L254,11.6 L256,12.5 L258,12.2 L260,11.4 L262,12.1 L264,12.6 L266,11.6 L268,11.6 L270,12.5 L272,12.1 L274,11.4 L276,13.1 L278,13.6 L280,7.6 L282,12.6 L284,13.5 L286,12.2 L288,11.4 L290,12.1 L292,12.5 L294,11.6 L296,11.6 L298,12.6 L300,12.1 L302,11.4 L304,12.2 L306,12.5 L308,11.6 L310,11.7 L312,12.6 L314,12.1 L316,11.4 L318,12.2 L320,12.5"/></svg>
           <p class="hero-lead">Dự án nghiên cứu, tài liệu chuyên ngành và kinh nghiệm khảo sát địa chất – địa vật lý.</p>
           <div class="hero-actions">
             <a class="btn btn-gold" href="#projects">Xem dự án <span>→</span></a>
@@ -3993,6 +4041,46 @@ if('serviceWorker' in navigator){
 </script>
 
 
+<script>
+// Chuyển động V1: thanh tiến trình cuộn và số liệu đếm lên khi cuộn tới.
+(function(){
+  'use strict';
+  const reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const bar=document.getElementById('scrollProgress');
+  if(bar&&!reduce){
+    let frame=0;
+    const update=()=>{
+      frame=0;
+      const max=document.documentElement.scrollHeight-window.innerHeight;
+      bar.style.transform='scaleX('+(max>0?Math.min(1,window.scrollY/max):0)+')';
+    };
+    window.addEventListener('scroll',()=>{if(!frame)frame=requestAnimationFrame(update);},{passive:true});
+    window.addEventListener('resize',update,{passive:true});
+    update();
+  }
+  const stats=[...document.querySelectorAll('.stats-row strong')];
+  if(reduce||!stats.length||!('IntersectionObserver' in window))return;
+  const run=el=>{
+    const text=el.textContent.trim();
+    const m=text.match(/^(\d+)(.*)$/);
+    if(!m)return;
+    const target=Number(m[1]),suffix=m[2],pad=m[1].length,start=performance.now(),dur=900;
+    let written=text;
+    const step=now=>{
+      if(el.textContent.trim()!==written)return; // dữ liệu mới vừa ghi đè: dừng, giữ số mới
+      const k=Math.min(1,(now-start)/dur),v=Math.round(target*(1-Math.pow(1-k,3)));
+      written=k<1?String(v).padStart(pad,'0')+suffix:text;
+      el.textContent=written;
+      if(k<1)requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  };
+  const io=new IntersectionObserver(entries=>{
+    if(entries.some(e=>e.isIntersecting)){io.disconnect();stats.forEach(run);}
+  },{threshold:.6});
+  io.observe(stats[0].closest('.stats-row'));
+})();
+</script>
 <script src="assets/site-language.js?v=20261028-perf2" defer></script>
 </body>
 </html>
