@@ -2461,7 +2461,7 @@ body{color:var(--ink-strong)!important}
             <label>Họ và tên<input name="name" required minlength="2" maxlength="100" autocomplete="name" placeholder="Nguyễn Văn A"></label>
             <label>Email<input name="email" type="email" required maxlength="160" autocomplete="email" placeholder="email@example.com"></label>
           </div>
-          <label>Chủ đề<select name="topic"><option>Trao đổi học thuật</option><option>Góp ý bài tập</option><option>Hợp tác nghiên cứu</option><option>Khác</option></select></label>
+          <label>Chủ đề<select name="topic"><option value="Trao đổi học thuật">Trao đổi học thuật</option><option value="Góp ý bài tập">Góp ý bài tập</option><option value="Hợp tác nghiên cứu">Hợp tác nghiên cứu</option><option value="Khác">Khác</option></select></label>
           <label>Nội dung<textarea name="message" rows="5" required minlength="10" maxlength="2000" placeholder="Nội dung bạn muốn trao đổi..."></textarea></label>
           <div class="form-footer"><small>Lời nhắn được lưu vào hệ thống quản trị để tôi có thể xem và phản hồi.</small><button class="btn btn-dark" type="submit">Gửi lời nhắn</button></div>
           <p class="form-status" id="contactStatus" role="status"></p>
@@ -2584,7 +2584,7 @@ body{color:var(--ink-strong)!important}
       <form id="commentForm" class="stack-form">
         <input type="hidden" id="commentAssignmentId">
         <label>Họ tên<input id="commentName" required minlength="2" maxlength="100" autocomplete="name" placeholder="Tên người nhận xét"></label>
-        <label>Vai trò<select id="commentRole"><option>Giảng viên</option><option>Sinh viên</option><option>Khách</option></select></label>
+        <label>Vai trò<select id="commentRole"><option value="Giảng viên">Giảng viên</option><option value="Sinh viên">Sinh viên</option><option value="Khách">Khách</option></select></label>
         <label>Nhận xét<textarea id="commentText" rows="5" required minlength="5" maxlength="2000" placeholder="Nhận xét về bài làm..."></textarea></label>
         <button class="btn btn-dark" type="submit">Lưu nhận xét</button>
         <p class="form-status" id="commentStatus" role="status"></p>
@@ -2804,6 +2804,11 @@ function configurationError(){
   return new Error('Dịch vụ dữ liệu hiện chưa khả dụng.');
 }
 function requireSupabase(){ if (!sb) throw configurationError(); return sb; }
+// Giá trị chuẩn lưu vào Supabase, không phụ thuộc ngôn ngữ giao diện:
+// bộ chọn ngôn ngữ chỉ dịch nhãn hiển thị của các lựa chọn.
+const CONTACT_TOPIC_VALUES=Object.freeze(['Trao đổi học thuật','Góp ý bài tập','Hợp tác nghiên cứu','Khác']);
+const COMMENT_ROLE_VALUES=Object.freeze(['Giảng viên','Sinh viên','Khách']);
+function isAllowedValue(value,allowed){ return typeof value==='string'&&allowed.includes(value); }
 function formatDate(value){
   if (!value) return '';
   try { return new Date(value).toLocaleDateString('vi-VN', {month:'2-digit', year:'numeric'}); }
@@ -3352,6 +3357,12 @@ $('#commentForm')?.addEventListener('submit',async event=>{
     form.reportValidity();
     return;
   }
+  if(!isAllowedValue(role,COMMENT_ROLE_VALUES)){
+    console.warn('Từ chối giá trị vai trò không hợp lệ:',role);
+    $('#commentStatus').textContent='Vai trò không hợp lệ. Vui lòng chọn lại trong danh sách.';
+    $('#commentRole')?.focus();
+    return;
+  }
   const submit=form.querySelector('button[type="submit"]');
   submit.disabled=true;
   $('#commentStatus').textContent='Đang gửi riêng tư…';
@@ -3437,6 +3448,12 @@ $('#contactForm')?.addEventListener('submit', async event => {
     return;
   }
   const data = Object.fromEntries(new FormData(form).entries());
+  if(!isAllowedValue(data.topic,CONTACT_TOPIC_VALUES)){
+    console.warn('Từ chối giá trị chủ đề không hợp lệ:',data.topic);
+    $('#contactStatus').textContent='Chủ đề không hợp lệ. Vui lòng chọn lại trong danh sách.';
+    form.querySelector('select[name="topic"]')?.focus();
+    return;
+  }
   if(String(data.website||'').trim()){
     form.reset();
     $('#contactStatus').textContent='Đã gửi lời nhắn thành công.';
@@ -3975,6 +3992,6 @@ if('serviceWorker' in navigator){
 </script>
 
 
-<script src="assets/site-language.js?v=20261015-perf1" defer></script>
+<script src="assets/site-language.js?v=20261028-formvalues1" defer></script>
 </body>
 </html>
