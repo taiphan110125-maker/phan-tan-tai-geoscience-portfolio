@@ -2339,6 +2339,89 @@ main section:not(.hero) h2::before{
   #about .stats-row span{font-size:10px!important;line-height:1.35;display:block}
 }
 </style>
+<style id="ptt-header-footer-v2">
+/* Header: biểu tượng SVG sắc nét thay ký tự (🌐 ⌄ ⌕ ☰), các nút cùng chiều cao/viền/bo góc. */
+.site-header .hd-ico{width:17px;height:17px;display:block}
+.site-header .hd-chev{width:14px;height:14px;display:block}
+.site-header .shell.nav-row{min-height:72px!important}
+.site-header .primary-nav{gap:clamp(4px,.6vw,10px)!important}
+.site-header .primary-nav a{padding:9px 12px!important;border-radius:10px;font-size:13px!important;font-weight:600!important;color:#4a6377!important;transition:background .18s,color .18s}
+.site-header .primary-nav a::after{display:none!important}
+.site-header .primary-nav a:hover{background:#f1f6f9;color:#15466d!important}
+.site-header .primary-nav a.active{background:#eaf2f8;color:#123f63!important;font-weight:700!important}
+.site-header .site-language-control,.site-header .global-search-open,.site-header .account-chip,.site-header .btn-login,.site-header .btn-register,.site-header .nav-toggle{height:40px!important;min-height:40px!important;border-radius:12px!important}
+.site-header .site-language-control,.site-header .global-search-open,.site-header .account-chip,.site-header .btn-login{background:#fff!important;border:1px solid #dfe8ee!important;color:#29506b!important}
+.site-header .site-language-control:hover,.site-header .global-search-open:hover,.site-header .account-chip:hover,.site-header .btn-login:hover{background:#f6f9fb!important;border-color:#bfd3e0!important}
+.site-header .site-language-control{padding:0 30px 0 11px!important;gap:7px!important}
+.site-header .site-language-icon{display:flex;color:#3b7aa3;font-size:0!important}
+.site-header .site-language-control select{font-size:12.5px!important;font-weight:600!important;padding-right:0!important;max-width:110px!important}
+.site-header .site-language-chevron{right:10px!important;display:flex;color:#7d95a6;font-size:0!important}
+.site-header .global-search-open{padding:0 8px 0 12px!important;gap:8px!important;font-size:12.5px!important}
+.site-header .hd-search-ico{display:flex;color:#3b7aa3}
+.site-header .global-search-open kbd{font:600 10px/1 "Segoe UI",Arial,sans-serif!important;padding:4px 6px!important;border-radius:6px!important;border:1px solid #e3eaef!important;background:#f5f8fa!important;color:#8396a4!important}
+.site-header .account-chip{padding:0 10px 0 5px!important;gap:8px!important}
+.site-header .account-avatar{width:30px!important;height:30px!important;border-radius:9px!important;background:linear-gradient(145deg,#1d5a86,#123c5c)!important;color:#fff!important;font-weight:700!important}
+.site-header .account-copy strong{font-size:12.5px!important;font-weight:650!important}
+.site-header .account-chev{display:flex;color:#7d95a6}
+.site-header .account-chip[aria-expanded="true"] .account-chev{transform:rotate(180deg)}
+.site-header .account-menu{border-radius:14px!important;border:1px solid #dfe8ee!important;box-shadow:0 18px 44px rgba(19,55,78,.14)!important}
+.site-header .nav-toggle{font-size:0!important}
+.site-header .nav-toggle svg{width:20px;height:20px}
+@media(max-width:1250px){.site-header .primary-nav a{padding:8px 9px!important;font-size:12px!important}}
+@media(max-width:1080px){.site-header .primary-nav.open a{padding:12px 12px!important}}
+@media(max-width:700px){
+ .site-header .shell.nav-row{min-height:64px!important}
+ .site-header .site-language-control,.site-header .global-search-open,.site-header .account-chip,.site-header .btn-register,.site-header .nav-toggle{height:38px!important;min-height:38px!important}
+ .site-header .site-language-control{padding:0 22px 0 8px!important;gap:5px!important}
+ .site-header .site-language-control select{font-size:11px!important;max-width:70px!important}
+ .site-header .site-language-chevron{right:6px!important}
+ .site-header .global-search-open{padding:0!important}
+}
+
+/* Footer: nền xanh đậm khép trang, 3 cột (giới thiệu · điều hướng · liên hệ). */
+.site-footer{background:#071c29!important;border-top:0!important;padding:56px 0 22px!important;color:#c7d5de}
+.site-footer .footer-grid-v2{display:grid;grid-template-columns:1.5fr 1fr 1.2fr;gap:48px;align-items:start}
+.site-footer .footer-brand{display:inline-flex!important;align-items:center;gap:13px;margin:0 0 16px!important;text-decoration:none}
+.site-footer .footer-emblem{width:52px!important;height:52px!important;flex:0 0 52px;background:#fff;border-radius:14px;padding:5px}
+.site-footer .footer-brand .brand-copy strong{color:#fff!important;font-size:15px!important;letter-spacing:.14em!important;font-weight:800!important}
+.site-footer .footer-brand .brand-copy small{color:#d9b071!important;font-size:9px!important;letter-spacing:.16em!important;margin-top:5px}
+.site-footer .footer-tagline{margin:0!important;max-width:340px;font-size:13.5px!important;line-height:1.7;color:#93a9b7!important;text-align:left!important}
+.site-footer .footer-title{margin:4px 0 16px;font-size:11px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:#d9b071}
+.site-footer .footer-links{display:flex!important;flex-direction:column;align-items:flex-start;gap:11px!important;max-width:none!important;padding:0!important}
+.site-footer .footer-links a{color:#c7d5de!important;font-size:13.5px!important;font-weight:500!important;text-decoration:none;transition:color .18s,transform .18s}
+.site-footer .footer-links a:hover{color:#fff!important;transform:translateX(3px)}
+.site-footer .footer-contact-v2{display:flex;flex-direction:column;gap:14px}
+.site-footer .footer-contact-v2 a{display:flex;align-items:center;gap:12px;text-decoration:none;color:inherit;min-width:0}
+.site-footer .ft-ico{width:18px;height:18px;flex:0 0 auto}
+.site-footer .footer-contact-v2 .ft-ico{box-sizing:content-box;padding:10px;border-radius:12px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:#d9b071}
+.site-footer .footer-contact-v2 span{display:flex;flex-direction:column;min-width:0}
+.site-footer .footer-contact-v2 small{font-size:10.5px;color:#8098a8;letter-spacing:.04em}
+.site-footer .footer-contact-v2 strong{font-size:14px;font-weight:650;color:#fff;overflow-wrap:anywhere}
+.site-footer .footer-contact-v2 a:hover strong{color:#f0ca82}
+.site-footer .footer-bottom{margin-top:44px!important;padding-top:18px!important;border-top:1px solid rgba(255,255,255,.09)!important;display:flex;align-items:center;justify-content:space-between;gap:18px}
+.site-footer .footer-bottom p{margin:0!important;font-size:12px!important;color:#7890a0!important;text-align:left!important}
+.site-footer .footer-bottom-links{display:flex;align-items:center;gap:22px}
+.site-footer .footer-bottom a{display:inline-flex;align-items:center;gap:6px;color:#9fb3c0!important;font-size:12px!important;font-weight:600!important;text-decoration:none}
+.site-footer .footer-bottom a:hover{color:#fff!important}
+.site-footer .footer-bottom .ft-ico{width:14px;height:14px}
+.site-footer :focus-visible{outline:2px solid #f0ca82;outline-offset:3px;border-radius:6px}
+@media(max-width:900px){.site-footer .footer-grid-v2{grid-template-columns:1fr 1fr;gap:36px}.site-footer .footer-about{grid-column:1/-1}}
+@media(max-width:600px){
+ .site-footer{padding:44px 0 96px!important}
+ .site-footer .footer-grid-v2{grid-template-columns:1fr;gap:30px}
+ .site-footer .footer-links{flex-direction:row;flex-wrap:wrap;gap:10px 20px!important}
+ .site-footer .footer-links .footer-title{flex-basis:100%;margin-bottom:4px}
+ .site-footer .footer-bottom{flex-direction:column;align-items:flex-start;gap:12px;margin-top:34px!important}
+}
+@media(prefers-reduced-motion:reduce){.site-footer *{transition:none!important}}
+.site-header .brand-emblem-mobile{display:none}
+@media(max-width:520px){
+ .site-header .brand-lockup{display:none!important}
+ .site-header .brand-emblem-mobile{display:block;width:44px;height:44px}
+ .site-header .brand-header{flex:0 0 auto!important;margin-right:auto!important}
+}
+@media(max-width:1320px) and (min-width:601px){.site-footer .footer-bottom{padding-right:84px}}
+</style>
 </head>
 <body>
   <div class="scroll-progress" id="scrollProgress" aria-hidden="true"></div>
@@ -2348,9 +2431,10 @@ main section:not(.hero) h2::before{
     <div class="shell nav-row">
       <a class="brand brand-header" href="#home" aria-label="Phan Tấn Tài - Trang chủ">
         <img class="brand-lockup" src="assets/ptt-brand.svg" alt="Phan Tấn Tài — Địa chất và Địa vật lý" width="720" height="170" decoding="async">
+        <img class="brand-emblem-mobile" src="assets/ptt-emblem.svg" alt="" width="180" height="180" decoding="async">
       </a>
 
-      <button class="nav-toggle" id="navToggle" aria-label="Mở menu" aria-expanded="false">☰</button>
+      <button class="nav-toggle" id="navToggle" aria-label="Mở menu" aria-expanded="false"><svg class="hd-ico" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
       <nav class="primary-nav" id="primaryNav" aria-label="Điều hướng chính">
         <a class="active" href="#home">Trang chủ</a>
         <a href="#about">Giới thiệu</a>
@@ -2360,24 +2444,24 @@ main section:not(.hero) h2::before{
         <a href="#geo-ai">Trợ lý ảo</a>
       </nav>
       <label class="site-language-control" for="pttLanguageSelector">
-        <span class="site-language-icon" aria-hidden="true">🌐</span>
+        <span class="site-language-icon" aria-hidden="true"><svg class="hd-ico" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.6 2.7 3.9 5.7 3.9 9s-1.3 6.3-3.9 9c-2.6-2.7-3.9-5.7-3.9-9S9.4 5.7 12 3z"/></svg></span>
         <select id="pttLanguageSelector" aria-label="Ngôn ngữ website">
           <option value="vi">Tiếng Việt</option>
           <option value="en">English</option>
           <option value="fr">Français</option>
         </select>
-        <span class="site-language-chevron" aria-hidden="true">⌄</span>
+        <span class="site-language-chevron" aria-hidden="true"><svg class="hd-chev" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m6 9 6 6 6-6"/></svg></span>
       </label>
       <div class="account-actions" id="accountActions">
         <button class="global-search-open" id="globalSearchOpen" type="button" aria-label="Tìm kiếm toàn website" aria-haspopup="dialog">
-          <span aria-hidden="true">⌕</span><span class="global-search-label">Tìm kiếm</span><kbd>Ctrl K</kbd>
+          <span class="hd-search-ico" aria-hidden="true"><svg class="hd-ico" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></span><span class="global-search-label">Tìm kiếm</span><kbd>Ctrl K</kbd>
         </button>
         <button class="btn btn-outline btn-login" id="userLoginOpen">Đăng nhập</button>
         <button class="btn btn-gold btn-register" id="userRegisterOpen">Đăng ký</button>
         <button class="account-chip" id="userAccountBtn" type="button" hidden aria-haspopup="true" aria-expanded="false">
           <span class="account-avatar" id="userAvatar">U</span>
           <span class="account-copy"><strong id="userAccountName">Tài khoản</strong><small>Người dùng</small></span>
-          <span aria-hidden="true">⌄</span>
+          <span class="account-chev" aria-hidden="true"><svg class="hd-chev" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m6 9 6 6 6-6"/></svg></span>
         </button>
         <div class="account-menu" id="userAccountMenu" hidden>
           <div><strong id="userMenuName">Người dùng</strong><small id="userMenuEmail"></small></div>
@@ -2585,42 +2669,40 @@ main section:not(.hero) h2::before{
 
   <footer class="site-footer">
     <div class="shell footer-clean">
-      <div class="footer-main">
-        <div class="footer-left">
-          <div class="brand footer-brand">
+      <div class="footer-grid-v2">
+        <div class="footer-col footer-about">
+          <a class="brand footer-brand" href="#home" aria-label="Phan Tấn Tài - Trang chủ">
             <img class="footer-emblem" src="assets/ptt-emblem.svg" alt="" width="180" height="180" loading="lazy" decoding="async">
             <span class="brand-copy">
               <strong>PHAN TẤN TÀI</strong>
               <small>ĐỊA CHẤT · ĐỊA VẬT LÝ</small>
             </span>
-          </div>
-
-          <div class="footer-contact-inline" aria-label="Thông tin liên hệ">
-            <a href="mailto:phantantai1101@gmail.com">
-              <span>Thư điện tử</span>
-              <strong>phantantai1101@gmail.com</strong>
-            </a>
-            <span class="footer-contact-sep" aria-hidden="true"></span>
-            <a href="tel:0911230016">
-              <span>Điện thoại</span>
-              <strong>0911 230 016</strong>
-            </a>
-          </div>
+          </a>
+          <p class="footer-tagline">Dự án nghiên cứu, tài liệu chuyên ngành và kinh nghiệm khảo sát địa chất – địa vật lý.</p>
         </div>
 
-        <nav class="footer-links" aria-label="Điều hướng cuối trang">
+        <nav class="footer-col footer-links" aria-label="Điều hướng cuối trang">
+          <h3 class="footer-title">Điều hướng</h3>
           <a href="#about">Giới thiệu</a>
           <a href="#projects">Dự án</a>
           <a href="#assignments">Bài tập</a>
           <a href="#contact">Liên hệ</a>
           <a href="#geo-ai">Trợ lý ảo</a>
-          <a href="admin-login.html">Quản trị</a>
         </nav>
+
+        <div class="footer-col footer-contact-v2" aria-label="Thông tin liên hệ">
+          <h3 class="footer-title">Liên hệ</h3>
+          <a href="mailto:phantantai1101@gmail.com"><svg class="ft-ico" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="m4 7 8 6 8-6"/></svg><span><small>Thư điện tử</small><strong>phantantai1101@gmail.com</strong></span></a>
+          <a href="tel:0911230016"><svg class="ft-ico" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 4h3.5l1.7 4.3-2.2 1.4a11 11 0 0 0 6.3 6.3l1.4-2.2L20 15.5V19a1.5 1.5 0 0 1-1.6 1.5A16.5 16.5 0 0 1 3.5 5.6 1.5 1.5 0 0 1 5 4z"/></svg><span><small>Điện thoại</small><strong>0911 230 016</strong></span></a>
+        </div>
       </div>
 
       <div class="footer-bottom">
         <p>© 2026 Phan Tấn Tài · Academic Geoscience Portfolio</p>
-        <a href="#home">Lên đầu trang ↑</a>
+        <div class="footer-bottom-links">
+          <a href="admin-login.html">Quản trị</a>
+          <a class="footer-top" href="#home">Lên đầu trang <svg class="ft-ico" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 19V5M6 11l6-6 6 6"/></svg></a>
+        </div>
       </div>
     </div>
   </footer>
@@ -4212,6 +4294,6 @@ if('serviceWorker' in navigator){
   if(img.complete&&img.naturalWidth)start();else img.addEventListener('load',start,{once:true});
 })();
 </script>
-<script src="assets/site-language.js?v=20261028-perf2" defer></script>
+<script src="assets/site-language.js?v=20261029-hf2" defer></script>
 </body>
 </html>
