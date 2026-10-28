@@ -1804,13 +1804,14 @@ function closeSubjectModal(){ subjectModal.classList.remove('open');subjectModal
 $('#manageSubjectsBtn')?.addEventListener('click',openSubjectModal);$('#subjectModalClose')?.addEventListener('click',closeSubjectModal);subjectModal?.addEventListener('click',e=>{if(e.target===subjectModal)closeSubjectModal();});
 $('#subjectForm')?.addEventListener('submit',async event=>{
   event.preventDefault();
+  const form=event.currentTarget; // giữ lại trước await: sau await, event.currentTarget là null
   const name=$('#subjectName').value.trim(); const slug=subjectSlug(name);
   if(name.length<2||!slug){$('#subjectStatus').textContent='Tên môn học chưa hợp lệ.';return;}
   if(subjects.some(s=>s.slug===slug)){ $('#subjectStatus').textContent='Môn học này đã tồn tại.'; return; }
   const sortOrder=subjects.reduce((m,s)=>Math.max(m,s.sortOrder||0),0)+10;
   const {error}=await sb.from('assignment_subjects').insert({slug,name,sort_order:sortOrder,active:true});
   if(error){$('#subjectStatus').textContent=error.message;return;}
-  event.currentTarget.reset();$('#subjectStatus').textContent='Đã thêm môn học.';
+  form.reset();$('#subjectStatus').textContent='Đã thêm môn học.';
   await loadAdminData();notifyPublicContentChanged('assignment_subjects');renderSubjects();
 });
 
