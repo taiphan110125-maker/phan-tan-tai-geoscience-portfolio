@@ -39,13 +39,11 @@ Tài liệu bàn giao, cập nhật **28/10/2026**. Đây là điểm vào; chi 
 | Trang quản trị khi đã đăng nhập | Chỉ đọc mã | Chưa đăng nhập thử |
 | Đăng ký, đăng nhập, gửi nhận xét/thảo luận/liên hệ trên production | Chưa thử | Không ghi dữ liệu thật khi chưa được phép |
 
-## Quyền truy cập còn thiếu
+## Quyền truy cập
 
-| Cần | Cách kết nối an toàn |
-| --- | --- |
-| GitHub (push nhánh, mở Pull Request) | Liên kết GitHub tại claude.ai › Settings › Connectors, cấp quyền ghi cho repository này |
+GitHub (quyền ghi qua ứng dụng Claude), Supabase và Render đã kết nối qua OAuth ngày 28/10/2026. Không gửi `service_role`, `sb_secret`, access token hay mật khẩu vào cuộc trò chuyện.
 
-Supabase và Render đã kết nối qua OAuth (28/10/2026). Không gửi `service_role`, `sb_secret`, access token hay mật khẩu vào cuộc trò chuyện.
+Để kiểm thử các luồng có đăng nhập (trang quản trị, nhận xét riêng) mà không chạm dữ liệu thật, cần một tài khoản thử riêng hoặc một nhánh Supabase thử nghiệm.
 
 ## Nguyên tắc làm việc
 
