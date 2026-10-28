@@ -1,0 +1,29 @@
+# Tự động deploy lên Render mỗi khi có code mới trên nhánh main.
+# Cần secret RENDER_DEPLOY_HOOK_URL (Render → Settings → Deploy Hook) trong
+# GitHub → Settings → Secrets and variables → Actions. Không ghi link vào mã nguồn.
+name: Deploy Render
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: render-deploy
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Gọi Deploy Hook của Render
+        env:
+          HOOK: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+        run: |
+          if [ -z "$HOOK" ]; then
+            echo "::error::Chưa có secret RENDER_DEPLOY_HOOK_URL"; exit 1
+          fi
+          curl -fsS -X POST "$HOOK" -o /dev/null -w "Render trả về HTTP %{http_code}\n"
