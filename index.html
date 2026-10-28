@@ -3198,11 +3198,12 @@ async function openProjectReport(projectId,index){
   const file=project?.reportFiles?.[Number(index)];
   if(!file){ showToast('Không tìm thấy file báo cáo.'); return; }
   try{
+    // Bucket "project-reports" là công khai: dùng URL công khai thay cho signed URL.
     let target=file.url || '';
-    if(file.path && sb){
-      const {data,error}=await sb.storage.from('project-reports').createSignedUrl(file.path,120);
-      if(error || !data?.signedUrl) throw error || new Error('File báo cáo không còn trong Storage.');
-      target=data.signedUrl;
+    if(file.path){
+      const cfg=window.PTT_CONFIG||{};
+      const encoded=String(file.path).split('/').map(encodeURIComponent).join('/');
+      target=`${cfg.SUPABASE_URL}/storage/v1/object/public/project-reports/${encoded}`;
     }
     if(!target) throw new Error('File báo cáo chưa có đường dẫn.');
     const opened=window.open(target,'_blank','noopener');

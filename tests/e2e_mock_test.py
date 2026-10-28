@@ -368,6 +368,18 @@ def public_suite(browser, base, mobile, lang):
     page.wait_for_timeout(600)
     check(row(fake, 'messages', email='khach@example.test') is not None, f'{tag} không gửi được liên hệ')
 
+    # Mở báo cáo dự án: phải dùng URL công khai, không gọi signed URL
+    proj = fake.db['projects'][0]
+    proj['report_files'] = [{'name': 'bao-cao.pdf', 'type': 'PDF', 'path': f'{proj["id"]}/1-bao-cao.pdf', 'url': ''}]
+    page.evaluate("loadPublicContent({silent:true})")
+    page.wait_for_function("projects[0] && projects[0].reportFiles.length === 1")
+    page.evaluate("() => { window.__opened = []; window.open = function (u) { window.__opened.push(String(u)); return {}; }; }")
+    page.evaluate("() => openProjectReport(projects[0].id, 0)")
+    page.wait_for_timeout(300)
+    opened = page.evaluate("window.__opened")
+    check(opened and '/storage/v1/object/public/project-reports/' in opened[0],
+          f'{tag} báo cáo dự án không mở bằng URL công khai: {opened}')
+
     # Trợ lý ảo: backend và dự phòng
     page.click('#aiFab')
     page.fill('#aiInput', 'Website có những dự án nào?')
@@ -392,6 +404,11 @@ def public_suite(browser, base, mobile, lang):
     page.goto(base + '/assignment-viewer.html?id=' + with_file['id'])
     page.wait_for_selector('#previewShell iframe', timeout=15000)
     check(page.get_attribute('#downloadBtn', 'aria-disabled') == 'false', f'{tag} viewer: nút tải chưa bật')
+    src = page.get_attribute('#previewShell iframe', 'src') or ''
+    check('/storage/v1/object/public/assignments/' in src or 'officeapps' in src and
+          'object%2Fpublic%2Fassignments' in src, f'{tag} viewer không dùng URL công khai: {src[:120]}')
+    check('download=' in (page.get_attribute('#downloadBtn', 'href') or ''), f'{tag} viewer: link tải thiếu download=')
+    check(not any('/object/sign/' in path for _, path in fake.calls), f'{tag} viewer vẫn gọi signed URL')
     check(page.evaluate(OVERFLOW_JS) <= 1, f'{tag} viewer tràn ngang')
     check(not errors, f'{tag} viewer lỗi JavaScript: {errors}')
     ctx.close()
