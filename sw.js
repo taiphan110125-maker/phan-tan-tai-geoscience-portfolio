@@ -1,6 +1,6 @@
 'use strict';
 
-const CACHE_NAME='ptt-static-v24-20261028';
+const CACHE_NAME='ptt-static-v25-20261029';
 const PRECACHE=[
   '/',
   '/index.html',
@@ -12,7 +12,7 @@ const PRECACHE=[
   '/assets/assignments-review.svg',
   '/assets/geo-ai.svg',
   '/assets/vendor/supabase-js-2.117.2.js?v=2.117.2',
-  '/assets/site-language.js?v=20261028-perf2'
+  '/assets/site-language.js?v=20261029-hf2'
 ];
 
 self.addEventListener('install',event=>{
