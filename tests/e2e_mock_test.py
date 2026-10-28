@@ -371,6 +371,18 @@ def public_suite(browser, base, mobile, lang):
     check(row(fake, 'academic_chat_messages', body='Tin nhắn thảo luận kiểm thử.') is not None,
           f'{tag} không gửi được thảo luận')
 
+    # Máy chủ từ chối vì gửi quá nhanh: phải báo đúng ngôn ngữ, không báo lỗi chung chung
+    limit_msg = {'vi': 'Bạn gửi quá nhanh. Vui lòng chờ một lúc rồi thử lại.',
+                 'en': 'You are sending too quickly. Please wait a moment and try again.',
+                 'fr': 'Vous envoyez trop rapidement. Veuillez patienter un moment puis réessayer.'}[lang]
+    fake.limited_tables.add('academic_chat_messages')
+    page.fill('#academicChatMessage', 'Tin nhắn thứ hai bị giới hạn.')
+    page.click('#academicChatForm button[type=submit]')
+    page.wait_for_function("!/Đang gửi|Sending|Envoi/.test(document.getElementById('academicChatStatus').textContent)")
+    check(page.text_content('#academicChatStatus').strip() == limit_msg,
+          f'{tag} thông báo giới hạn thảo luận sai: {page.text_content("#academicChatStatus")!r}')
+    fake.limited_tables.clear()
+
     # Liên hệ
     page.fill('#contactForm input[name=name]', 'Khách liên hệ')
     page.fill('#contactForm input[name=email]', 'khach@example.test')
@@ -378,6 +390,16 @@ def public_suite(browser, base, mobile, lang):
     page.evaluate("document.getElementById('contactForm').requestSubmit()")
     page.wait_for_timeout(600)
     check(row(fake, 'messages', email='khach@example.test') is not None, f'{tag} không gửi được liên hệ')
+    fake.limited_tables.add('messages')
+    page.evaluate("localStorage.removeItem('ptt-contact-last')")
+    page.fill('#contactForm input[name=name]', 'Khách liên hệ')
+    page.fill('#contactForm input[name=email]', 'khach2@example.test')
+    page.fill('#contactForm textarea[name=message]', 'Nội dung liên hệ lần hai.')
+    page.evaluate("document.getElementById('contactForm').requestSubmit()")
+    page.wait_for_timeout(600)
+    check(page.text_content('#contactStatus').strip() == limit_msg,
+          f'{tag} thông báo giới hạn liên hệ sai: {page.text_content("#contactStatus")!r}')
+    fake.limited_tables.clear()
 
     # Mở báo cáo dự án: phải dùng URL công khai, không gọi signed URL
     proj = fake.db['projects'][0]

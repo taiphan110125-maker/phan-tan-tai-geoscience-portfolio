@@ -47,6 +47,7 @@ class FakeSupabase:
         self.writes = []         # (method, table/bucket, body)
         self.unexpected = []
         self.fail_functions = set()
+        self.limited_tables = set()  # bảng đang mô phỏng lỗi giới hạn tần suất từ trigger
         self.users = {}
         self.tokens = {}
         admin = self.add_user(admin_email, admin_password, 'Quản trị thử', role='admin')
@@ -227,6 +228,9 @@ class FakeSupabase:
             return self.respond(route, 401, {'code': '42501', 'message': 'permission denied (kiểm thử)'})
 
         body = json.loads(req.post_data or 'null')
+        if req.method == 'POST' and table in self.limited_tables:
+            return self.respond(route, 400, {'code': 'P0001', 'message': 'rate_limit_exceeded',
+                                             'hint': 'Gửi quá nhanh. Vui lòng thử lại sau.', 'details': None})
         self.writes.append((req.method, table, body))
         if req.method == 'POST':
             items = body if isinstance(body, list) else [body]

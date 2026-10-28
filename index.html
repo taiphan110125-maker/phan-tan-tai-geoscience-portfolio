@@ -2809,6 +2809,13 @@ function requireSupabase(){ if (!sb) throw configurationError(); return sb; }
 const CONTACT_TOPIC_VALUES=Object.freeze(['Trao đổi học thuật','Góp ý bài tập','Hợp tác nghiên cứu','Khác']);
 const COMMENT_ROLE_VALUES=Object.freeze(['Giảng viên','Sinh viên','Khách']);
 function isAllowedValue(value,allowed){ return typeof value==='string'&&allowed.includes(value); }
+// Lỗi giới hạn tần suất do máy chủ trả về (trigger private.enforce_insert_rate_limit)
+function serverLimitMessage(error){
+  const raw=String(error?.message||'');
+  if(raw.includes('rate_limit_exceeded'))return 'Bạn gửi quá nhanh. Vui lòng chờ một lúc rồi thử lại.';
+  if(raw.includes('duplicate_content'))return 'Nội dung này vừa được gửi. Vui lòng không gửi lặp lại.';
+  return '';
+}
 function formatDate(value){
   if (!value) return '';
   try { return new Date(value).toLocaleDateString('vi-VN', {month:'2-digit', year:'numeric'}); }
@@ -3433,7 +3440,7 @@ $('#academicChatForm')?.addEventListener('submit',async event=>{
   }catch(error){
     pendingOwnChatKey='';
     console.warn('Không gửi được tin nhắn:',error);
-    status.textContent='Không gửi được tin nhắn. Vui lòng thử lại.';
+    status.textContent=serverLimitMessage(error)||'Không gửi được tin nhắn. Vui lòng thử lại.';
   }finally{
     button.disabled=false;
   }
@@ -3476,7 +3483,7 @@ $('#contactForm')?.addEventListener('submit', async event => {
     localStorage.setItem('ptt-contact-last',String(Date.now()));
     $('#contactStatus').textContent = 'Đã gửi lời nhắn thành công.';
     showToast('Đã ghi nhận lời nhắn');
-  } catch (error){ console.warn('Không gửi được lời nhắn:',error); $('#contactStatus').textContent = 'Không gửi được lời nhắn. Vui lòng thử lại.'; }
+  } catch (error){ console.warn('Không gửi được lời nhắn:',error); $('#contactStatus').textContent = serverLimitMessage(error)||'Không gửi được lời nhắn. Vui lòng thử lại.'; }
   finally { submit.disabled = false; }
 });
 
@@ -3985,7 +3992,7 @@ document.addEventListener('keydown', event => { if (event.key === 'Escape') $$('
 <script>
 if('serviceWorker' in navigator){
   window.addEventListener('load',()=>{
-    navigator.serviceWorker.register('/sw.js?v=20261028-perf2',{scope:'/',updateViaCache:'none'})
+    navigator.serviceWorker.register('/sw.js?v=20261028-ratelimit1',{scope:'/',updateViaCache:'none'})
       .then(registration=>registration.update())
       .catch(error=>console.warn('Service worker unavailable:',error));
   },{once:true});
@@ -3993,6 +4000,6 @@ if('serviceWorker' in navigator){
 </script>
 
 
-<script src="assets/site-language.js?v=20261028-perf2" defer></script>
+<script src="assets/site-language.js?v=20261028-ratelimit1" defer></script>
 </body>
 </html>

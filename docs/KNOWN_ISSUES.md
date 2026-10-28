@@ -32,7 +32,7 @@ Cập nhật 28/10/2026. Mức ưu tiên: **P1** xử lý trước mọi phát t
 | P-07 | Cloudflare trả `max-age=0` cho cả ảnh và JS | Trình duyệt chưa có service worker kiểm tra lại mọi file mỗi lần |
 | D-01 | Phông Be Vietnam Pro và Source Serif 4 khai báo nhưng không được tải | Chữ hiển thị khác nhau giữa Windows, macOS, Android |
 | S-04 | Chưa có header `Content-Security-Policy`, `frame-ancestors`/`X-Frame-Options`; supabase-js từ CDN không có kiểm tra toàn vẹn (SRI) | Giảm lớp phòng vệ |
-| S-05 | Chống spam cho thảo luận công khai và form liên hệ chỉ có ở trình duyệt (đăng ký và trợ lý ảo đã có giới hạn phía server) | Có thể bị gửi hàng loạt |
+| S-05 | Chống spam cho thảo luận công khai và form liên hệ chỉ có ở trình duyệt (đăng ký và trợ lý ảo đã có giới hạn phía server) | Có thể bị gửi hàng loạt — **Đã sửa** 28/10/2026: trigger giới hạn theo IP (thảo luận 5 tin/phút, 30 tin/giờ; liên hệ 3 lần/10 phút, 10 lần/ngày), chặn nội dung trùng trong 10 phút; IP chỉ lưu dạng băm |
 | S-06 | Tắt "Leaked Password Protection" của Supabase Auth (cảnh báo của Supabase Advisor) | Người dùng đặt được mật khẩu đã bị lộ — tính năng chỉ có từ gói Pro; dự án đang dùng gói Free |
 | S-07 | Quyền bảng (GRANT) cho `anon`/`authenticated` ở mức mặc định rộng | Giảm lớp phòng vệ — **Một phần đã sửa** 28/10/2026: thu hồi TRUNCATE, TRIGGER, REFERENCES; SELECT/INSERT/UPDATE/DELETE vẫn do RLS chặn |
 | D-03 | Thêm môn học trong admin: lưu được nhưng danh sách không cập nhật, form không xóa (`event.currentTarget` dùng sau `await`) | Dễ bấm lại, báo trùng | **Đã sửa** (PR #3, đã deploy) |
