@@ -300,19 +300,12 @@
         return;
       }
 
-      let previewUrl=a.file_url||'';
-      let downloadUrl=a.file_url||'';
-      if(a.file_path && sb){
-        const [previewRes,downloadRes]=await Promise.all([
-          sb.storage.from('assignments').createSignedUrl(a.file_path,3600),
-          sb.storage.from('assignments').createSignedUrl(a.file_path,3600,{download:a.file_name||true})
-        ]);
-        if(previewRes.error||!previewRes.data?.signedUrl) throw previewRes.error||new Error('Không tạo được đường dẫn xem trước.');
-        previewUrl=previewRes.data.signedUrl;
-        downloadUrl=downloadRes.data?.signedUrl||previewUrl;
-      }else if(a.file_path && !previewUrl){
-        previewUrl=publicAssignmentUrl(a.file_path);
-        downloadUrl=previewUrl;
+      // Bucket "assignments" là công khai: mở file bằng URL công khai, không cần
+      // signed URL (signed URL đòi quyền SELECT trên storage.objects cho khách).
+      let previewUrl=a.file_path ? publicAssignmentUrl(a.file_path) : (a.file_url||'');
+      let downloadUrl=previewUrl;
+      if(a.file_path){
+        downloadUrl=previewUrl+'?download='+encodeURIComponent(a.file_name||'');
       }
 
       const download=$('#downloadBtn');
