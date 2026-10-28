@@ -9,7 +9,7 @@ Mỗi bước là một nhánh và một Pull Request riêng, có kiểm thử v
 | 0.1 | Gắn tag `baseline-2026-10-28`; merge bộ tài liệu này | — |
 | 0.2 | Lưu 26 migration và mã 3 Edge Functions vào `supabase/` (chỉ lưu, không áp dụng) | Q-08 |
 | 0.3 | Bật Pull Request Previews trên Render | Kiểm thử trước khi merge |
-| 0.4 | Migration bảo mật (mỗi mục có script áp dụng + hoàn tác, thử trên nhánh/dự án Supabase riêng, chờ duyệt): bỏ quyền liệt kê Storage, làm chặt quy tắc gán admin, thêm policy UPDATE cho metadata `comments`, thu hẹp GRANT, bật Leaked Password Protection | S-01, S-03, S-06, S-07, D-02 |
+| 0.4 | **Đã xong 28/10/2026:** migration `security_hardening_20261028` (bỏ quyền liệt kê Storage, bỏ gán admin theo email, policy UPDATE `comments`, thu hồi TRUNCATE/TRIGGER/REFERENCES); có script hoàn tác lưu riêng. Còn lại: Leaked Password Protection (cần gói Pro) | S-01, S-03, S-07, D-02 (S-06 còn mở) |
 | 0.5 | Giới hạn tần suất phía server cho thảo luận công khai và form liên hệ | S-05 |
 
 ## Giai đoạn 1 — Sửa lỗi và tốc độ (chỉ frontend)

@@ -41,7 +41,7 @@ Giá trị chuẩn ghi vào database (không phụ thuộc ngôn ngữ giao di�
 | Đối tượng | Loại | Vai trò |
 | --- | --- | --- |
 | `private.is_admin()` | Function `SECURITY DEFINER`, `search_path` cố định | Trả `true` nếu `profiles.role = 'admin'` cho `auth.uid()`; dùng trong hầu hết policy |
-| `public.handle_new_user()` | Trigger `AFTER INSERT` trên `auth.users` (`on_auth_user_created`) | Tạo hàng `profiles`; gán quyền admin cho tài khoản chủ website theo quy tắc cố định |
+| `public.handle_new_user()` | Trigger `AFTER INSERT` trên `auth.users` (`on_auth_user_created`) | Tạo hàng `profiles` với vai trò `user` cho mọi tài khoản mới (từ 28/10/2026). Admin chỉ được cấp bằng SQL thủ công |
 | `public.touch_assignment_subject_updated_at()` | Trigger `BEFORE UPDATE` trên `assignment_subjects` | Cập nhật `updated_at` |
 
 Không có trigger cập nhật `updated_at` cho `projects`/`assignments`; frontend tự gửi giá trị.
@@ -53,14 +53,14 @@ Không có trigger cập nhật `updated_at` cho `projects`/`assignments`; front
 | `projects`, `assignments` | Đọc khi `published` và chưa xóa | Như khách | Đọc tất cả, thêm, sửa, xóa |
 | `assignment_subjects` | Đọc khi `active` | Như khách | Đọc tất cả, thêm, sửa, xóa |
 | `site_settings` | Đọc | Đọc | Thêm, sửa, xóa |
-| `comments` | Không có quyền bảng | Thêm khi `user_id = auth.uid()` và bài tập đang công bố; đọc của chính mình | Đọc tất cả, xóa |
+| `comments` | Không có quyền bảng | Thêm khi `user_id = auth.uid()` và bài tập đang công bố; đọc của chính mình | Đọc tất cả, sửa, xóa |
 | `academic_chat_messages` | Đọc; thêm với `user_id` rỗng | Đọc; thêm với `user_id` rỗng hoặc của chính mình | Xóa |
 | `messages` | Thêm | Thêm | Đọc, xóa |
 | `profiles` | — | Đọc hàng của mình; sửa hàng của mình nhưng **không được đổi `role` khác `user`** | Đọc tất cả |
 | `admin_notification_state` | — | — | Đọc, thêm, sửa hàng của mình |
 | `signup_rate_limits`, `geo_ai_rate_limits` | Chặn hoàn toàn | Chặn hoàn toàn | Chỉ Edge Function (service role) |
 
-Ghi chú: quyền bảng (GRANT) cho `anon`/`authenticated` đang ở mức mặc định của Supabase (gồm cả UPDATE/DELETE/TRUNCATE); RLS là lớp chặn thực tế. Cập nhật `comments` không có policy, nên frontend admin không sửa được metadata nhận xét qua API (lỗi được bỏ qua).
+Ghi chú: từ 28/10/2026, `anon`/`authenticated` không còn quyền TRUNCATE, TRIGGER, REFERENCES; các quyền SELECT/INSERT/UPDATE/DELETE còn lại do RLS chặn.
 
 ## Storage
 
@@ -71,7 +71,7 @@ Ghi chú: quyền bảng (GRANT) cho `anon`/`authenticated` đang ở mức mặ
 | `project-images` | Có | 6 MB | JPEG, PNG, WebP | 2 |
 | `site-images` | Có | 8 MB | JPEG, PNG, WebP | 1 |
 
-Policy `storage.objects`: mọi người được SELECT trong 4 bucket; chỉ admin được INSERT/UPDATE/DELETE. Đường dẫn file:
+Policy `storage.objects` (từ 28/10/2026): **chỉ admin** được SELECT/INSERT/UPDATE/DELETE. Khách không liệt kê được tên file, nhưng vẫn mở file qua URL công khai `/storage/v1/object/public/<bucket>/<đường dẫn>` vì 4 bucket đều công khai. Trang công khai không được dùng signed URL. Đường dẫn file:
 
 | Bucket | Đường dẫn |
 | --- | --- |
@@ -100,7 +100,7 @@ Bảng được phát qua `supabase_realtime`: `projects`, `assignments`, `comme
 
 ## Migration
 
-26 migration (28/09 → 30/09/2026), áp dụng trực tiếp trên dự án, chưa có trong repository. Mốc chính: `initial_portfolio_schema`, `harden_admin_rls_functions`, `bootstrap_owner_admin_email`, `assignments_use_calendar_date`, `preserve_academic_discussions`, `academic_live_chat`, `add_site_settings_and_about_image_admin`, `add_signup_rate_limit_table`, `add_admin_notification_state`, `add_content_trash_soft_delete`, `harden_public_content_and_trash_indexes`.
+27 migration (28/09 → 28/10/2026), áp dụng trực tiếp trên dự án, chưa có trong repository; mới nhất: `security_hardening_20261028`. Mốc chính: `initial_portfolio_schema`, `harden_admin_rls_functions`, `bootstrap_owner_admin_email`, `assignments_use_calendar_date`, `preserve_academic_discussions`, `academic_live_chat`, `add_site_settings_and_about_image_admin`, `add_signup_rate_limit_table`, `add_admin_notification_state`, `add_content_trash_soft_delete`, `harden_public_content_and_trash_indexes`.
 
 ## Cảnh báo từ Supabase Advisor (28/10)
 
