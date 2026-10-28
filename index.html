@@ -2300,7 +2300,12 @@ body{color:var(--ink-strong)!important}
 <style id="ptt-layout-polish-v1">
 /* Đồng bộ bố cục: tiêu đề các phần cùng cỡ chữ + vạch nhấn vàng, phần Trợ lý ảo cân đối,
    số liệu 3 cột trên điện thoại. Chỉ thay đổi giao diện, không đổi nội dung/chức năng. */
-main section:not(.hero) h2{
+#highlights .section-head h2,
+#about .about-copy h2,
+#projects .section-head h2,
+#assignments .section-head h2,
+#contact .contact-copy h2,
+#geo-ai .ai-copy h2.ai-simple-title{
   font-size:clamp(38px,4.1vw,54px)!important;
   line-height:1.06!important;
   letter-spacing:-.035em!important;
@@ -2325,7 +2330,7 @@ main section:not(.hero) h2::before{
   #geo-ai .ai-media{height:280px!important}
 }
 @media(max-width:700px){
-  main section:not(.hero) h2{font-size:31px!important}
+  #highlights .section-head h2,#about .about-copy h2,#projects .section-head h2,#assignments .section-head h2,#contact .contact-copy h2,#geo-ai .ai-copy h2.ai-simple-title{font-size:31px!important}
   main section:not(.hero) h2::before{width:38px;margin-bottom:14px}
   #geo-ai .ai-media{height:220px!important}
   #about .stats-row{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:8px!important}
